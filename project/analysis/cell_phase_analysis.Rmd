@@ -1,0 +1,523 @@
+---
+title: "iPSC clustering and cell cycle phase matching"
+author: "Kushal K Dey, Joyce H. Siao"
+date: "July 13, 2015"
+output: html_document
+---
+
+```{r packages, echo=FALSE, eval=TRUE}
+suppressMessages(suppressWarnings(library(data.table)))
+suppressMessages(suppressWarnings(library(maptpx)))
+suppressMessages(suppressWarnings(library(gplots)))
+suppressMessages(suppressWarnings(library(philentropy)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(edgeR)))
+
+
+```
+
+The main focus of this script is to perform a clustering of iPSC using Structure and then trying to figure out if that clustering corresponds to the cell cycle phases as obtained by John Blischak. We first use his code to filter out the data set for both reads and molecules so as to remove the "drop-outs" cells and genes that are not expressed.
+
+
+- read the reads and molecules files 
+
+```{r echo=TRUE, eval=TRUE}
+
+#setwd('/Users/kushal/Documents/Matthew Stephens Project/counts_clustering/Single_Cell_seq_Blischak/src/');
+reads <- data.frame(fread('../data/reads.txt'),row.names=1);
+molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
+
+```
+
+- read the quality check file and the annotation file
+
+```{r echo=TRUE, eval=TRUE}
+quality_single_cells <- scan("../data/quality-single-cells.txt",
+                             what = "character")
+
+anno <- data.frame(fread('../data/annotation.txt'));
+```
+
+- Removing the non single cells or bulk data
+
+```{r, echo=TRUE, eval=TRUE}
+molecules <- molecules[, grepl("bulk", colnames(molecules)) |
+                         colnames(molecules) %in% quality_single_cells]
+anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
+stopifnot(ncol(molecules) == nrow(anno),
+          colnames(molecules) == anno$sample_id)
+
+reads <- reads[, grepl("bulk", colnames(reads)) |
+                         colnames(reads) %in% quality_single_cells]
+stopifnot(ncol(reads) == nrow(anno),
+          colnames(reads) == anno$sample_id)
+```
+
+- Filtering out gens with zero counts in single cells/ bulk.
+
+```{r, echo=TRUE, eval=TRUE}
+expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
+             rowSums(molecules[, anno$well != "bulk"]) > 0
+molecules <- molecules[expressed, ]
+dim(molecules)
+
+expressed <- rowSums(reads[, anno$well == "bulk"]) > 0 &
+             rowSums(reads[, anno$well != "bulk"]) > 0
+reads <- reads[expressed, ]
+dim(reads)
+
+molecules_single <- molecules %>% select(-contains("bulk"))
+reads_single <- reads %>% select(-contains("bulk"))
+
+## Remove genes with max molecule numer larger than 1024
+
+molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+
+
+```
+
+- Obtain cell cycle information for the genes
+
+```{r echo=TRUE, eval=TRUE}
+
+cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
+
+## create 5 lists of 5 phases (de-level and then remove "")
+cell_cycle_genes_list <- lapply(1:5,function(x){
+  temp <- as.character(cell_cycle_genes[,x])
+  temp[temp!=""]
+})
+
+
+```
+
+- Obtain phase scores for each sample
+
+```{r echo=TRUE, eval=TRUE}
+
+ans <-
+sapply(cell_cycle_genes_list,function(xx){
+  #### create table of each phase
+  reads_single_phase <- reads_single[rownames(reads_single) %in% unlist(xx) ,]
+  #### add average expression of all genes in the phase
+  combined_matrix <- rbind(reads_single_phase,average=apply(reads_single_phase,2,mean))
+  #### use transpose to compute cor matrix
+  cor_matrix <- cor(t(combined_matrix))
+  #### take the numbers
+  cor_vector <- cor_matrix[,dim(cor_matrix)[1]]
+  #### restrict to correlation >= 0.3 
+  reads_single_phase_restricted <- reads_single_phase[rownames(reads_single_phase) %in% names(cor_vector[cor_vector >= 0.3]),]
+  #### apply normalization to reads
+  norm_factors_single <- calcNormFactors(reads_single_phase_restricted, method = "TMM")
+  reads_single_cpm <- cpm(reads_single_phase_restricted, log = TRUE,
+                            lib.size = colSums(reads_single) * norm_factors_single)
+  #### output the phase specific scores (mean of normalized expression levels in the phase)
+  apply(reads_single_cpm,2,mean)
+
+})
+
+head(ans)
+
+
+```
+
+
+- Two step normalization of phase-specific scores
+
+```{r echo=TRUE, eval=TRUE}
+
+#### normalization function
+flexible_normalization <- function(data_in,by_row=TRUE){
+  if(by_row){
+    row_mean <- apply(data_in,1,mean)
+    row_sd   <- apply(data_in,1,sd)
+    output <- data_in
+    for(i in 1:dim(data_in)[1]){
+      output[i,] <- (data_in[i,] - row_mean[i])/row_sd[i]
+    }
+  }
+  #### if by column
+  if(!by_row){
+    col_mean <- apply(data_in,2,mean)
+    col_sd   <- apply(data_in,2,sd)
+    output <- data_in
+    for(i in 1:dim(data_in)[2]){
+      output[,i] <- (data_in[,i] - col_mean[i])/col_sd[i]
+    }
+  }
+  output
+}
+
+#### apply the normalization function
+## first normalized for each phase
+ans_normed <- flexible_normalization(ans,by_row=FALSE)
+## then normalized of each cell
+ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
+
+head(ans_normed_normed)
+
+```
+
+- Assign cell phase for each cell
+
+```{r echo=TRUE, eval=TRUE}
+
+cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
+assign_cell_phase <- data.frame(cell_phase)
+
+
+```
+
+We check from here on if these cell phases show up in the Structure clustering.
+
+We perform Structure plots on the reads data for $K=5,6,7$ and also compare the model fit for different clusters using Bayes factor. 
+
+```{r echo=FALSE, eval=FALSE}
+K=6;
+Topic_Clus_reads <- topics(t(reads_single),K=6,tol=0.003);
+
+write.table(Topic_Clus_reads$omega,paste0('../data_derived/topic_omega_reads_clus_',K,'.txt'));
+
+write.table(Topic_Clus_reads$theta,paste0('../data_derived/topic_theta_reads_clus_',K,'.txt'));
+
+
+```
+
+## Cell cycle effects (reads)
+
+```{r echo=FALSE, eval=TRUE}
+
+ structure_cell_cycle <- function(clus=6,cell_phase)
+{
+  
+  docweights_reads <-read.table(paste0('../data_derived/topic_omega_reads_clus_',clus,'.txt'));
+  
+ color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  cell_phase_ordered <- cell_phase[order(cell_phase)];
+  
+  docweights_reads_ordered = docweights_reads[order(cell_phase),];
+
+barplot(t(docweights_reads_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(cell_phase_ordered), cell_phase_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_reads_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(cell_phase_ordered),las=2);
+
+}
+
+structure_cell_cycle(clus=5,as.vector(as.matrix(assign_cell_phase)))
+structure_cell_cycle(clus=6,as.vector(as.matrix(assign_cell_phase)))
+structure_cell_cycle(clus=7,as.vector(as.matrix(assign_cell_phase)))
+
+
+```
+
+
+## Individual effects (reads)
+
+```{r echo=FALSE, eval=TRUE}
+
+subgroup_id =colnames(reads_single);
+
+individual_effect = unlist(lapply(strsplit(subgroup_id, "\\."), function(x) x[1]));
+
+
+  
+structure_individual <- function(clus=6,individual)
+{
+  
+  docweights_reads <-read.table(paste0('../data_derived/topic_omega_reads_clus_',clus,'.txt'));
+  
+  color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  individual_ordered <- individual[order(individual)];
+  
+  docweights_reads_ordered = docweights_reads[order(individual),];
+
+barplot(t(docweights_reads_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(individual_ordered), individual_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_reads_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(individual_ordered),las=2);
+
+}
+
+structure_individual(clus=5,individual_effect)
+structure_individual(clus=6,individual_effect)
+structure_individual(clus=7,individual_effect)
+
+
+
+
+```
+
+## Batch effects (reads)
+
+```{r echo=FALSE, eval=TRUE}
+
+subgroup_id =colnames(reads_single);
+
+batch_effect = unlist(lapply(strsplit(subgroup_id, "\\."), function(x) x[2]));
+
+structure_batch <- function(clus=6,batch)
+{
+  docweights_reads <-read.table(paste0('../data_derived/topic_omega_reads_clus_',clus,'.txt'));
+  
+  color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  batch_ordered <- batch[order(batch)];
+  
+  docweights_reads_ordered = docweights_reads[order(batch),];
+
+barplot(t(docweights_reads_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(batch_ordered), batch_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_reads_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(batch_ordered),las=2);
+
+}
+
+structure_batch(clus=5,batch_effect)
+structure_batch(clus=6,batch_effect)
+structure_batch(clus=7,batch_effect)
+
+```
+
+## Well effect (reads)
+
+```{r echo=FALSE, eval=TRUE}
+
+subgroup_id =colnames(reads_single);
+
+well_effect = substring(unlist(lapply(strsplit(subgroup_id, "\\."), function(x) x[3])),1,1);
+
+structure_well <- function(clus=6,well)
+{
+  docweights_reads <-read.table(paste0('../data_derived/topic_omega_reads_clus_',clus,'.txt'));
+  
+  color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  well_ordered <- well[order(well)];
+  
+  docweights_reads_ordered = docweights_reads[order(well),];
+
+barplot(t(docweights_reads_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(well_ordered), well_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_reads_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(well_ordered),las=2);
+
+}
+
+structure_well(clus=5,well_effect)
+structure_well(clus=6,well_effect)
+structure_well(clus=7,well_effect)
+
+```
+
+
+# Molecules Data
+
+Above we focused only on the reads data. In this section, we shall focus on the molecules data which is the set of reads that were tagged by UMI. We do expect similar output for the molecules data. However the numbe rof molecules is always less than the number of reads and the molcules data is sparser. 
+
+```{r, echo=FALSE, eval=FALSE}
+
+K=6;
+
+Topic_Clus_molecules <- topics (t(molecules_single), K=6, tol=0.003);
+
+write.table(Topic_Clus_molecules$omega,paste0('../data_derived/topic_omega_molecules_clus_',K,'.txt'));
+
+write.table(Topic_Clus_molecules$theta,paste0('../data_derived/topic_theta_molecules_clus_',K,'.txt'));
+
+```
+
+## Cell cycle effects (molecules)
+
+```{r echo=FALSE, eval=TRUE}
+
+ structure_cell_cycle <- function(clus=6,cell_phase)
+{
+  
+  docweights_molecules <-read.table(paste0('../data_derived/topic_omega_molecules_clus_',clus,'.txt'));
+  
+ color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  cell_phase_ordered <- cell_phase[order(cell_phase)];
+  
+  docweights_molecules_ordered = docweights_molecules[order(cell_phase),];
+
+barplot(t(docweights_molecules_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(cell_phase_ordered), cell_phase_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_molecules_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(cell_phase_ordered),las=2);
+
+}
+
+structure_cell_cycle(clus=5,as.vector(as.matrix(assign_cell_phase)))
+structure_cell_cycle(clus=6,as.vector(as.matrix(assign_cell_phase)))
+structure_cell_cycle(clus=7,as.vector(as.matrix(assign_cell_phase)))
+
+
+```
+
+
+## Individual effects (molecules)
+
+```{r echo=FALSE, eval=TRUE}
+
+subgroup_id =colnames(molecules_single);
+
+individual_effect = unlist(lapply(strsplit(subgroup_id, "\\."), function(x) x[1]));
+
+
+  
+structure_individual <- function(clus,individual)
+{
+  
+  docweights_molecules <-read.table(paste0('../data_derived/topic_omega_molecules_clus_',clus,'.txt'));
+  
+  color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  individual_ordered <- individual[order(individual)];
+  
+  docweights_molecules_ordered = docweights_molecules[order(individual),];
+
+barplot(t(docweights_molecules_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(individual_ordered), individual_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_molecules_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(individual_ordered),las=2);
+
+}
+
+structure_individual(clus=5,individual_effect)
+structure_individual(clus=6,individual_effect)
+structure_individual(clus=7,individual_effect)
+
+
+
+
+```
+
+## Batch effects (molecules)
+
+```{r echo=FALSE, eval=TRUE}
+
+subgroup_id =colnames(molecules_single);
+
+batch_effect = unlist(lapply(strsplit(subgroup_id, "\\."), function(x) x[2]));
+
+structure_batch <- function(clus=6,batch)
+{
+  docweights_molecules <-read.table(paste0('../data_derived/topic_omega_molecules_clus_',clus,'.txt'));
+  
+  color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  batch_ordered <- batch[order(batch)];
+  
+  docweights_molecules_ordered = docweights_molecules[order(batch),];
+
+barplot(t(docweights_molecules_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(batch_ordered), batch_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_molecules_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(batch_ordered),las=2);
+
+}
+
+structure_batch(clus=5,batch_effect)
+structure_batch(clus=6,batch_effect)
+structure_batch(clus=7,batch_effect)
+
+```
+
+## Well effect (molecules)
+
+```{r echo=FALSE, eval=TRUE}
+
+subgroup_id =colnames(molecules_single);
+
+well_effect = substring(unlist(lapply(strsplit(subgroup_id, "\\."), function(x) x[3])),1,1);
+
+structure_well <- function(clus=6,well)
+{
+  docweights_molecules <-read.table(paste0('../data_derived/topic_omega_molecules_clus_',clus,'.txt'));
+  
+  color=c("red","blue","cornflowerblue","black","cyan","darkblue",
+        "brown4","burlywood","darkgoldenrod1","darkgray","deepskyblue","darkkhaki",
+        "firebrick","darkorchid","hotpink","green","magenta","yellow", "azure1","azure4");
+  
+  well_ordered <- well[order(well)];
+  
+  docweights_molecules_ordered = docweights_molecules[order(well),];
+
+barplot(t(docweights_molecules_ordered),col=color[1:clus],axisnames=F,space=0,border=NA,main=paste("No. of clusters=",clus),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+
+labels = match(unique(well_ordered), well_ordered);
+abline(v=labels)
+
+labels_low=labels;
+labels_up=c(labels[2:length(labels)],dim(docweights_molecules_ordered)[1]);
+mid_point=labels_low +0.5*(labels_up-labels_low);
+
+axis(1,at=mid_point, unique(well_ordered),las=2);
+
+}
+
+structure_well(clus=5,well_effect)
+structure_well(clus=6,well_effect)
+structure_well(clus=7,well_effect)
+
+```
