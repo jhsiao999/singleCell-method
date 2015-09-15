@@ -1,13 +1,21 @@
 ---
+<<<<<<< HEAD
 title: "Clustering of transcriptional profile based on cell cycle genes"
+=======
+title: "Clustering of Po-Yuan data based on cell cycle genes"
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 author: "Kushal K Dey"
 date: "September 3, 2015"
 output: html_document
 ---
 
+<<<<<<< HEAD
 ## Goal
 
 Consider only the transcriptional profile of the cell-cycle genes. We apply an admixture model to the single cell data collected at Yoav's lab.  tSNE model +PCA model approach on the single cell data collected at Yoav's lab, using only the cell cycle gene expression. 
+=======
+In this script, we perform an admixture model clustering + tSNE model +PCA model approach on the single cell data collected by Yoav's lab, using only the cell cycle gene expression. 
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 
 ```{r echo=TRUE, eval=TRUE}
 suppressMessages(suppressWarnings(library(data.table)))
@@ -18,6 +26,7 @@ suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(edgeR)))
 suppressMessages(suppressWarnings(library(tsne)))
 suppressMessages(suppressWarnings(library(qtlcharts)))
+<<<<<<< HEAD
 ```
 
 
@@ -40,6 +49,27 @@ anno <- data.frame(fread('./data/annotation.txt'));
 
 Keep only quality single cells. Remove bulk RNA-seq samples.
 
+=======
+
+
+```
+
+
+```{r echo=FALSE, eval=TRUE}
+
+setwd('/Users/kushal/Documents/singlecellseq/src/');
+reads <- data.frame(fread('../data/reads.txt'),row.names=1);
+molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
+
+```
+
+```{r echo=FALSE, eval=TRUE}
+quality_single_cells <- scan("../data/quality-single-cells.txt",
+                             what = "character")
+anno <- data.frame(fread('../data/annotation.txt'));
+```
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```{r, echo=FALSE, eval=TRUE}
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
@@ -53,8 +83,11 @@ stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
 ```
 
+<<<<<<< HEAD
 Exclude genes with no mapped reads across the single cell samples.
 
+=======
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```{r, echo=FALSE, eval=TRUE}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
@@ -64,6 +97,7 @@ expressed <- rowSums(reads[, anno$well == "bulk"]) > 0 &
              rowSums(reads[, anno$well != "bulk"]) > 0
 reads <- reads[expressed, ]
 
+<<<<<<< HEAD
 
 molecules_single <- molecules %>% select(-contains("bulk"))
 reads_single <- reads %>% select(-contains("bulk"))
@@ -82,17 +116,41 @@ Now we import the list of marker gene for cell cycle information.
 
 ```{r echo=TRUE, eval=TRUE}
 cell_cycle_genes <- read.table("./data/cellcyclegenes.txt", header = TRUE, sep="\t")
+=======
+molecules_single <- molecules %>% select(-contains("bulk"))
+reads_single <- reads %>% select(-contains("bulk"))
+
+## Remove genes with max molecule numer larger than 1024
+
+molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+
+
+```
+
+
+Now we draw a list of marker genes that have cell cycle information.
+
+```{r echo=TRUE, eval=TRUE}
+
+cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 
 ## create 5 lists of 5 phases (de-level and then remove "")
 cell_cycle_genes_list <- lapply(1:5,function(x){
   temp <- as.character(cell_cycle_genes[,x])
   temp[temp!=""]
 })
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```
 
 We extract those columns (genes) that match with the cell-cycle genes list.
 
 ```{r echo=TRUE, eval=TRUE}
+<<<<<<< HEAD
 labs <- unique(unlist(lapply(1:5, function(k) X = 
                                  match(cell_cycle_genes_list[[k]],
                                        rownames(molecules_single)))) )
@@ -100,6 +158,14 @@ labs <-  labs[!is.na(labs)]
 molecules_single_cell_cycle <- molecules_single[labs,]
 ```
 
+=======
+
+labs=unique(unlist(lapply(1:5, function(k) match(cell_cycle_genes_list[[k]],rownames(molecules_single)))));
+labs = labs[!is.na(labs)];
+molecules_single_cell_cycle <- molecules_single[labs,];
+
+```
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 
 We have now extracted the data for the cell cycle genes only. Based on these cell cycle genes, we assign each cell to one of the phase scores. 
 
@@ -155,8 +221,13 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
+<<<<<<< HEAD
 ```
 
+=======
+
+```
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 
 The cell phase vector is given by 
 
@@ -164,6 +235,7 @@ The cell phase vector is given by
 cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
 ```
 
+<<<<<<< HEAD
 
 ## Maximum normalized value of cell cycle scores
 
@@ -171,10 +243,14 @@ cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
 
 We now fit an admixture model (topic model) on the molecule count data comprising 
 of only the cell cycle genes.
+=======
+We now fit an admixture model on the reduced data comprising of only the cell cycle genes.
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 
 ```{r sructure, echo=TRUE, eval=TRUE, cache=TRUE}
 structure_cell_cycle_genes <- function(data,K, type_info)
 {
+<<<<<<< HEAD
     Topic_clus <- topics(data, K = K, tol = 0.005)
     docweights <- Topic_clus$omega;
     type_ordered <- type_info[order(type_info)];
@@ -210,6 +286,38 @@ From the admixture plot on the cell cycle genes, there seems to be a weak cell c
 
 ### Admixture model
 
+=======
+Topic_clus <- topics(data, K=K, tol=0.005);
+docweights <- Topic_clus$omega;
+type_ordered <- type_info[order(type_info)];
+docweights_ordered <- docweights[order(type_info),];
+barplot(t(docweights_ordered),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=0.3,cex.main=1.4);
+labels = match(unique(type_ordered), type_ordered);
+abline(v=labels-1)
+
+labels_low=labels-1;
+labels_up=c(labels_low[2:length(labels_low)],dim(docweights_ordered)[1]);
+mid_point <- labels_low +0.5*(labels_up-labels_low);
+axis(1,at=mid_point, unique(type_ordered),las=2,cex.axis=0.3);
+}
+
+sapply(2:7, function(k) structure_cell_cycle_genes(t(molecules_single_cell_cycle),k,cell_phase_vector))
+
+
+```
+
+We now implement t-SNE on the single cells based on the data on the cell cycle genes to see how the single cells cluster
+
+```{r tsne, echo=TRUE, eval=TRUE, cache=FALSE}
+
+tsne_samples <- tsne(t(molecules_single_cell_cycle),2);
+iplot(tsne_samples[,1],tsne_samples[,2],rep(1,length(tsne_samples[,1])),cell_phase_vector)
+
+```
+
+From the admixture plot on the cell cycle genes, there seems to be a weak cell cycle specific effect indeed even for the cell cycle genes. We now focus on a different assignment scheme where instead of assigning the cell to the maximum normalized value, we assign it to the maximum absolute normalized value. 
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```{r echo=TRUE, eval=TRUE, cahce=TRUE}
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(abs(x))])
 assign_cell_phase <- data.frame(cell_phase)
@@ -219,8 +327,11 @@ cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
 sapply(2:7, function(k) structure_cell_cycle_genes(t(molecules_single_cell_cycle),k,cell_phase_vector))
 ```
 
+<<<<<<< HEAD
 ### t-SNE plot
 
+=======
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 The t-sne plot with modified cell phase info is the following
 
 ```{r echo=TRUE, eval=TRUE}

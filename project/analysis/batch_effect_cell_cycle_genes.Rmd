@@ -1,12 +1,19 @@
 ---
+<<<<<<< HEAD
 title: "Batch effect modeling"
+=======
+title: "Batch effect modeling on cell cycle genes"
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 author: "Kushal K Dey"
 date: "September 3, 2015"
 output: html_document
 ---
 
+<<<<<<< HEAD
 ## Goal 
 
+=======
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not. 
 
 
@@ -21,6 +28,7 @@ suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(edgeR)))
 suppressMessages(suppressWarnings(library(qtlcharts)))
 suppressMessages(suppressWarnings(library(limma)))
+<<<<<<< HEAD
 ```
 
 
@@ -40,6 +48,27 @@ anno <- data.frame(fread('./data/annotation.txt'));
 
 
 ```{r, echo=TRUE, eval=TRUE}
+=======
+
+
+```
+
+```{r echo=FALSE, eval=TRUE}
+
+setwd('/Users/kushal/Documents/singlecellseq/src/');
+reads <- data.frame(fread('../data/reads.txt'),row.names=1);
+molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
+
+```
+
+```{r echo=FALSE, eval=TRUE}
+quality_single_cells <- scan("../data/quality-single-cells.txt",
+                             what = "character")
+anno <- data.frame(fread('../data/annotation.txt'));
+```
+
+```{r, echo=FALSE, eval=TRUE}
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
 anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
@@ -52,8 +81,12 @@ stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
 ```
 
+<<<<<<< HEAD
 
 ```{r, echo=TRUE, eval=TRUE}
+=======
+```{r, echo=FALSE, eval=TRUE}
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
@@ -64,18 +97,31 @@ reads <- reads[expressed, ]
 
 molecules_single <- molecules %>% select(-contains("bulk"))
 reads_single <- reads %>% select(-contains("bulk"))
+<<<<<<< HEAD
 ```
 
 Remove genes with max molecule numer larger than 1024
 
 ```{r}
 molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+=======
+
+## Remove genes with max molecule numer larger than 1024
+
+molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```
 
 
 Now we draw a list of marker genes that have cell cycle information.
 
 ```{r echo=TRUE, eval=TRUE}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
 
 ## create 5 lists of 5 phases (de-level and then remove "")
@@ -87,6 +133,11 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
 labs=unique(unlist(lapply(1:5, function(k) match(cell_cycle_genes_list[[k]],rownames(molecules_single)))));
 labs = labs[!is.na(labs)];
 molecules_single_cell_cycle <- molecules_single[labs,];
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```
 
 
@@ -145,6 +196,7 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
 cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
+<<<<<<< HEAD
 ```
 
 
@@ -173,26 +225,54 @@ batch_id <- sapply(1:length(rownames(cpm_data)),
                    function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][2])
 
 batch_removed_cpm <- matrix(0,dim(cpm_data)[1], dim(cpm_data)[2])
+=======
+
+```
+
+```
+
+Now we apply a linear model taking into account the individual effect and the batch effect and grab the residuals free of individual and batch effects.
+
+```{r echo=TRUE, eval=TRUE}
+
+counts_data <- t(molecules_single_cell_cycle);
+cpm_data <- voom(counts_data)$E;
+
+individual_id <- sapply(1:length(rownames(cpm_data)), function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][1]);
+
+batch_id <- sapply(1:length(rownames(cpm_data)), function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][2]);
+
+batch_removed_cpm <- matrix(0,dim(cpm_data)[1], dim(cpm_data)[2]);
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 for(g in 1:dim(cpm_data)[2])
 {
   res <- as.numeric(lm(cpm_data[,g] ~ individual_id+batch_id)$residuals);
   batch_removed_cpm[,g] <- res;
 }
 
+<<<<<<< HEAD
 col <- c(rgb(seq(0,1,length=15),1,seq(0,1,length=15)),
          rgb(1,seq(1,0,length=15),seq(1,0,length=15)))
+=======
+col=c(rgb(seq(0,1,length=15),1,seq(0,1,length=15)),rgb(1,seq(1,0,length=15),seq(1,0,length=15)))
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 library(gplots)
 
 par(mar=c(4,4,4,4))
 cor_batch <- cor(t(batch_removed_cpm));
 heatmap.2(cor_batch,scale="none",trace="none",labRow=cell_phase_vector,labCol=cell_phase_vector,breaks=c(seq(-1,0,0.07),seq(0,0.5,0.05),seq(0.6,1,0.1)),col=col,distfun=function(x) dist(x,method="euclidean"),hclustfun=function(x) hclust(x,method="average"));
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 out <- kmeans(batch_removed_cpm,5);
 xtabs(~out$cluster+cell_phase_vector)
 ```
 
 None of the hierarchical clustering heatmaps or the kmeans algorithm seem to show distinct clusters of the cell cycle effects. We take the exponent of the normalized terms, apply an admixture model to the remodeled normalized data.
 
+<<<<<<< HEAD
 CJH: This shows the mean differences are removed in the batch-corrected data.
 
 
@@ -200,11 +280,14 @@ CJH: This shows the mean differences are removed in the batch-corrected data.
 
 #### Omega
 
+=======
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 ```{r echo=TRUE, eval=TRUE}
 exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm));
 
 structure_cell_cycle_genes <- function(data,K, type_info)
 {
+<<<<<<< HEAD
     Topic_clus <- topics(data, K=K, tol=0.005);
     docweights <- Topic_clus$omega;
     type_ordered <- type_info[order(type_info)];
@@ -252,3 +335,25 @@ sapply(2:7, function(k) {
     })
 ```
 
+=======
+Topic_clus <- topics(data, K=K, tol=0.005);
+docweights <- Topic_clus$omega;
+type_ordered <- type_info[order(type_info)];
+docweights_ordered <- docweights[order(type_info),];
+barplot(t(docweights_ordered),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=0.3,cex.main=1.4);
+labels = match(unique(type_ordered), type_ordered);
+abline(v=labels-1)
+
+labels_low=labels-1;
+labels_up=c(labels_low[2:length(labels_low)],dim(docweights_ordered)[1]);
+mid_point <- labels_low +0.5*(labels_up-labels_low);
+axis(1,at=mid_point, unique(type_ordered),las=2,cex.axis=0.3);
+}
+
+sapply(2:7, function(k) structure_cell_cycle_genes(exp_batch_removed_cpm_data,k,cell_phase_vector))
+
+
+```
+
+
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a

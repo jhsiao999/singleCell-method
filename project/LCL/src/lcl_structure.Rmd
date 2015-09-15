@@ -1,0 +1,71 @@
+---
+title: 'LCL analysis : Structure'
+author: "Kushal K Dey & Joyce Hsiao"
+date: "September 14, 2015"
+output: html_document
+---
+
+In this script, we perform Structure on LCL data and try to cluster the LCLs into sub types. 
+
+```{r echo=TRUE, eval=TRUE}
+setwd('/Users/kushal/Documents/singleCell-method/project/LCL/src')
+library(readr)
+library(data.table)
+lcl_qc_data <- read_csv("../data/qc-lcl.csv");
+lcl_annotations <- read.table('../data/annotation-lcl.txt',header=TRUE);
+lcl_molecules <- t(data.frame(fread('../data/molecules-lcl.txt'), row.names = 1));
+
+```
+
+Extract the 96 LCLs by matching the lane name with the batch ids.
+
+```{r echo=TRUE, eval=TRUE}
+lcl_indices <- match(lcl_qc_data$ll_name, lcl_annotations$well)
+
+lcl_molecules_refined <- lcl_molecules[lcl_indices,];
+lcl_annotations_refined <- lcl_annotations[lcl_indices,];
+```
+
+We install the package CountClust and then apply the Structure analysis on the LCL cells taking into account the sample metadata owing to individual id, the batch id and the number of cells in the well as well. 
+
+```{r echo=TRUE, eval=TRUE}
+library(CountClust)
+library(maptpx)
+
+lcl_molecules_refined <- handleNA(lcl_molecules_refined)$data;
+
+nclus_vec <- 2:5;
+
+if(!dir.exists("Structure")) dir.create("Structure")
+if(!dir.exists("Structure/batch_uncorrected")) dir.create("Structure/batch_uncorrected")
+
+bayesfac <- array(0,length(nclus_vec));
+
+samp_metadata <- cbind.data.frame(1:96,lcl_qc_data$cell.num);
+colnames(samp_metadata) = c("samples","no. of cells");
+
+#for(num in 1:length(nclus_vec))
+#{
+#  if(!dir.exists(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))
+#  obj <- StructureObj(lcl_molecules_refined,nclus_vec[num],samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path=paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]),partition=c('FALSE','TRUE'));
+#}
+
+for(num in 1:length(nclus_vec))
+{
+  if(!dir.exists(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))
+  omega <- as.matrix(read.table(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num],"/omega_mat.txt")));
+  obj <- StructureObj_omega(omega,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path=paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]),partition=c('FALSE','TRUE'));
+}
+
+
+
+```
+
+We now present the Structure plots in the same sequence as we had the LCL data.
+
+<img src='Structure/batch_uncorrected/clus_2/struct_clus_2_samples.png' style="width:304px;height:228px;">
+<img src='Structure/batch_uncorrected/clus_3/struct_clus_3_samples.png' style="width:304px;height:228px;">
+<img src='Structure/batch_uncorrected/clus_4/struct_clus_4_samples.png' style="width:304px;height:228px;">
+<img src='Structure/batch_uncorrected/clus_5/struct_clus_5_samples.png' style="width:304px;height:228px;">
+
+
