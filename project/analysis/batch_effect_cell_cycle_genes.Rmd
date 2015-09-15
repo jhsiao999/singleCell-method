@@ -1,74 +1,48 @@
 ---
-<<<<<<< HEAD
 title: "Batch effect modeling"
-=======
-title: "Batch effect modeling on cell cycle genes"
->>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 author: "Kushal K Dey"
 date: "September 3, 2015"
 output: html_document
 ---
 
-<<<<<<< HEAD
 ## Goal 
 
-=======
->>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not. 
 
 
 We first load the packages and the data.
 
 ```{r packages, echo=FALSE, eval=TRUE}
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(maptpx)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
-suppressMessages(suppressWarnings(library(qtlcharts)))
-suppressMessages(suppressWarnings(library(limma)))
-<<<<<<< HEAD
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+library(tsne)
+library(qtlcharts)
+library(limma)
 ```
 
 
 ## Prepare data
 
-```{r echo=FALSE, eval=TRUE}
+```{r}
 reads <- data.frame(fread('./data/reads.txt'),row.names=1);
 molecules <-  data.frame(fread('./data/molecules.txt'),row.names=1);
 ```
 
 
-```{r echo=FALSE, eval=TRUE}
-quality_single_cells <- scan("./data/quality-single-cells.txt",
-                             what = "character")
-anno <- data.frame(fread('./data/annotation.txt'));
-```
-
-
-```{r, echo=TRUE, eval=TRUE}
-=======
-
-
-```
-
-```{r echo=FALSE, eval=TRUE}
-
-setwd('/Users/kushal/Documents/singlecellseq/src/');
-reads <- data.frame(fread('../data/reads.txt'),row.names=1);
-molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
-
-```
-
-```{r echo=FALSE, eval=TRUE}
+```{r}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
 anno <- data.frame(fread('../data/annotation.txt'));
 ```
 
+
+Remove bulk samples and include only quality single cells.
+
 ```{r, echo=FALSE, eval=TRUE}
->>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
 anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]

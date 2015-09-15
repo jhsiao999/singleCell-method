@@ -1,0 +1,17 @@
+base
+methods
+datasets
+utils
+grDevices
+graphics
+stats
+data.table
+slam
+maptpx
+gplots
+philentropy
+dplyr
+limma
+edgeR
+tsne
+qtlcharts
