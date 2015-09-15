@@ -18,3 +18,8 @@ tagline:
 * [Exploratory analysis of cell cycle scores and cell cycle genes](project/analysis/cell_cycle_score_analysis.html)
 * [Structure plot using cell cycle genes before batch, individual correction](project/analysis/clustering_cell_cycle_genes.html)
 * [Structure plot of cell cycle genes after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
+
+
+### LCL analysis
+
+* [Structure analysis of LCL data](project/LCL/src/lcl_structure.html)
