@@ -11,6 +11,9 @@ In this script, we perform Structure on LCL data and try to cluster the LCLs int
 setwd('/Users/kushal/Documents/singleCell-method/project/LCL/src')
 library(readr)
 library(data.table)
+library(devtools)
+library(CountClust)
+library(parallel)
 lcl_qc_data <- read_csv("../data/qc-lcl.csv");
 lcl_annotations <- read.table('../data/annotation-lcl.txt',header=TRUE);
 lcl_molecules <- t(data.frame(fread('../data/molecules-lcl.txt'), row.names = 1));
@@ -54,7 +57,7 @@ for(num in 1:length(nclus_vec))
 {
   if(!dir.exists(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))
   omega <- as.matrix(read.table(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num],"/omega_mat.txt")));
-  obj <- StructureObj_omega(omega,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path=paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]),partition=c('FALSE','TRUE'));
+  obj <- StructureObj_omega(omega,samp_metadata = samp_metadata, batch_lab = NULL, path=paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]),partition=c('FALSE','TRUE'));
 }
 
 
@@ -95,10 +98,8 @@ for(num in 1:length(nclus_vec))
 {
   if(!dir.exists(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]))
   omega <- as.matrix(read.table(paste0("Structure/batch_uncorrected/clus_",nclus_vec[num],"/omega_mat.txt")));
-  obj <- StructureObj_omega(omega,samp_metadata = samp_metadata, tol=0.001, batch_lab = batch_lab, path=paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]),partition=c('FALSE','TRUE'));
+  obj <- StructureObj_omega(omega,samp_metadata = samp_metadata, batch_lab = batch_lab, path=paste0("Structure/batch_uncorrected/clus_",nclus_vec[num]),partition=c('FALSE','TRUE'));
 }
-
-
 
 ```
 
@@ -108,6 +109,41 @@ for(num in 1:length(nclus_vec))
 <img src='Structure/batch_uncorrected/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
 
 
-It seems from the above plots there is batch effect in the data and that is most clear for number of topics equal to 4 or 5. It also seems all the batches have very distinct patterns. 
+It seems from the above plots there is batch effect in the data and that is most clear for number of topics equal to 4 or 5. It also seems all the batches have very distinct patterns. Now we obtain batch corrected counts.
 
+```{r batch_correct, echo=TRUE, eval=TRUE}
+
+batch_corrected_lcl_molecules <- BatchCorrectedCounts(lcl_molecules_refined,batch_lab,use_parallel=TRUE)
+
+```
+
+Now we apply StructureObj on the batch corrected new counts data and see what patterns we get from the new data analysis, ideally we should not see the batch patterns that we saw in the previous run.
+
+```{r batch_corrected_structure, echo=TRUE, eval=TRUE}
+
+if(!dir.exists("Structure/batch_corrected")) dir.create("Structure/batch_corrected")
+
+#for(num in 1:length(nclus_vec))
+#{
+#  if(!dir.exists(paste0("Structure/batch_corrected/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected/clus_",nclus_vec[num]))
+#    obj <- StructureObj(batch_corrected_lcl_molecules,nclus_vec[num],samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_lab, path=paste0("Structure/batch_corrected/clus_",nclus_vec[num]));
+#}
+
+
+for(num in 1:length(nclus_vec))
+{
+  if(!dir.exists(paste0("Structure/batch_corrected/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected/clus_",nclus_vec[num]))
+  omega <- as.matrix(read.table(paste0("Structure/batch_corrected/clus_",nclus_vec[num],"/omega_mat.txt")));
+    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab, path=paste0("Structure/batch_corrected/clus_",nclus_vec[num]),partition = c("FALSE"));
+}
+
+```
+
+
+The batch removed Structure plots are as follows 
+
+<img src='Structure/batch_corrected/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='Structure/batch_corrected/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='Structure/batch_corrected/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='Structure/batch_corrected/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
 
