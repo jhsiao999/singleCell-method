@@ -13,6 +13,13 @@ tagline:
 * [Investigating ERCC spike ins - RUV normalization](project/analysis/RUV_normalization.html)
 
 
+<<<<<<< HEAD
+###  Cell-cycle genes analysis
+
+* [Cell-cycle scores](project/analysis/cell_cycle_score_analysis.html)
+* [Structure plot using cell cycle genes before batch, individual correction](project/analysis/clustering_cell_cycle_genes.html)
+* [Structure plot of cell cycle genes after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
+=======
 ###  Cell cycle genes analysis
 
 * [Exploratory analysis of cell cycle scores and cell cycle genes](project/analysis/cell_cycle_score_analysis.html)
@@ -23,3 +30,4 @@ tagline:
 ### LCL analysis
 
 * [Structure analysis of LCL data](project/LCL/src/lcl_structure.html)
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a

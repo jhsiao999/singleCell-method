@@ -10,7 +10,11 @@ In this script, we try to investigate the behavioral pattern of the cell phase s
 
 First we read the data. 
 
+<<<<<<< HEAD
+```{r packages, echo=TRUE, eval=TRUE}
+=======
 ```{r packages, echo=FALSE, eval=TRUE}
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 suppressMessages(suppressWarnings(library(data.table)))
 suppressMessages(suppressWarnings(library(maptpx)))
 suppressMessages(suppressWarnings(library(gplots)))
@@ -18,6 +22,29 @@ suppressMessages(suppressWarnings(library(philentropy)))
 suppressMessages(suppressWarnings(library(dplyr)))
 suppressMessages(suppressWarnings(library(edgeR)))
 suppressMessages(suppressWarnings(library(qtlcharts)))
+<<<<<<< HEAD
+```
+
+Import raw count data. 
+
+```{r echo=FALSE, eval=TRUE}
+reads <- data.frame(fread('./data/reads.txt'),row.names=1);
+molecules <-  data.frame(fread('./data/molecules.txt'),row.names=1);
+```
+
+Quality single cell index.
+
+```{r echo=TRUE, eval=TRUE}
+quality_single_cells <- scan("./data/quality-single-cells.txt",
+                             what = "character")
+anno <- data.frame(fread('./data/annotation.txt'));
+```
+
+
+Keep only quality single cells. Remove bulk gene expression data.
+
+```{r, echo=TRUE, eval=TRUE}
+=======
 
 
 ```
@@ -37,6 +64,7 @@ anno <- data.frame(fread('../data/annotation.txt'));
 ```
 
 ```{r, echo=FALSE, eval=TRUE}
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
 anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
@@ -49,7 +77,14 @@ stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
 ```
 
+<<<<<<< HEAD
+
+Exclude genes with a sum of 0 count across quality single cells.
+
+```{r, echo=TRUE, eval=TRUE}
+=======
 ```{r, echo=FALSE, eval=TRUE}
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
@@ -64,10 +99,16 @@ reads_single <- reads %>% select(-contains("bulk"))
 ## Remove genes with max molecule numer larger than 1024
 
 molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+<<<<<<< HEAD
+```
+
+
+=======
 
 
 ```
 
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 
 Now we draw a list of marker genes that have cell cycle information.
 
@@ -80,10 +121,16 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
   temp <- as.character(cell_cycle_genes[,x])
   temp[temp!=""]
 })
+<<<<<<< HEAD
+```
+
+
+=======
 
 
 ```
 
+>>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
 We explore these genes in greater detail. How do the **iplotCurves** look like for the single cells for the cell cylce genes. 
 
 ```{r echo=TRUE, eval=TRUE}
