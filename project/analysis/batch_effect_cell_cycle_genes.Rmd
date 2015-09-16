@@ -1,43 +1,48 @@
 ---
-title: "Batch effect modeling on cell cycle genes"
-author: "Kushal K Dey"
-date: "September 3, 2015"
+title: "Batch effect modeling"
+author: "Kushal K Dey and Joyce Hsiao"
+date: "September 16, 2015"
 output: html_document
 ---
+
+## Goal 
 
 In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not. 
 
 
 We first load the packages and the data.
 
-```{r packages, echo=FALSE, eval=TRUE}
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(maptpx)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
-suppressMessages(suppressWarnings(library(qtlcharts)))
-suppressMessages(suppressWarnings(library(limma)))
-
-
+```{r message = FALSE, warning = FALSE}
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+library(tsne)
+library(qtlcharts)
+library(limma)
 ```
 
-```{r echo=FALSE, eval=TRUE}
 
-setwd('/Users/kushal/Documents/singlecellseq/src/');
+## Prepare data
+
+```{r}
 reads <- data.frame(fread('../data/reads.txt'),row.names=1);
 molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
-
 ```
 
-```{r echo=FALSE, eval=TRUE}
+
+```{r}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
 anno <- data.frame(fread('../data/annotation.txt'));
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+
+Remove bulk samples and include only quality single cells.
+
+```{r}
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
 anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
@@ -50,7 +55,10 @@ stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+
+Remove genes with 0 count across single cells.
+
+```{r}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
@@ -61,19 +69,21 @@ reads <- reads[expressed, ]
 
 molecules_single <- molecules %>% select(-contains("bulk"))
 reads_single <- reads %>% select(-contains("bulk"))
-
-## Remove genes with max molecule numer larger than 1024
-
-molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
-
-
 ```
 
 
+Remove genes with max molecule numer larger than 1024
+
+```{r}
+molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+```
+
+
+## Cell-cycle genes
+
 Now we draw a list of marker genes that have cell cycle information.
 
-```{r echo=TRUE, eval=TRUE}
-
+```{r}
 cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
 
 ## create 5 lists of 5 phases (de-level and then remove "")
@@ -82,36 +92,35 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
   temp[temp!=""]
 })
 
-labs=unique(unlist(lapply(1:5, function(k) match(cell_cycle_genes_list[[k]],rownames(molecules_single)))));
-labs = labs[!is.na(labs)];
-molecules_single_cell_cycle <- molecules_single[labs,];
-
-
+labs <- unique(unlist(lapply(1:5, function(k) 
+                            match(cell_cycle_genes_list[[k]],
+                            rownames(molecules_single)))) )
+labs <- labs[!is.na(labs)]
+molecules_single_cell_cycle <- molecules_single[labs,]
 ```
 
 
 We fix the cell phase scores
 
-```{r phase_scores, echo=TRUE, eval=TRUE}
+```{r}
 ans <-
-sapply(cell_cycle_genes_list,function(xx){
-  #### create table of each phase
-  reads_single_phase <- reads_single[rownames(reads_single) %in% unlist(xx) ,]
-  #### add average expression of all genes in the phase
-  combined_matrix <- rbind(reads_single_phase,average=apply(reads_single_phase,2,mean))
-  #### use transpose to compute cor matrix
-  cor_matrix <- cor(t(combined_matrix))
-  #### take the numbers
-  cor_vector <- cor_matrix[,dim(cor_matrix)[1]]
-  #### restrict to correlation >= 0.3 
-  reads_single_phase_restricted <- reads_single_phase[rownames(reads_single_phase) %in% names(cor_vector[cor_vector >= 0.3]),]
-  #### apply normalization to reads
-  norm_factors_single <- calcNormFactors(reads_single_phase_restricted, method = "TMM")
-  reads_single_cpm <- cpm(reads_single_phase_restricted, log = TRUE,
-                            lib.size = colSums(reads_single) * norm_factors_single)
-  #### output the phase specific scores (mean of normalized expression levels in the phase)
-  apply(reads_single_cpm,2,mean)
-
+    sapply(cell_cycle_genes_list,function(xx){
+      #### create table of each phase
+      reads_single_phase <- reads_single[rownames(reads_single) %in% unlist(xx) ,]
+      #### add average expression of all genes in the phase
+      combined_matrix <- rbind(reads_single_phase,average=apply(reads_single_phase,2,mean))
+      #### use transpose to compute cor matrix
+      cor_matrix <- cor(t(combined_matrix))
+      #### take the numbers
+      cor_vector <- cor_matrix[,dim(cor_matrix)[1]]
+      #### restrict to correlation >= 0.3 
+      reads_single_phase_restricted <- reads_single_phase[rownames(reads_single_phase) %in% names(cor_vector[cor_vector >= 0.3]),]
+      #### apply normalization to reads
+      norm_factors_single <- calcNormFactors(reads_single_phase_restricted, method = "TMM")
+      reads_single_cpm <- cpm(reads_single_phase_restricted, log = TRUE,
+                                lib.size = colSums(reads_single) * norm_factors_single)
+      #### output the phase specific scores (mean of normalized expression levels in the phase)
+      apply(reads_single_cpm,2,mean)
 })
 
 #### normalization function
@@ -145,21 +154,48 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
 cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
-
 ```
 
-```
 
-Now we apply a linear model taking into account the individual effect and the batch effect and grab the residuals free of individual and batch effects.
+## Batch effect correction
+
+Now we apply a linear model taking into account the individual effect and the batch effect and grab the residuals free of individual and batch effects. We used the CPM corrected data for batch effect modeling.
+
+
+### Remove batch effect
+
+We fit for every gene the following model across individuals and batches:
+
+$$ y_{ijk} = \mu + \alpha_i + \beta_{ij} + \epsilon_{ijk}$$,
+
+where $y_{ijk}$ is log2 CPM of each gene in individual $i$, batch$i$ and cell$k$. The batch-corrected log2-CPM is computed as $y_{ijk} - \hat{\alpha}_i - \hat{\beta}_{ij}$.
+
 
 ```{r echo=TRUE, eval=TRUE}
+counts_data <- t(molecules_single_cell_cycle)
+cpm_data <- voom(counts_data)$E
 
-counts_data <- t(molecules_single_cell_cycle);
-cpm_data <- voom(counts_data)$E;
+individual_id <- sapply(1:length(rownames(cpm_data)), 
+                        function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][1])
 
-individual_id <- sapply(1:length(rownames(cpm_data)), function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][1]);
+batch_id <- sapply(1:length(rownames(cpm_data)), 
+                   function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][2])
 
-batch_id <- sapply(1:length(rownames(cpm_data)), function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][2]);
+batch_removed_cpm <- matrix(0,dim(cpm_data)[1], dim(cpm_data)[2])
+```
+
+
+Now on the logCPM data, we apply a linear model taking into account the individual effect and the batch effect and grab the residuals free of individual and batch effects.
+
+```{r}
+counts_data <- t(molecules_single_cell_cycle)
+cpm_data <- voom(counts_data)$E
+
+individual_id <- sapply(1:length(rownames(cpm_data)), function(x) 
+                        strsplit(rownames(cpm_data)[x],"[.]")[[1]][1])
+
+batch_id <- sapply(1:length(rownames(cpm_data)), function(x)
+                    strsplit(rownames(cpm_data)[x],"[.]")[[1]][2]);
 
 batch_removed_cpm <- matrix(0,dim(cpm_data)[1], dim(cpm_data)[2]);
 for(g in 1:dim(cpm_data)[2])
@@ -167,43 +203,184 @@ for(g in 1:dim(cpm_data)[2])
   res <- as.numeric(lm(cpm_data[,g] ~ individual_id+batch_id)$residuals);
   batch_removed_cpm[,g] <- res;
 }
+col <- c(rgb(seq(0,1,length=15),1,seq(0,1,length=15)),
+         rgb(1,seq(1,0,length=15),seq(1,0,length=15)))
+```
 
-col=c(rgb(seq(0,1,length=15),1,seq(0,1,length=15)),rgb(1,seq(1,0,length=15),seq(1,0,length=15)))
+Heatmap of the variance-covariance matrix of the batch corrected data.
+
+```{r}
 library(gplots)
-
-par(mar=c(4,4,4,4))
+par( mar = c(4,4,4,4) )
 cor_batch <- cor(t(batch_removed_cpm));
-heatmap.2(cor_batch,scale="none",trace="none",labRow=cell_phase_vector,labCol=cell_phase_vector,breaks=c(seq(-1,0,0.07),seq(0,0.5,0.05),seq(0.6,1,0.1)),col=col,distfun=function(x) dist(x,method="euclidean"),hclustfun=function(x) hclust(x,method="average"));
-
-
+heatmap.2(cor_batch,scale="none", trace="none",
+          labRow = cell_phase_vector,labCol = cell_phase_vector,
+          breaks = c(seq(-1,0,0.07), seq(0,0.5,0.05), seq(0.6,1,0.1)),
+          col = col, distfun=function(x) dist(x,method="euclidean"),
+          hclustfun=function(x) hclust(x,method="average"))
 out <- kmeans(batch_removed_cpm,5);
 xtabs(~out$cluster+cell_phase_vector)
 ```
 
 None of the hierarchical clustering heatmaps or the kmeans algorithm seem to show distinct clusters of the cell cycle effects. We take the exponent of the normalized terms, apply an admixture model to the remodeled normalized data.
 
-```{r echo=TRUE, eval=TRUE}
-exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm));
+CJH: This shows the mean differences are removed in the batch-corrected data.
 
-structure_cell_cycle_genes <- function(data,K, type_info)
-{
-Topic_clus <- topics(data, K=K, tol=0.005);
-docweights <- Topic_clus$omega;
-type_ordered <- type_info[order(type_info)];
-docweights_ordered <- docweights[order(type_info),];
-barplot(t(docweights_ordered),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=0.3,cex.main=1.4);
-labels = match(unique(type_ordered), type_ordered);
-abline(v=labels-1)
 
-labels_low=labels-1;
-labels_up=c(labels_low[2:length(labels_low)],dim(docweights_ordered)[1]);
-mid_point <- labels_low +0.5*(labels_up-labels_low);
-axis(1,at=mid_point, unique(type_ordered),las=2,cex.axis=0.3);
+### Batch-corrected counts
+
+Check if the admixture output exists already. If not, compute clustering
+assignment for possible groupings of 2 to 7. 
+
+```{r}
+clust_vec <- 2:7
+if(file.exists("../rdas/batch_effect_cell_cycle_genes.rda")) {
+    load("../rdas/batch_effect_cell_cycle_genes.rda")
+} else {
+    exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm))
+    topics_list <- lapply(clust_vec, function(per_clust) {
+        topics(exp_batch_removed_cpm_data, K = per_clust, tol=0.005)
+        })    
+    names(topics_list) <- paste0("clust",clust_vec)
+    save(topics_list, file = "../rdas/batch_effect_cell_cycle_genes.rda")
 }
-
-sapply(2:7, function(k) structure_cell_cycle_genes(exp_batch_removed_cpm_data,k,cell_phase_vector))
-
-
 ```
 
+Making structure plots.
+
+```{r}
+nclust <- length(topics_list)
+type_info <- cell_phase_vector
+
+for (per_clust in 1:nclust) {
+    topics_clust <- topics_list[[per_clust]]
+    clust <- topics_clust$K
+    docweights <- topics_clust$omega
+    type_ordered <- type_info[order(type_info)]
+    docweights_ordered <- docweights[order(type_info),]
+    barplot( t(docweights_ordered), 
+             col = 2:(clust+1), axisnames = F,
+             space = 0, border=NA,
+             main = paste("No. of clusters=", clust), las = 1,
+             ylim = c(0,1), cex.axis = 0.3, cex.main=1.4)
+    labels <- match(unique(type_ordered), type_ordered)
+    abline(v=labels-1)
+    labels_low <- labels-1
+    labels_up <- c(labels_low[2:length(labels_low)], dim(docweights_ordered)[1])
+    mid_point <- labels_low +0.5*(labels_up-labels_low)
+    axis(1, at = mid_point, unique(type_ordered), las = 2, cex.axis=0.3)
+}
+```
+
+
+
+
+#### Gene assignment weights (Theta)
+
+For a $k$-cluster assignemnt, the admixture model assigns each gene a weight for its
+relative contribution to the cluster. 
+
+##### 2 clusters
+
+Consider a 2-cluster scenario.
+
+```{r}
+topics_clust <- topics_list[[1]]
+clust <- topics_clust$K
+word_weights <- topics_clust$theta
+```
+
+Order genes by difference between cluster weights.
+
+```{r}
+word_order <- order(abs(word_weights[,1] - word_weights[,2]) )
+matplot(word_weights[word_order, ], type = "l",
+        ylab = "cluster weights",
+        xlab = "genes ordered by differences between two cluster weights",
+        main = "2 clusters")
+```
+
+Output genes ordered by absolute differences between the two clusters
+
+```{r}
+geneNames <- rownames(molecules_single_cell_cycle)
+if (!file.exists("../output/batch_effect_cell_cycle_genes/batch-corrected-clust-2.txt")) {
+write.table(rev(geneNames[word_order]),
+            file = "../output/batch_effect_cell_cycle_genes/batch-corrected-clust-2.txt",
+            quote = FALSE, col.names = FALSE, row.names = FALSE)
+}
+```
+
+List out hgnc symbol for the top 20 genes that distinguish the clusters.
+
+```{r}
+library(biomaRt)
+library(knitr)
+# define biomart object
+mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+# query biomart
+results <- getBM(attributes = c("hgnc_symbol", "description"), 
+                 filters = "ensembl_gene_id", 
+                 values = rev(geneNames[word_order])[1:20],
+                 mart = mart)
+kable(as.data.frame(results))
+```
+
+
+
+##### 3 clusters
+
+```{r}
+topics_clust <- topics_list[[2]]
+clust <- topics_clust$K
+word_weights <- topics_clust$theta
+```
+
+Order genes by difference between cluster weights. Compute differences based on
+mean of absolute deviation from the median.
+
+```{r}
+diff_vec <- apply(word_weights, 1 , function(per_gene) {
+                    mean(abs(per_gene - median(per_gene)))
+            })
+matplot(word_weights[order(diff_vec), ], type = "l",
+        ylab = "cluster weights",
+        xlab = "genes ordered by distances between cluster weights",
+        main = "3 clusters")
+```
+
+Output genes ordered by distance among clusters
+
+```{r}
+geneNames <- rownames(molecules_single_cell_cycle)
+if (!file.exists("../output/batch_effect_cell_cycle_genes/batch-corrected-clust-3.txt")) {
+write.table(rev(geneNames[order(diff_vec)]),
+            file = "../output/batch_effect_cell_cycle_genes/batch-corrected-clust-3.txt",
+            quote = FALSE, col.names = FALSE, row.names = FALSE)
+}
+```
+
+
+
+List out hgnc symbol for the top 20 genes that distinguish the two clusters.
+
+```{r}
+library(biomaRt)
+library(knitr)
+# define biomart object
+mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+# query biomart
+results <- getBM(attributes = c("hgnc_symbol", "description"), 
+                 filters = "ensembl_gene_id", 
+                 values = rev(geneNames[order(diff_vec)])[1:20],
+                 mart = mart)
+kable(as.data.frame(results))
+```
+
+
+## Session information
+
+```{r}
+sessionInfo()
+```
 

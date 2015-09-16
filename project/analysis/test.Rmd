@@ -1,0 +1,20 @@
+---
+title: "cell phase score analysis"
+author: "Kushal K Dey"
+date: "September 3, 2015"
+output: html_document
+---
+
+In this script, we investigate the behavioral pattern of the cell phase scores for the 5 different cell cycle phases for the single cell seq data collected by Yoav's lab.
+
+
+```{r packages, echo=TRUE, eval=TRUE}
+library(data.table)
+```
+Import raw count data. 
+
+```{r echo=TRUE, eval=TRUE}
+print(getwd())
+#reads <- data.frame(fread('data/reads.txt'), row.names=1)
+#molecules <-  data.frame(fread('data/molecules.txt'), row.names=1)
+```
