@@ -268,7 +268,7 @@ for(num in 1:length(nclus_vec))
 {
   if(!dir.exists(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]))
   omega <- as.matrix(read.table(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num],"/omega_mat.txt")));
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]),partition = c("FALSE"));
+    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]),partition = c("TRUE"));
 }
 ```
 
@@ -301,7 +301,7 @@ for(num in 1:length(nclus_vec))
 {
   if(!dir.exists(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]))
   omega <- as.matrix(read.table(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num],"/omega_mat.txt")));
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]),partition = c("FALSE"));
+    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]),partition = c("TRUE"));
 }
 ```
 
