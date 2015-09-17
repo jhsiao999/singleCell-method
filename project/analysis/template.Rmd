@@ -1,0 +1,25 @@
+---
+title: "Short title highlighting your analysis"
+author: "your name"
+date: "date"
+output: html_document
+---
+
+## Goal
+
+Analysis objectives
+
+
+## Analysis 
+
+```{r}
+# R code goes here
+```
+
+
+## Session information
+
+```{r}
+
+```
+

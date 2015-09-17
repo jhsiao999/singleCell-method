@@ -1,7 +1,7 @@
 ---
 title: "Batch effect modeling"
-author: "Kushal K Dey"
-date: "September 3, 2015"
+author: "Kushal K Dey and Joyce Hsiao"
+date: "September 16, 2015"
 output: html_document
 ---
 
@@ -12,7 +12,7 @@ In this script, we use a batch effect modeling of the single cells using only th
 
 We first load the packages and the data.
 
-```{r packages, echo=FALSE, eval=TRUE}
+```{r message = FALSE, warning = FALSE}
 library(data.table)
 library(maptpx)
 library(gplots)
@@ -172,7 +172,7 @@ where $y_{ijk}$ is log2 CPM of each gene in individual $i$, batch$i$ and cell$k$
 
 
 ```{r echo=TRUE, eval=TRUE}
-counts_data <- t(molecules_single_cell_cycle);
+counts_data <- t(molecules_single_cell_cycle)
 cpm_data <- voom(counts_data)$E
 
 individual_id <- sapply(1:length(rownames(cpm_data)), 
@@ -226,84 +226,161 @@ None of the hierarchical clustering heatmaps or the kmeans algorithm seem to sho
 
 CJH: This shows the mean differences are removed in the batch-corrected data.
 
+
 ### Batch-corrected counts
 
-#### Omega
+Check if the admixture output exists already. If not, compute clustering
+assignment for possible groupings of 2 to 7. 
 
-=======
->>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
-```{r echo=TRUE, eval=TRUE}
-exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm));
+```{r}
+clust_vec <- 2:7
+if(file.exists("../rdas/batch_effect_cell_cycle_genes.rda")) {
+    load("../rdas/batch_effect_cell_cycle_genes.rda")
+} else {
+    exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm))
+    topics_list <- lapply(clust_vec, function(per_clust) {
+        topics(exp_batch_removed_cpm_data, K = per_clust, tol=0.005)
+        })    
+    names(topics_list) <- paste0("clust",clust_vec)
+    save(topics_list, file = "../rdas/batch_effect_cell_cycle_genes.rda")
+}
+```
 
-structure_cell_cycle_genes <- function(data,K, type_info)
-{
-<<<<<<< HEAD
-    Topic_clus <- topics(data, K=K, tol=0.005);
-    docweights <- Topic_clus$omega;
-    type_ordered <- type_info[order(type_info)];
-    docweights_ordered <- docweights[order(type_info),];
-    barplot(t(docweights_ordered),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=0.3,cex.main=1.4);
-    labels = match(unique(type_ordered), type_ordered);
+Making structure plots.
+
+```{r}
+nclust <- length(topics_list)
+type_info <- cell_phase_vector
+
+for (per_clust in 1:nclust) {
+    topics_clust <- topics_list[[per_clust]]
+    clust <- topics_clust$K
+    docweights <- topics_clust$omega
+    type_ordered <- type_info[order(type_info)]
+    docweights_ordered <- docweights[order(type_info),]
+    barplot( t(docweights_ordered), 
+             col = 2:(clust+1), axisnames = F,
+             space = 0, border=NA,
+             main = paste("No. of clusters=", clust), las = 1,
+             ylim = c(0,1), cex.axis = 0.3, cex.main=1.4)
+    labels <- match(unique(type_ordered), type_ordered)
     abline(v=labels-1)
-
-    labels_low=labels-1;
-    labels_up=c(labels_low[2:length(labels_low)],dim(docweights_ordered)[1]);
-    mid_point <- labels_low +0.5*(labels_up-labels_low);
-    axis(1,at=mid_point, unique(type_ordered),las=2,cex.axis=0.3);
+    labels_low <- labels-1
+    labels_up <- c(labels_low[2:length(labels_low)], dim(docweights_ordered)[1])
+    mid_point <- labels_low +0.5*(labels_up-labels_low)
+    axis(1, at = mid_point, unique(type_ordered), las = 2, cex.axis=0.3)
 }
-
-sapply(2:7, function(k) {
-    structure_cell_cycle_genes(exp_batch_removed_cpm_data, k, cell_phase_vector)
-    })
 ```
 
 
 
 
-#### Theta (genes)
+#### Gene assignment weights (Theta)
 
-For a $k$-cluster assignemnt, we computed $k$ vectors of assignment scores that weights
-the genes by their relative contribution to the clustering. Each of the $k$ vectors sums 
-up to 1. 
+For a $k$-cluster assignemnt, the admixture model assigns each gene a weight for its
+relative contribution to the cluster. 
 
-```{r echo=TRUE, eval=TRUE}
-exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm));
+##### 2 clusters
 
-structure_cell_cycle_thetas <- function(data, K, type_info)
-{
-    Topic_clus <- topics(data, K=K, tol=0.005)
-    word_weights <- Topic_clus$theta;
-    word_order <- order(word_weights[,1])
+Consider a 2-cluster scenario.
 
-    plot(word_weights[ word_order, 1], type = "l", col = 1)
-    for (i in 2:K) {
-        lines(word_weights[ word_order, i], type = "l", col = i)
-    }
-}
-sapply(2:7, function(k) {
-    structure_cell_cycle_thetas(exp_batch_removed_cpm_data, k, cell_phase_vector)
-    })
+```{r}
+topics_clust <- topics_list[[1]]
+clust <- topics_clust$K
+word_weights <- topics_clust$theta
 ```
 
-=======
-Topic_clus <- topics(data, K=K, tol=0.005);
-docweights <- Topic_clus$omega;
-type_ordered <- type_info[order(type_info)];
-docweights_ordered <- docweights[order(type_info),];
-barplot(t(docweights_ordered),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=0.3,cex.main=1.4);
-labels = match(unique(type_ordered), type_ordered);
-abline(v=labels-1)
+Order genes by difference between cluster weights.
 
-labels_low=labels-1;
-labels_up=c(labels_low[2:length(labels_low)],dim(docweights_ordered)[1]);
-mid_point <- labels_low +0.5*(labels_up-labels_low);
-axis(1,at=mid_point, unique(type_ordered),las=2,cex.axis=0.3);
+```{r}
+word_order <- order(abs(word_weights[,1] - word_weights[,2]) )
+matplot(word_weights[word_order, ], type = "l",
+        ylab = "cluster weights",
+        xlab = "genes ordered by differences between two cluster weights",
+        main = "2 clusters")
+```
+
+Output genes ordered by absolute differences between the two clusters
+
+```{r}
+geneNames <- rownames(molecules_single_cell_cycle)
+if (!file.exists("../output/batch_effect_cell_cycle_genes/batch-corrected-clust-2.txt")) {
+write.table(rev(geneNames[word_order]),
+            file = "../output/batch_effect_cell_cycle_genes/batch-corrected-clust-2.txt",
+            quote = FALSE, col.names = FALSE, row.names = FALSE)
 }
+```
 
-sapply(2:7, function(k) structure_cell_cycle_genes(exp_batch_removed_cpm_data,k,cell_phase_vector))
+List out hgnc symbol for the top 20 genes that distinguish the clusters.
 
-
+```{r}
+library(biomaRt)
+library(knitr)
+# define biomart object
+mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+# query biomart
+results <- getBM(attributes = c("hgnc_symbol", "description"), 
+                 filters = "ensembl_gene_id", 
+                 values = rev(geneNames[word_order])[1:20],
+                 mart = mart)
+kable(as.data.frame(results))
 ```
 
 
->>>>>>> 72d6a607259988e78047f6193250d813e9ae2b0a
+
+##### 3 clusters
+
+```{r}
+topics_clust <- topics_list[[2]]
+clust <- topics_clust$K
+word_weights <- topics_clust$theta
+```
+
+Order genes by difference between cluster weights. Compute differences based on
+mean of absolute deviation from the median.
+
+```{r}
+diff_vec <- apply(word_weights, 1 , function(per_gene) {
+                    mean(abs(per_gene - median(per_gene)))
+            })
+matplot(word_weights[order(diff_vec), ], type = "l",
+        ylab = "cluster weights",
+        xlab = "genes ordered by distances between cluster weights",
+        main = "3 clusters")
+```
+
+Output genes ordered by distance among clusters
+
+```{r}
+geneNames <- rownames(molecules_single_cell_cycle)
+if (!file.exists("../output/batch_effect_cell_cycle_genes/batch-corrected-clust-3.txt")) {
+write.table(rev(geneNames[order(diff_vec)]),
+            file = "../output/batch_effect_cell_cycle_genes/batch-corrected-clust-3.txt",
+            quote = FALSE, col.names = FALSE, row.names = FALSE)
+}
+```
+
+
+
+List out hgnc symbol for the top 20 genes that distinguish the two clusters.
+
+```{r}
+library(biomaRt)
+library(knitr)
+# define biomart object
+mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
+# query biomart
+results <- getBM(attributes = c("hgnc_symbol", "description"), 
+                 filters = "ensembl_gene_id", 
+                 values = rev(geneNames[order(diff_vec)])[1:20],
+                 mart = mart)
+kable(as.data.frame(results))
+```
+
+
+## Session information
+
+```{r}
+sessionInfo()
+```
+
