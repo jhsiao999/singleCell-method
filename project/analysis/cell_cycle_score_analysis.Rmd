@@ -34,7 +34,7 @@ Quality single cell index.
 ```{r echo=TRUE, eval=TRUE}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
-anno <- data.frame(fread('../data/annotation.txt'));
+anno <- data.frame(fread('../data/annotation.txt'))
 ```
 
 
@@ -56,7 +56,7 @@ stopifnot(ncol(reads) == nrow(anno),
 
 Exclude genes with a sum of 0 count across quality single cells.
 
-```{r, echo=TRUE, eval=TRUE}
+```{r}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
@@ -68,6 +68,7 @@ reads <- reads[expressed, ]
 molecules_single <- molecules %>% select(-contains("bulk"))
 reads_single <- reads %>% select(-contains("bulk"))
 ```
+
 
 Remove genes with max molecule numer larger than 1024
 
