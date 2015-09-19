@@ -1,8 +1,10 @@
 ---
 title: "RUV normalization of iPSC samples"
 author: "Kushal K Dey, Joyce H Siao"
-date: "July 27, 2015"
-output: html_document
+date: "2015-07-27"
+output: 
+  html_document:
+    toc: true
 ---
 
 The iPSC data was found to have individual effects and batch effects. The individual effect (there were 3 individuals) was the strongest, and both the reads/molecules data seemed to be clustering as per individuals. Initially it seemed there is no batch effect. But when we looked closely at one specific individual, we found that the batch effect seems to be there. So batch effect seems to be nested within the individual. RUV assumes the batch effects as additive and may not be a great tool to normalize when the two effects (individual and batch effect here) are such that one effect is nested within another. 
@@ -13,26 +15,26 @@ So, the aim of this script is two-fold
 
 2. To see if RUV normalization is performed within an individual, if the normalized samples show the batch effect or not.
 
-```{r packages, echo=TRUE, eval=TRUE}
 
-suppressMessages(suppressWarnings(library("edgeR")))
-suppressMessages(suppressWarnings(library("ggplot2")))
-theme_set(theme_bw(base_size = 16))
-suppressMessages(suppressWarnings(library("RUVSeq")))
-suppressMessages(suppressWarnings(library("preprocessCore")))
-suppressMessages(suppressWarnings(library("affy")))
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(reshape2)))
-suppressMessages(suppressWarnings(library(testit)))
-suppressMessages(suppressWarnings(library(qtlcharts)))
+```{r packages, warning=FALSE, message = FALSE}
+library("edgeR")
+library("ggplot2")
+library("RUVSeq")
+library("preprocessCore")
+library("affy")
+library(data.table)
+library(reshape2)
+library(testit)
+library(qtlcharts)
 source('functions.R')
-
 ```
+
+
+## Prepare data
 
 Reading the reads and the molecules data.
 
 ```{r data_read}
-
 anno <- read.table("../data/annotation.txt", header = TRUE,
                    stringsAsFactors = FALSE)
 
@@ -42,6 +44,7 @@ reads <- data.frame(fread("../data/reads.txt", header = FALSE,
 molecules <- data.frame(fread("../data/molecules.txt", header = TRUE,
                     stringsAsFactors = FALSE),row.names=1);
 ```
+
 
 Next we read the ERCC information table
 
@@ -99,9 +102,8 @@ We obtain the CPM data from the counts data
 ## calculating the cpm 
 
 molecules_single_cpm <- cpm(molecules_single_collision, log = TRUE)
-
-
 ```
+
 
 Detect which rows of the matrix correspond to ERCCs and which to actual genes.
 
@@ -136,17 +138,22 @@ ercc_final_lab <- ercc_rows_single_mod[as.numeric(which(numzeros <=50))];
   
 ```
 
+## ERCC log2CPM distribution
+
 We plot the signal or the log cpm values of the ERCC genes selected from above across the single cells to see how the behavioral pattern of these genes across the different single cells looks liek. It seems they are pretty uniformly varying across all the single cells. 
 
 ```{r }
-
-individual_id = unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[1]));
-batch_id = unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[2]));
+individual_id <- unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[1]));
+batch_id <- unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[2]));
 
 ercc_indiv <-  lapply(1:length(unique(individual_id)),function(n) molecules_single_ercc[,which(individual_id==unique(individual_id)[n])])
 
 batch_id_indiv <- lapply(1:length(unique(individual_id)),function(n) batch_id[which(individual_id==unique(individual_id)[n])]);
+```
 
+### Batch effect
+
+```{r}
 iplotCurves(log(ercc_indiv[[1]]+0.5,base=2))
 iplotCurves(log(ercc_indiv[[2]]+0.5,base=2))
 iplotCurves(log(ercc_indiv[[3]]+0.5,base=2))
@@ -160,6 +167,8 @@ iplotCurves(log(ercc_indiv[[3]]+0.5,base=2))
 It seems that the ERCC expression is not determined by the batch effects. 
 
 We next obtain the cell cycle phases.
+
+## Cell cycle
 
 ```{r cell_cycle}
 cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
@@ -225,13 +234,16 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 
 cell_phase_mat <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 cell_phase <- as.vector(as.matrix(data.frame(cell_phase_mat)))
-
-
+cell_phase <- factor(cell_phase, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 ```
+
+
+## RUV normalization
 
 First we do PC plots before RUV normalization and we check whether the batch effects show up or not in the ERCC genes. Ideally it should not show up.
 
-## PC plots ERCC genes before RUV
+### PC plots of ERCC genes before RUV
 
 ```{r PC_ERCC}
 
@@ -272,7 +284,7 @@ plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=5,
 
 Now we consider the PC plots of the non ERCC genes before RUV normalization. This should show batch effects if the batch effects indeed exist.
 
-## PC plots non ERCC genes before RUV
+### PC plots of non-ERCC genes before RUV
 
 ```{r PC_non_ERCC}
 

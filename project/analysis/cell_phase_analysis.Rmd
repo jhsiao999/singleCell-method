@@ -1,46 +1,48 @@
 ---
 title: "iPSC clustering and cell cycle phase matching"
 author: "Kushal K Dey, Joyce H. Siao"
-date: "July 13, 2015"
-output: html_document
+date: "2015-07-13"
+output: 
+  html_document:
+    toc: true
 ---
 
-```{r packages, echo=FALSE, eval=TRUE}
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(maptpx)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
-
-
+```{r packages, message=FALSE, warning = FALSE}
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
 ```
 
-The main focus of this script is to perform a clustering of iPSC using Structure and then trying to figure out if that clustering corresponds to the cell cycle phases as obtained by John Blischak. We first use his code to filter out the data set for both reads and molecules so as to remove the "drop-outs" cells and genes that are not expressed.
+The main focus of this script is to perform a clustering of iPSC using Structure and then trying to figure out 
+if that clustering corresponds to the cell cycle phases as obtained by John Blischak. We first use his code to 
+filter out the data set for both reads and molecules so as to remove the "drop-outs" cells and genes that are 
+not expressed.
 
 
-- read the reads and molecules files 
+## Prepare data
 
-```{r echo=TRUE, eval=TRUE}
+Read the reads and molecules files 
 
-#setwd('/Users/kushal/Documents/Matthew Stephens Project/counts_clustering/Single_Cell_seq_Blischak/src/');
+```{r}
 reads <- data.frame(fread('../data/reads.txt'),row.names=1);
 molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
-
 ```
 
-- read the quality check file and the annotation file
+Read the quality check file and the annotation file
 
-```{r echo=TRUE, eval=TRUE}
+```{r}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
 
 anno <- data.frame(fread('../data/annotation.txt'));
 ```
 
-- Removing the non single cells or bulk data
+Removing the non single cells or bulk data
 
-```{r, echo=TRUE, eval=TRUE}
+```{r}
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
 anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
@@ -53,9 +55,9 @@ stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
 ```
 
-- Filtering out gens with zero counts in single cells/ bulk.
+Filtering out gens with zero counts in single cells/ bulk.
 
-```{r, echo=TRUE, eval=TRUE}
+```{r}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
@@ -72,14 +74,13 @@ reads_single <- reads %>% select(-contains("bulk"))
 ## Remove genes with max molecule numer larger than 1024
 
 molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
-
-
 ```
 
-- Obtain cell cycle information for the genes
+## Cell cycle
 
-```{r echo=TRUE, eval=TRUE}
+Obtain cell cycle information for the genes
 
+```{r}
 cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
 
 ## create 5 lists of 5 phases (de-level and then remove "")
@@ -87,16 +88,12 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
   temp <- as.character(cell_cycle_genes[,x])
   temp[temp!=""]
 })
-
-
 ```
 
-- Obtain phase scores for each sample
+Obtain phase scores for each sample
 
 ```{r echo=TRUE, eval=TRUE}
-
-ans <-
-sapply(cell_cycle_genes_list,function(xx){
+ans <- sapply(cell_cycle_genes_list,function(xx){
   #### create table of each phase
   reads_single_phase <- reads_single[rownames(reads_single) %in% unlist(xx) ,]
   #### add average expression of all genes in the phase
@@ -117,15 +114,12 @@ sapply(cell_cycle_genes_list,function(xx){
 })
 
 head(ans)
-
-
 ```
 
 
-- Two step normalization of phase-specific scores
+Two step normalization of phase-specific scores
 
 ```{r echo=TRUE, eval=TRUE}
-
 #### normalization function
 flexible_normalization <- function(data_in,by_row=TRUE){
   if(by_row){
@@ -158,32 +152,36 @@ head(ans_normed_normed)
 
 ```
 
-- Assign cell phase for each cell
+Assign cell phase for each cell
 
 ```{r echo=TRUE, eval=TRUE}
-
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
-assign_cell_phase <- data.frame(cell_phase)
-
-
+#assign_cell_phase <- data.frame(cell_phase)
+cell_phase <- factor(cell_phase, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 ```
+
+
+## Admixture model on reads
 
 We check from here on if these cell phases show up in the Structure clustering.
 
 We perform Structure plots on the reads data for $K=5,6,7$ and also compare the model fit for different clusters using Bayes factor. 
 
-```{r echo=FALSE, eval=FALSE}
-K=6;
-Topic_Clus_reads <- topics(t(reads_single),K=6,tol=0.003);
 
-write.table(Topic_Clus_reads$omega,paste0('../data_derived/topic_omega_reads_clus_',K,'.txt'));
-
-write.table(Topic_Clus_reads$theta,paste0('../data_derived/topic_theta_reads_clus_',K,'.txt'));
-
-
+```{r}
+if (!file.exists("../output/cell-phase-analysis/topic-omega-reads-clust-6.txt")) {
+    for (per_clust in c(5, 6, 7)) {
+        topics_reads <- topics(t(reads_single), K = per_clust, tol = 0.003)
+        write.table(topics_reads$omega, 
+                    paste0('../output/cell-phase-analysis/topic-omega-reads-clus-', per_clust, '.txt') )
+        write.table(topics_reads$theta, 
+                    paste0('../output/cell-phase-analysis/topic-theta-reads-clus-', per_clust,'.txt') )
+    }
+} 
 ```
 
-## Cell cycle effects (reads)
+## Cell cycle effects
 
 ```{r echo=FALSE, eval=TRUE}
 

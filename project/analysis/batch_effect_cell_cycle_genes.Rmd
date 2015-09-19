@@ -1,8 +1,10 @@
 ---
 title: "Batch effect modeling"
 author: "Kushal K Dey and Joyce Hsiao"
-date: "September 16, 2015"
-output: html_document
+date: "2015-09-16"
+output: 
+  html_document:
+    toc: true
 ---
 
 ## Goal 
