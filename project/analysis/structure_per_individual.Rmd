@@ -1,30 +1,39 @@
 ---
 title: 'iPSC clustering: are there hidden cell cycle effects?'
-author: "Kushal K Dey, Joyce H. Siao"
-date: "July 21, 2015"
-output: html_document
+author: "Kushal K Dey, Joyce Hsiao"
+date: "2015-07-21"
+output: 
+  html_document:
+    toc: true
 ---
 
 When we performed Structure on the single cell - gene data table of counts, with the aim to cluster the single cells, we observed that the individual effets largely drove the clusters and the cell cycle specific effects did not show up. A general feeling is that if we account for the individual effect as a batch effect and redo our analysis, we should get the cell cycle information getting reflected in the cluster patterns. But is it true?...What if we do the analysis and then find that the cell cycle specific effects do not show up?...Can we be little more confident about what whether we would get some cell cycle driven clusters once we use individual information as a batch effect in our statistical model. One way to figure this out would be to cluster the single cells by the Structure model 
 
-```{r, echo=FALSE, eval=TRUE}
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(maptpx)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
+```{r, message = FALSE, warning = FALSE}
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+```
 
+## Prepare data
 
-#setwd('/Users/kushal/Documents/Matthew Stephens Project/counts_clustering/Single_Cell_seq_Blischak/src/');
-reads <- data.frame(fread('../data/reads.txt'),row.names=1);
-molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
+Import raw read and molecule count.
 
+```{r}
+reads <- data.frame(fread('../data/reads.txt'), row.names=1)
+molecules <-  data.frame(fread('../data/molecules.txt'), row.names=1)
+```
 
+Quality single cells
+
+```{r}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
 
-anno <- data.frame(fread('../data/annotation.txt'));
+anno <- data.frame(fread('../data/annotation.txt'))
 
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
@@ -36,17 +45,20 @@ reads <- reads[, grepl("bulk", colnames(reads)) |
                          colnames(reads) %in% quality_single_cells]
 stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
+```
 
+Remove genes that have 0 count across single cells.
 
+```{r}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
-#dim(molecules)
+dim(molecules)
 
 expressed <- rowSums(reads[, anno$well == "bulk"]) > 0 &
              rowSums(reads[, anno$well != "bulk"]) > 0
 reads <- reads[expressed, ]
-#dim(reads)
+dim(reads)
 
 stopifnot(nrow(ercc) == 92)
 quality_single_cells <- scan("../data/quality-single-cells.txt",
@@ -66,11 +78,12 @@ molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
 molecules_single <- molecules_single[-grep("ERCC",rownames(molecules_single)),]; 
 
 reads_single <- reads_single[-grep("ERCC",rownames(reads_single)),];
+```
 
 
+## Cell cycle
 
-
-
+```{r}
 cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
 
 ## create 5 lists of 5 phases (de-level and then remove "")
@@ -129,13 +142,22 @@ flexible_normalization <- function(data_in,by_row=TRUE){
 ans_normed <- flexible_normalization(ans,by_row=FALSE)
 ## then normalized of each cell
 ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
+head(ans_normed_normed)
+```
 
-#head(ans_normed_normed)
+Cell phase vector.
 
+```{r}
 cell_phase_mat <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 cell_phase <- as.vector(as.matrix(data.frame(cell_phase_mat)))
-
+cell_phase <- factor(cell_phase, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 ```
+
+
+## Admixture model
+
+### Individual 19299
 
 We first choose the single cells coming from the first individual.
 
@@ -212,6 +234,9 @@ What happens when we fix one individual and one batch?...Do we then get the cell
 
 We consider two different senarios with fixed individual and fixed batch. 
 
+
+### Individual #1 batch #1
+
 ```{r echo=TRUE, eval=TRUE, cache=FALSE}
   counts_data <- molecules_single
   nclus <- 5
@@ -250,6 +275,7 @@ We consider two different senarios with fixed individual and fixed batch.
 
 ```
 
+### Individaul #3 batch #3
 
 ```{r echo=FALSE, eval=TRUE, cache=FALSE}
   counts_data <- molecules_single

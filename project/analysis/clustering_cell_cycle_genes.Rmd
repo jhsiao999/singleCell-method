@@ -1,8 +1,10 @@
 ---
 title: "Clustering of transcriptional profile based on cell cycle genes"
 author: "Kushal K Dey, Joyce Hsiao"
-date: "September 17, 2015"
-output: html_document
+date: "2015-09-17"
+output: 
+  html_document:
+    toc: true
 ---
 
 ## Goal

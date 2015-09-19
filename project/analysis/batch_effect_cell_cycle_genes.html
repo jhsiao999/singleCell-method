@@ -70,9 +70,21 @@ img {
 <div id="header">
 <h1 class="title">Batch effect modeling</h1>
 <h4 class="author"><em>Kushal K Dey and Joyce Hsiao</em></h4>
-<h4 class="date"><em>September 16, 2015</em></h4>
+<h4 class="date"><em>2015-09-16</em></h4>
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#goal">Goal</a></li>
+<li><a href="#prepare-data">Prepare data</a></li>
+<li><a href="#cell-cycle-genes">Cell-cycle genes</a></li>
+<li><a href="#batch-effect-correction">Batch effect correction</a><ul>
+<li><a href="#remove-batch-effect">Remove batch effect</a></li>
+<li><a href="#batch-corrected-counts">Batch-corrected counts</a></li>
+</ul></li>
+<li><a href="#session-information">Session information</a></li>
+</ul>
+</div>
 
 <div id="goal" class="section level2">
 <h2>Goal</h2>
@@ -241,11 +253,11 @@ heatmap.2(cor_batch,scale=&quot;none&quot;, trace=&quot;none&quot;,
 xtabs(~out$cluster+cell_phase_vector)</code></pre>
 <pre><code>##            cell_phase_vector
 ## out$cluster G1.S  S G2.M  M M.G1
-##           1   42 30    9 14   33
-##           2   58 29    7  5   34
-##           3   26 12    9  4   11
-##           4   27 22   28 36   23
-##           5   14 10   45 31   19</code></pre>
+##           1   24 11    8  4   11
+##           2   11 10   20 22   11
+##           3   41 28    7 12   28
+##           4   57 31   23 15   35
+##           5   34 23   40 37   35</code></pre>
 <p>None of the hierarchical clustering heatmaps or the kmeans algorithm seem to show distinct clusters of the cell cycle effects. We take the exponent of the normalized terms, apply an admixture model to the remodeled normalized data.</p>
 <p>CJH: This shows the mean differences are removed in the batch-corrected data.</p>
 </div>

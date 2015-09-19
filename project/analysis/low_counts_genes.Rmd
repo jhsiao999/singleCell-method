@@ -1,8 +1,10 @@
 ---
 title: "low counts genes??…iPSC clustering"
 author: "Kushal K Dey"
-date: "July 21, 2015"
-output: html_document
+date: "2015-07-21"
+output: 
+  html_document:
+    toc: true
 ---
 
 
@@ -10,21 +12,26 @@ In this script, we try to figure out if some of the genes with very low counts f
 
 We start with the dataset of single cells and genes table that was obtained after various QC checks and filtering of both cells and genes.
 
-```{r packages, echo=FALSE, eval=TRUE}
 
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(maptpx)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
+```{r, message = FALSE, warning = FALSE}
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+```
 
+## Prepare data
 
-#setwd('/Users/kushal/Documents/Matthew Stephens Project/counts_clustering/Single_Cell_seq_Blischak/src/');
+```{r}
 reads <- data.frame(fread('../data/reads.txt'),row.names=1);
 molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
+```
 
+Quality single cells
 
+```{r}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
 
@@ -40,54 +47,60 @@ reads <- reads[, grepl("bulk", colnames(reads)) |
                          colnames(reads) %in% quality_single_cells]
 stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
+```
 
 
+Remove over-expressed genes and bulk samples.
+
+```{r}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
-#dim(molecules)
+dim(molecules)
 
 expressed <- rowSums(reads[, anno$well == "bulk"]) > 0 &
              rowSums(reads[, anno$well != "bulk"]) > 0
 reads <- reads[expressed, ]
-#dim(reads)
+dim(reads)
 
 molecules_single <- molecules %>% select(-contains("bulk"))
 reads_single <- reads %>% select(-contains("bulk"))
 
 ## Remove genes with max molecule numer larger than 1024
-
 molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
-
-
 ```
 
+
+## Gene count distribution
 
 We mainly focus on the molecules data because they correspond to UMI tagging. 
 
 ```{r echo=TRUE, eval=TRUE}
 
-gene_counts_molecules <- rowSums(molecules_single);
-plot(density(log(gene_counts_molecules+1)),xlab="log total reads per gene",ylab="density",
-     main="Density plot of log total reads per gene (molecules)",col="red");
+gene_counts_molecules <- rowSums(molecules_single)
+plot( density(log(gene_counts_molecules+1) ),
+     xlab="log total reads per gene", ylab="density",
+     main="Density plot of log total reads per gene (molecules)", col="red")
 
-hist(log(gene_counts_molecules+1),xlab="log total reads per gene",ylab="frequency",
-     main="Histogram of log total reads per gene (molecules)",col="gray")
+hist( log(gene_counts_molecules+1),
+      xlab="log total reads per gene", ylab="frequency",
+      main="Histogram of log total reads per gene (molecules)", col="gray")
 
-gene_counts_reads <- rowSums(reads_single);
-plot(density(log(gene_counts_reads+1)),xlab="log total reads per gene",ylab="density",
-     main="Density plot of log total reads per gene (reads)",col="red");
+gene_counts_reads <- rowSums(reads_single)
+plot(density(log(gene_counts_reads+1)), 
+     xlab="log total reads per gene",ylab="density",
+     main="Density plot of log total reads per gene (reads)", col="red")
 
-hist(log(gene_counts_reads+1),xlab="log total reads per gene",ylab="frequency",
-     main="Histogram of log total reads per gene (reads)",col="gray")
-
-
+hist( log(gene_counts_reads+1),
+     xlab="log total reads per gene", ylab="frequency",
+     main="Histogram of log total reads per gene (reads)", col="gray")
 ```
+
+## Sparsity
 
 We now examine the sparsity in the dataset
 
 ```{r echo=TRUE, eval=TRUE}
-
 gene_counts_zeros_molecules <- apply(molecules_single,1, function(x) length(which(x==0))/length(x));
 
 plot(density(gene_counts_zeros_molecules),xlab="prop. zero reads per gene",ylab="density",
@@ -104,6 +117,4 @@ plot(density(gene_counts_zeros_reads),xlab="prop. zero reads per gene",ylab="den
 
 hist(gene_counts_zeros_reads,xlab="prop. zero reads per gene",ylab="frequency",
      main="Histogram of prop of  zero reads per gene (reads)",col="gray")
-
-
 ```
