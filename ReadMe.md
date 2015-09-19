@@ -32,8 +32,9 @@ For consistency, we structure the content as follows:
 *  Add input data (e.g., count matrix and phenotypes) to `project/data`.
 *  Add output files (e.g., Admixture proportions and Structure plots)
    to `project/output/name-of-the-html-page/`.
-*  Add word documents (e.g., method summary) to `project/notes`.
 *  Add `rda` files (e.g., results) to `project/rdas`.
+*  Add word documents (e.g., method summary) to `project/notes`.
+*  Add figures (pdfs or pngs) to `project/figures`
 
 
 
