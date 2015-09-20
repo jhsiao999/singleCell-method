@@ -1,8 +1,10 @@
 ---
 title: "Batch effect modeling on all genes"
 author: "Kushal K Dey"
-date: "September 3, 2015"
-output: html_document
+date: "2015-09-03"
+output: 
+  html_document:
+    toc: true
 ---
 
 In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not. 
@@ -21,21 +23,18 @@ suppressMessages(suppressWarnings(library(qtlcharts)))
 suppressMessages(suppressWarnings(library(limma)))
 ```
 
-```{r echo=FALSE, eval=TRUE}
-
-setwd('/Users/kushal/Documents/singlecellseq/src/');
+```{r}
 reads <- data.frame(fread('../data/reads.txt'),row.names=1);
 molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
-
 ```
 
-```{r echo=FALSE, eval=TRUE}
+```{r}
 quality_single_cells <- scan("../data/quality-single-cells.txt",
                              what = "character")
 anno <- data.frame(fread('../data/annotation.txt'));
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r}
 molecules <- molecules[, grepl("bulk", colnames(molecules)) |
                          colnames(molecules) %in% quality_single_cells]
 anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
@@ -48,7 +47,7 @@ stopifnot(ncol(reads) == nrow(anno),
           colnames(reads) == anno$sample_id)
 ```
 
-```{r, echo=FALSE, eval=TRUE}
+```{r}
 expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
              rowSums(molecules[, anno$well != "bulk"]) > 0
 molecules <- molecules[expressed, ]
@@ -70,7 +69,7 @@ molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
 
 Now we draw a list of marker genes that have cell cycle information.
 
-```{r echo=TRUE, eval=TRUE}
+```{r}
 
 cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
 
@@ -83,9 +82,8 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
 labs=unique(unlist(lapply(1:5, function(k) match(cell_cycle_genes_list[[k]],rownames(molecules_single)))));
 labs = labs[!is.na(labs)];
 molecules_single_cell_cycle <- molecules_single[labs,];
-
-
 ```
+
 
 
 We fix the cell phase scores

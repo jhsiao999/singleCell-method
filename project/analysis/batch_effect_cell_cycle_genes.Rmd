@@ -1,8 +1,10 @@
 ---
 title: "Batch effect modeling"
 author: "Kushal K Dey and Joyce Hsiao"
-date: "September 16, 2015"
-output: html_document
+date: "2015-09-16"
+output: 
+  html_document:
+    toc: true
 ---
 
 ## Goal 
@@ -154,6 +156,8 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
 cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
+cell_phase_vector <- factor(cell_phase_vector, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 ```
 
 

@@ -1,9 +1,12 @@
 ---
 title: "Short title highlighting your analysis"
 author: "your name"
-date: "date"
-output: html_document
+date: "YYYY-MM-DD"
+output: 
+  html_document:
+    toc: true
 ---
+
 
 ## Goal
 
@@ -18,7 +21,6 @@ Analysis objectives
 
 
 ## Session information
-
 ```{r}
 
 ```
