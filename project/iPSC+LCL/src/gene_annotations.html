@@ -241,6 +241,156 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 </tr>
 </tbody>
 </table>
+</div>
+<div id="cell-cycle-gene-analysis" class="section level2">
+<h2>Cell cycle gene analysis</h2>
+<p>Now we consider the relative epxression profile of the cell cycle genes from the analysis constrained to cell cycle genes only and now we shall look at the similar analysis as above for <span class="math">\(k=2\)</span> but constraining the genes to be the cell cycle genes.</p>
+<pre class="r"><code>theta &lt;- as.matrix(read.table('Structure/batch_uncorrected_cell_cycle_genes//clus_2/theta_mat.txt'));
+features &lt;- ExtractTopFeatures(theta,top_features=10,method=&quot;poisson&quot;)
+
+features_vec &lt;- unique(as.vector(features));
+
+class &lt;- as.numeric(apply(theta[features_vec,], 1, which.max))
+
+imp_gene_names &lt;- rownames(theta[features_vec,]);
+
+imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(class==x)]);</code></pre>
+<div id="gene-annotations-1" class="section level3">
+<h3>Gene Annotations</h3>
+<p>The gene annotations of the driving genes with higher expression in first cluster mainly represented by iPSCs.</p>
+<pre class="r"><code>out &lt;- queryMany(imp_genes_per_class[[1]], scopes=&quot;ensembl.gene&quot;, fields=c(&quot;name&quot;, &quot;summary&quot;), species=&quot;human&quot;);</code></pre>
+<pre><code>## Finished</code></pre>
+<pre class="r"><code>kable(as.data.frame(out))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">query</th>
+<th align="left">X_id</th>
+<th align="left">name</th>
+<th align="left">summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ENSG00000174720</td>
+<td align="left">51574</td>
+<td align="left">La ribonucleoprotein domain family, member 7</td>
+<td align="left">This gene encodes a protein which is found in the 7SK snRNP (small nuclear ribonucleoprotein). This snRNP complex inhibits a cyclin-dependent kinase, positive transcription elongation factor b, which is required for paused RNA polymerase II at a promoter to begin transcription elongation. A pseudogene of this gene is located on chromosome 3. Alternative splicing results in multiple transcript variants.</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000086475</td>
+<td align="left">22929</td>
+<td align="left">selenophosphate synthetase 1</td>
+<td align="left">This gene encodes an enzyme that synthesizes selenophosphate from selenide and ATP. Selenophosphate is the selenium donor used to synthesize selenocysteine, which is co-translationally incorporated into selenoproteins at in-frame UGA codons.</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000122786</td>
+<td align="left">800</td>
+<td align="left">caldesmon 1</td>
+<td align="left">This gene encodes a calmodulin- and actin-binding protein that plays an essential role in the regulation of smooth muscle and nonmuscle contraction. The conserved domain of this protein possesses the binding activities to Ca(2+)-calmodulin, actin, tropomyosin, myosin, and phospholipids. This protein is a potent inhibitor of the actin-tropomyosin activated myosin MgATPase, and serves as a mediating factor for Ca(2+)-dependent inhibition of smooth muscle contraction. Alternative splicing of this gene results in multiple transcript variants encoding distinct isoforms.</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000029993</td>
+<td align="left">3149</td>
+<td align="left">high mobility group box 3</td>
+<td align="left">This gene encodes a member of a family of proteins containing one or more high mobility group DNA-binding motifs. The encoded protein plays an important role in maintaining stem cell populations, and may be aberrantly expressed in tumor cells. A mutation in this gene was associated with microphthalmia, syndromic 13. There are numerous pseudogenes of this gene on multiple chromosomes. Alternative splicing results in multiple transcript variants.</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000196950</td>
+<td align="left">57181</td>
+<td align="left">solute carrier family 39 (zinc transporter), member 10</td>
+<td align="left">Zinc is an essential cofactor for hundreds of enzymes. It is involved in protein, nucleic acid, carbohydrate, and lipid metabolism, as well as in the control of gene transcription, growth, development, and differentiation. SLC39A10 belongs to a subfamily of proteins that show structural characteristics of zinc transporters (Taylor and Nicholson, 2003 [PubMed 12659941]).</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000129195</td>
+<td align="left">54478</td>
+<td align="left">family with sequence similarity 64, member A</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000109971</td>
+<td align="left">3312</td>
+<td align="left">heat shock 70kDa protein 8</td>
+<td align="left">This gene encodes a member of the heat shock protein 70 family, which contains both heat-inducible and constitutively expressed members. This protein belongs to the latter group, which are also referred to as heat-shock cognate proteins. It functions as a chaperone, and binds to nascent polypeptides to facilitate correct folding. It also functions as an ATPase in the disassembly of clathrin-coated vesicles during transport of membrane components through the cell. Alternatively spliced transcript variants encoding different isoforms have been found for this gene.</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000137267</td>
+<td align="left">7280</td>
+<td align="left">tubulin, beta 2A class IIa</td>
+<td align="left">Microtubules, key participants in processes such as mitosis and intracellular transport, are composed of heterodimers of alpha- and beta-tubulins. The protein encoded by this gene is a beta-tubulin. Defects in this gene are associated with complex cortical dysplasia with other brain malformations-5. Two transcript variants encoding distinct isoforms have been found for this gene.</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000102804</td>
+<td align="left">8848</td>
+<td align="left">TSC22 domain family, member 1</td>
+<td align="left">This gene encodes a member of the TSC22 domain family of leucine zipper transcription factors. The encoded protein is stimulated by transforming growth factor beta, and regulates the transcription of multiple genes including C-type natriuretic peptide. The encoded protein may play a critical role in tumor suppression through the induction of cancer cell apoptosis, and a single nucleotide polymorphism in the promoter of this gene has been associated with diabetic nephropathy. Alternatively spliced transcript variants encoding multiple isoforms have been observed for this gene.</td>
+</tr>
+</tbody>
+</table>
+<p>Now the same analysis done on LCLs gives us the following</p>
+<pre class="r"><code>out &lt;- queryMany(imp_genes_per_class[[2]], scopes=&quot;ensembl.gene&quot;, fields=c(&quot;name&quot;, &quot;summary&quot;), species=&quot;human&quot;);</code></pre>
+<pre><code>## Finished</code></pre>
+<pre class="r"><code>kable(as.data.frame(out))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">query</th>
+<th align="left">X_id</th>
+<th align="left">name</th>
+<th align="left">summary</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ENSG00000003402</td>
+<td align="left">8837</td>
+<td align="left">CASP8 and FADD-like apoptosis regulator</td>
+<td align="left">The protein encoded by this gene is a regulator of apoptosis and is structurally similar to caspase-8. However, the encoded protein lacks caspase activity and appears to be itself cleaved into two peptides by caspase-8. Several transcript variants encoding different isoforms have been found for this gene, and partial evidence for several more variants exists.</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000142541</td>
+<td align="left">23521</td>
+<td align="left">ribosomal protein L13a</td>
+<td align="left">Ribosomes, the organelles that catalyze protein synthesis, consist of a small 40S subunit and a large 60S subunit. Together these subunits are composed of 4 RNA species and approximately 80 structurally distinct proteins. This gene encodes a member of the L13P family of ribosomal proteins that is a component of the 60S subunit. The encoded protein also plays a role in the repression of inflammatory genes as a component of the IFN-gamma-activated inhibitor of translation (GAIT) complex. This gene is co-transcribed with the small nucleolar RNA genes U32, U33, U34, and U35, which are located in the second, fourth, fifth, and sixth introns, respectively. As is typical for genes encoding ribosomal proteins, there are multiple processed pseudogenes of this gene dispersed throughout the genome. Alternatively spliced transcript variants encoding multiple isoforms have been observed for this gene.</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000113441</td>
+<td align="left">4012</td>
+<td align="left">leucyl/cystinyl aminopeptidase</td>
+<td align="left">This gene encodes a zinc-dependent aminopeptidase that cleaves vasopressin, oxytocin, lys-bradykinin, met-enkephalin, dynorphin A and other peptide hormones. The protein can be secreted in maternal serum, reside in intracellular vesicles with the insulin-responsive glucose transporter GLUT4, or form a type II integral membrane glycoprotein. The protein catalyzes the final step in the conversion of angiotensinogen to angiotensin IV (AT4) and is also a receptor for AT4. Alternative splicing results in multiple transcript variants encoding different isoforms.</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000115415</td>
+<td align="left">6772</td>
+<td align="left">signal transducer and activator of transcription 1, 91kDa</td>
+<td align="left">The protein encoded by this gene is a member of the STAT protein family. In response to cytokines and growth factors, STAT family members are phosphorylated by the receptor associated kinases, and then form homo- or heterodimers that translocate to the cell nucleus where they act as transcription activators. This protein can be activated by various ligands including interferon-alpha, interferon-gamma, EGF, PDGF and IL6. This protein mediates the expression of a variety of genes, which is thought to be important for cell viability in response to different cell stimuli and pathogens. Two alternatively spliced transcript variants encoding distinct isoforms have been described.</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000113580</td>
+<td align="left">2908</td>
+<td align="left">nuclear receptor subfamily 3, group C, member 1 (glucocorticoid receptor)</td>
+<td align="left">This gene encodes glucocorticoid receptor, which can function both as a transcription factor that binds to glucocorticoid response elements in the promoters of glucocorticoid responsive genes to activate their transcription, and as a regulator of other transcription factors. This receptor is typically found in the cytoplasm, but upon ligand binding, is transported into the nucleus. It is involved in inflammatory responses, cellular proliferation, and differentiation in target tissues. Mutations in this gene are associated with generalized glucocorticoid resistance. Alternative splicing of this gene results in transcript variants encoding either the same or different isoforms. Additional isoforms resulting from the use of alternate in-frame translation initiation sites have also been described, and shown to be functional, displaying diverse cytoplasm-to-nucleus trafficking patterns and distinct transcriptional activities (<a href="PMID:15866175" class="uri">PMID:15866175</a>).</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000067082</td>
+<td align="left">1316</td>
+<td align="left">Kruppel-like factor 6</td>
+<td align="left">This gene encodes a member of the Kruppel-like family of transcription factors. The zinc finger protein is a transcriptional activator, and functions as a tumor suppressor. Multiple transcript variants encoding different isoforms have been found for this gene, some of which are implicated in carcinogenesis.</td>
+</tr>
+<tr class="odd">
+<td align="left">ENSG00000160216</td>
+<td align="left">56894</td>
+<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 3</td>
+<td align="left">The protein encoded by this gene is an acyltransferase that converts lysophosphatidic acid into phosphatidic acid, which is the second step in the de novo phospholipid biosynthetic pathway. The encoded protein may be an integral membrane protein. Two transcript variants encoding the same protein have been found for this gene.</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000124151</td>
+<td align="left">8202</td>
+<td align="left">nuclear receptor coactivator 3</td>
+<td align="left">The protein encoded by this gene is a nuclear receptor coactivator that interacts with nuclear hormone receptors to enhance their transcriptional activator functions. The encoded protein has histone acetyltransferase activity and recruits p300/CBP-associated factor and CREB binding protein as part of a multisubunit coactivation complex. This protein is initially found in the cytoplasm but is translocated into the nucleus upon phosphorylation. Several transcript variants encoding different isoforms have been found for this gene. In addition, a polymorphic repeat region is found in the C-terminus of the encoded protein.</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.2.0 (2015-04-16)
 ## Platform: x86_64-apple-darwin14.3.0 (64-bit)
@@ -271,24 +421,25 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 ## [17] plyr_1.8.3              stringr_1.0.0          
 ## [19] zlibbioc_1.14.0         Biostrings_2.36.1      
 ## [21] munsell_0.4.2           gtable_0.1.2           
-## [23] futile.logger_1.4.1     evaluate_0.7.2         
-## [25] latticeExtra_0.6-26     biomaRt_2.24.0         
-## [27] highr_0.5               proto_0.3-10           
-## [29] Rcpp_0.12.1             acepack_1.3-3.3        
-## [31] scales_0.2.5            formatR_1.2            
-## [33] Hmisc_3.16-0            jsonlite_0.9.16        
-## [35] XVector_0.8.0           Rsamtools_1.20.4       
-## [37] gridExtra_0.9.1         ggplot2_1.0.1          
-## [39] digest_0.6.8            stringi_0.5-5          
-## [41] grid_3.2.0              tools_3.2.0            
-## [43] bitops_1.0-6            magrittr_1.5           
-## [45] sqldf_0.4-10            RCurl_1.95-4.6         
-## [47] RSQLite_1.0.0           Formula_1.2-1          
-## [49] cluster_2.0.1           futile.options_1.0.0   
-## [51] MASS_7.3-40             rmarkdown_0.7          
-## [53] httr_0.6.1              rstudioapi_0.3.1       
-## [55] rpart_4.1-9             GenomicAlignments_1.4.1
-## [57] nnet_7.3-9</code></pre>
+## [23] futile.logger_1.4.1     codetools_0.2-11       
+## [25] evaluate_0.7.2          latticeExtra_0.6-26    
+## [27] biomaRt_2.24.0          highr_0.5              
+## [29] proto_0.3-10            Rcpp_0.12.1            
+## [31] acepack_1.3-3.3         scales_0.2.5           
+## [33] formatR_1.2             Hmisc_3.16-0           
+## [35] jsonlite_0.9.16         XVector_0.8.0          
+## [37] Rsamtools_1.20.4        gridExtra_0.9.1        
+## [39] ggplot2_1.0.1           digest_0.6.8           
+## [41] stringi_0.5-5           grid_3.2.0             
+## [43] tools_3.2.0             bitops_1.0-6           
+## [45] magrittr_1.5            sqldf_0.4-10           
+## [47] RCurl_1.95-4.6          RSQLite_1.0.0          
+## [49] Formula_1.2-1           cluster_2.0.1          
+## [51] futile.options_1.0.0    MASS_7.3-40            
+## [53] rmarkdown_0.7           httr_0.6.1             
+## [55] rstudioapi_0.3.1        rpart_4.1-9            
+## [57] GenomicAlignments_1.4.1 nnet_7.3-9</code></pre>
+</div>
 </div>
 
 
