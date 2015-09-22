@@ -2,29 +2,31 @@
 title: "iPSC + LCL pooled Structure"
 author: "Kushal K Dey & Joyce Hsiao"
 date: "September 16, 2015"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
-### Goal
+## Objective
 
 In this script, we consider the pooled data from iPSC and LCL and try to cluster them to see what patterns show up in the analysis. In this script, we shall consider throughout only the single cells from the iPSC study and the single cells from the LCL study and then apply the Structure model on the combined single cell level data from these two sources. 
 
 ```{r packages, echo=TRUE, eval=TRUE}
 rm(list=ls())
 setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
-library(readr)
-library(data.table)
-library(devtools)
-library(CountClust)
-library(maptpx)
-library(parallel)
-library(dplyr)
-library(ggplot2)
-library(edgeR)
-library(gplots)
+suppressMessages(suppressWarnings(library(CountClust)))
+suppressMessages(suppressWarnings(library(data.table)))
+suppressMessages(suppressWarnings(library(gplots)))
+suppressMessages(suppressWarnings(library(philentropy)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(edgeR)))
+suppressMessages(suppressWarnings(library(qtlcharts)))
+suppressMessages(suppressWarnings(library(limma)))
+suppressMessages(suppressWarnings(library(readr)))
+
 ```
 
-### Preparing the LCL data
+## Preparing the LCL data
 
 ```{r lcl_data, echo=TRUE, eval=TRUE}
 
@@ -129,7 +131,7 @@ cell_phase_LCL <- paste0(as.vector(as.matrix(assign_cell_phase)),"_","LCL");
 
 ```
 
-### Preparing the iPSC data
+## Preparing the iPSC data
 
 ```{r ipsc, echo=TRUE, eval=TRUE}
 
@@ -216,6 +218,8 @@ cell_phase_iPSC <- paste0(as.vector(as.matrix(assign_cell_phase)),"_","iPSC");
 
 ```
 
+## Pooling LCL and iPSC cells
+
 We now pool the LCL and the iPSC cells together
 
 ```{r pool_data, echo=TRUE, eval=TRUE}
@@ -227,7 +231,12 @@ cell_phase_pooled <- c(cell_phase_iPSC, cell_phase_LCL);
 
 ```
 
-Now we fit Structure model on the pooled data without lane correction.
+
+## All genes analysis
+
+### Batch uncorrected model
+
+Now we fit Structure model on the pooled data without batch-individual correction.
 
 ```{r echo=TRUE, eval=TRUE}
 
@@ -238,57 +247,57 @@ if(!dir.exists("Structure/batch_uncorrected_single")) dir.create("Structure/batc
 
 nclus_vec <- 2:5;
 
-#for(num in 1:length(nclus_vec))
-#{
-#  if(!dir.exists(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]))
-#  obj <- StructureObj(molecules_single_pooled,nclus_vec[num],samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path=paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]),partition=c('TRUE'));
-#}
+#StructureObj(molecules_single_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_LCL.rda",partition=c('TRUE'),path_struct = NULL);
+
+lcl_topics <- get(load("../../../project/rdas/topic_fit_LCL.rda"));
+
+if(!dir.exists("../../figures/lcl_structure")) dir.create("../../figures/lcl_structure")
 
 for(num in 1:length(nclus_vec))
 {
-  if(!dir.exists(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]))
-  omega <- as.matrix(data.frame(fread(paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num],"/omega_mat.txt")))[,-1]);
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = NULL, path=paste0("Structure/batch_uncorrected_single/clus_",nclus_vec[num]),partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"));
+ if(!dir.exists(paste0("../../figures/lcl_structure/clus_",nclus_vec[num]))) dir.create(paste0("../../figures/lcl_structure/clus_",nclus_vec[num]))
+obj <- StructureObj_omega(lcl_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"),path_struct=paste0('../../figures/lcl_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }
 
 
 ```
 
-### Structure on all genes (by cell phase)
+#### Structure on all genes (by cell phase)
 
-<img src='Structure/batch_uncorrected_single/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
 
-### Structure on all genes (by batch)
+#### Structure on all genes (by batch)
 
-<img src='Structure/batch_uncorrected_single/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
 
-### structure on all genes (by individual)
+#### structure on all genes (by individual)
 
-<img src='Structure/batch_uncorrected_single/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
 
-### structure on all genes (by lane)
+#### structure on all genes (by lane)
 
-<img src='Structure/batch_uncorrected_single/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
 
-### structure on all genes (by batch.individual)
+#### structure on all genes (by batch.individual)
 
-<img src='Structure/batch_uncorrected_single/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_single/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
 
+### Batch corrected model
 
 Now we perform a individual and batch joint correction on the CPM data and then use the residuals derived from the model fit to perform batch corrected Structure analysis.
 
@@ -305,59 +314,55 @@ Now we perform Structure on this batch corrected data
 
 nclus_vec <- 2:5;
 
-if(!dir.exists("Structure/batch_corrected_single")) dir.create("Structure/batch_corrected_single")
+#StructureObj(batch_corrected_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_LCL_batchcorrect.rda",partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
 
+lcl_topics_batchcorrect <- get(load("../../../project/rdas/topic_fit_LCL_batchcorrect.rda"));
 
-#for(num in 1:length(nclus_vec))
-#{
-#  if(!dir.exists(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]))
-#  obj <- StructureObj(batch_corrected_pooled,nclus_vec[num],samp_metadata = samp_metadata, tol=0.003, batch_lab = NULL, path=paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]),partition=c('TRUE'));
-#}
+if(!dir.exists("../../figures/lcl_structure_batchcorrect")) dir.create("../../figures/lcl_structure_batchcorrect")
 
 for(num in 1:length(nclus_vec))
 {
-  if(!dir.exists(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]))
-  omega <- as.matrix(data.frame(fread(paste0("Structure/batch_corrected_single/clus_",nclus_vec[num],"/omega_mat.txt")))[,-1]);
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = NULL, path=paste0("Structure/batch_corrected_single/clus_",nclus_vec[num]),partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"));
+ if(!dir.exists(paste0("../../figures/lcl_structure_batchcorrect/clus_",nclus_vec[num]))) dir.create(paste0("../../figures/lcl_structure_batchcorrect/clus_",nclus_vec[num]))
+obj <- StructureObj_omega(lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"),path_struct=paste0('../../figures/lcl_structure_batchcorrect/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }
 
 ```
 
 
-### Structure on all genes (by cell phase)
+#### Structure on all genes (by cell phase)
 
-<img src='Structure/batch_corrected_single/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
 
-### Structure on all genes (by batch)
+#### Structure on all genes (by batch)
 
-<img src='Structure/batch_corrected_single/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
 
-### structure on all genes (by individual)
+#### structure on all genes (by individual)
 
-<img src='Structure/batch_corrected_single/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
 
-### structure on all genes (by lane)
+#### structure on all genes (by lane)
 
-<img src='Structure/batch_corrected_single/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
 
-### structure on all genes (by batch.individual)
+#### structure on all genes (by batch.individual)
 
-<img src='Structure/batch_corrected_single/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_single/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_batchcorrect/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
 
 
 ## Cell cycle gene analysis
@@ -371,65 +376,66 @@ labs = labs[!is.na(labs)];
 molecules_pooled_cell_cycle_genes <- molecules_single_pooled[,labs];
 ```
 
+
+### Batch uncorrected model 
+
 We now perform structure plot on the data
 
 ```{r echo=TRUE, eval=TRUE}
 
-if(!dir.exists("Structure/batch_uncorrected_cell_cycle_genes")) dir.create("Structure/batch_uncorrected_cell_cycle_genes")
-
 nclus_vec <- 2:5;
 
-#for(num in 1:length(nclus_vec))
-#{
-#  if(!dir.exists(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))
-#  obj <- StructureObj(molecules_pooled_cell_cycle_genes,nclus_vec[num],samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path=paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]),partition=c('TRUE'));
-#}
+#StructureObj(molecules_pooled_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_LCL_cellcycle.rda",partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
+
+lcl_topics_cellcycle <- get(load("../../../project/rdas/topic_fit_LCL_cellcycle.rda"));
+
+if(!dir.exists("../../figures/lcl_structure_cellcycle")) dir.create("../../figures/lcl_structure_cellcycle")
 
 for(num in 1:length(nclus_vec))
 {
-  if(!dir.exists(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))
-  omega <- as.matrix(data.frame(fread(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num],"/omega_mat.txt")))[,-1]);
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = NULL, path=paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]),partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"));
+ if(!dir.exists(paste0("../../figures/lcl_structure_cellcycle/clus_",nclus_vec[num]))) dir.create(paste0("../../figures/lcl_structure_cellcycle/clus_",nclus_vec[num]))
+obj <- StructureObj_omega(lcl_topics_cellcycle[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"),path_struct=paste0('../../figures/lcl_structure_cellcycle/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }
 ```
 
 
-### Structure on cell cycle genes (by cell phase)
+#### Structure on cell cycle genes (by cell phase)
 
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
 
-### Structure on cell cycle genes (by batch)
+#### Structure on cell cycle genes (by batch)
 
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
 
-### structure on cell cycle genes (by individual)
+#### structure on cell cycle genes (by individual)
 
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
 
-### structure on cell cycle genes (by lane)
+#### structure on cell cycle genes (by lane)
 
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
 
-### structure on cell cycle genes (by batch.individual)
+#### structure on cell cycle genes (by batch.individual)
 
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
 
 
+### Batch corrected model
 
 Now we perform batch correction
 
@@ -443,58 +449,54 @@ Now we perform Structure on this data
 
 ```{r echo=TRUE, eval=TRUE}
 
-if(!dir.exists("Structure/batch_corrected_cell_cycle_genes")) dir.create("Structure/batch_corrected_cell_cycle_genes")
-
 nclus_vec <- 2:5;
 
-#for(num in 1:length(nclus_vec))
-#{
-#  if(!dir.exists(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))
-#  obj <- StructureObj(batch_corrected_cell_cycle_genes,nclus_vec[num],samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path=paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]),partition=c('TRUE'));
-#}
+#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_LCL_cellcycle_batchcorrect.rda",partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
+
+lcl_topics_cellcycle_batchcorrect <- get(load("../../../project/rdas/topic_fit_LCL_cellcycle_batchcorrect.rda"));
+
+if(!dir.exists("../../figures/lcl_structure_cellcycle_batchcorrect")) dir.create("../../figures/lcl_structure_cellcycle_batchcorrect")
 
 for(num in 1:length(nclus_vec))
 {
-  if(!dir.exists(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))
-  omega <- as.matrix(data.frame(fread(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num],"/omega_mat.txt")))[,-1]);
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = NULL, path=paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]),partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"));
+ if(!dir.exists(paste0("../../figures/lcl_structure_cellcycle_batchcorrect/clus_",nclus_vec[num]))) dir.create(paste0("../../figures/lcl_structure_cellcycle_batchcorrect/clus_",nclus_vec[num]))
+obj <- StructureObj_omega(lcl_topics_cellcycle_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c("TRUE","TRUE","TRUE","TRUE","TRUE"),path_struct=paste0('../../figures/lcl_structure_cellcycle_batchcorrect/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }
-
 ```
 
-### Structure on cell cycle genes - batch/individual corrected (by cell phase)
+#### Structure on cell cycle genes - batch/individual corrected (by cell phase)
 
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_2/struct_clus_2_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_3/struct_clus_3_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_4/struct_clus_4_cell_phase.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_5/struct_clus_5_cell_phase.png' style="width:350px;height:300px;">
 
-### Structure on cell cycle genes - batch/individual corrected (by batch)
+#### Structure on cell cycle genes - batch/individual corrected (by batch)
 
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_2/struct_clus_2_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_3/struct_clus_3_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_4/struct_clus_4_batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_5/struct_clus_5_batch.png' style="width:350px;height:300px;">
 
-### structure on cell cycle genes - batch/individual corrected (by individual)
+#### structure on cell cycle genes - batch/individual corrected (by individual)
 
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_2/struct_clus_2_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_3/struct_clus_3_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_4/struct_clus_4_individual.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_5/struct_clus_5_individual.png' style="width:350px;height:300px;">
 
-### structure on cell cycle genes - batch/individual corrected (by lane)
+#### structure on cell cycle genes - batch/individual corrected (by lane)
 
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_2/struct_clus_2_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_3/struct_clus_3_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_4/struct_clus_4_lane.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_5/struct_clus_5_lane.png' style="width:350px;height:300px;">
 
-### structure on cell cycle genes - batch/individual corrected (by batch.individual)
+#### structure on cell cycle genes - batch/individual corrected (by batch.individual)
 
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_2/struct_clus_2_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_3/struct_clus_3_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
+<img src='../../figures/lcl_structure_cellcycle_batchcorrect/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
 
 
