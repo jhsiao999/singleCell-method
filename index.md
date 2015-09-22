@@ -20,8 +20,12 @@ tagline:
 * [Structure plots after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
 
 
-### LCL data
+### LCL data analysis
 
 * [Admixture model]
   *  [Endogeneous genes](project/analysis/lcl_structure.html)
   *  [Cell cycle genes](project/analysis/lcl_structure_cell_cycle_genes.html)
+
+### iPSC +LCL pooled data analysis
+
+* [Admixture analysis (All genes + Cell cycle genes)](project/analysis/ipsc_lcl_structure.html)

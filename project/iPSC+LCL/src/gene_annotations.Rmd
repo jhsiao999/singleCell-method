@@ -1,5 +1,5 @@
 ---
-title: 'Gene Annottaions: iPSC+LCL'
+title: 'Gene Annotations: iPSC+LCL'
 author: "Kushal K Dey & Joyce Hsiao"
 date: "September 19, 2015"
 output: html_document
