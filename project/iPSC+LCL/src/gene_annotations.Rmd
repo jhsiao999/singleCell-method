@@ -1,0 +1,120 @@
+---
+title: 'Gene Annottaions: iPSC+LCL'
+author: "Kushal K Dey & Joyce Hsiao"
+date: "September 19, 2015"
+output: html_document
+---
+
+```{r echo=FALSE, eval=TRUE}
+rm(list=ls())
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(CountClust)
+suppressMessages(library(mygene))
+library(knitr)
+```
+
+### Goal
+From the Structure analysis, it seemed apparent that the iPSC and the LCL were clustering separately. Even for 2 clusters this was the case, and when we chose higher number of clusters, they were still catching the separation between iPSCs and the LCLs. In this script, we find which are the genes that are driving the clusters, their relative expression patterns in iPSCs and LCLs and finally the biological annotation of these genes.
+
+### Extracting driving genes per cluster
+
+```{r echo=TRUE, eval=TRUE}
+setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
+theta <- as.matrix(read.table('Structure/batch_uncorrected_single/clus_2/theta_mat.txt'));
+features <- ExtractTopFeatures(theta,top_features=10,method="poisson")
+
+features_vec <- unique(as.vector(features));
+
+class <- as.numeric(apply(theta[features_vec,], 1, which.max))
+
+imp_gene_names <- rownames(theta[features_vec,]);
+
+imp_genes_per_class <- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(class==x)]);
+
+```
+
+The colors of the designated cluster numbers as per the Structure plot are in the order given below. 
+
+```{r echo=TRUE, eval=TRUE}
+
+barplot(rep(1,dim(theta)[2]),col=(2:(dim(theta)[2]+1)))
+
+```
+
+
+### Gene Annotations
+
+
+The Ensemble IDS of the top genes that are highly expressed in iPSCs compared to the LCLs are the following. The summary information on genes which are significantly highly epressed in iPSCs compared to LCLs are the following.
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+
+out <- queryMany(imp_genes_per_class[[1]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
+
+kable(as.data.frame(out))
+
+```
+
+The summary information of the genes which are significantly highly expressed in LCL compared to iPSCs
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+
+out <- queryMany(imp_genes_per_class[[2]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
+
+kable(as.data.frame(out[,1:4]))
+
+```
+
+
+## Cell cycle gene analysis
+
+Now we consider the relative epxression profile of the cell cycle genes from the analysis constrained to cell cycle genes only and now we shall look at the similar analysis as above for $k=2$ but constraining the genes to be the cell cycle genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+theta <- as.matrix(read.table('Structure/batch_uncorrected_cell_cycle_genes//clus_2/theta_mat.txt'));
+features <- ExtractTopFeatures(theta,top_features=10,method="poisson")
+
+features_vec <- unique(as.vector(features));
+
+class <- as.numeric(apply(theta[features_vec,], 1, which.max))
+
+imp_gene_names <- rownames(theta[features_vec,]);
+
+imp_genes_per_class <- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(class==x)]);
+
+
+```
+
+### Gene Annotations
+
+The gene annotations of the driving genes with higher expression in first cluster mainly represented by iPSCs.
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+
+out <- queryMany(imp_genes_per_class[[1]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
+
+kable(as.data.frame(out))
+
+```
+
+
+Now the same analysis done on LCLs gives us the following 
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+
+out <- queryMany(imp_genes_per_class[[2]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
+
+kable(as.data.frame(out))
+
+```
+
+
+```{r echo=TRUE, eval=TRUE}
+
+sessionInfo()
+```
+
+
