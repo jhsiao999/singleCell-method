@@ -29,3 +29,5 @@ tagline:
 ### iPSC +LCL pooled data analysis
 
 * [Admixture analysis (All genes + Cell cycle genes)](project/analysis/ipsc_lcl_structure.html)
+* [Gene annotations of iPSC and LCL data](project/analysis/gene_annotations_ipsc_lcl.html)
+
