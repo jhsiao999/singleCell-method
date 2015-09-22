@@ -499,4 +499,5 @@ obj <- StructureObj_omega(ipsc_lcl_topics_cellcycle_batchcorrect[[num]]$omega, s
 <img src='../../figures/ipsc_lcl_structure_cellcycle_batchcorrect/clus_4/struct_clus_4_indiv.batch.png' style="width:350px;height:300px;">
 <img src='../../figures/ipsc_lcl_structure_cellcycle_batchcorrect/clus_5/struct_clus_5_indiv.batch.png' style="width:350px;height:300px;">
 
-
+```{r }
+sessionInfo()

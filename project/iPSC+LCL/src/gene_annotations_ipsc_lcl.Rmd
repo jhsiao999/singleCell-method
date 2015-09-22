@@ -24,7 +24,9 @@ From the Structure analysis, it seemed apparent that the iPSC and the LCL were c
 
 ```{r echo=TRUE, eval=TRUE}
 setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
-theta <- as.matrix(read.table('Structure/batch_uncorrected_single/clus_2/theta_mat.txt'));
+ipsc_lcl_topics <- get(load("../../../project/rdas/topic_fit_ipsc_lcl.rda"));
+
+theta <- ipsc_lcl_topics[[1]]$theta;
 features <- ExtractTopFeatures(theta,top_features=10,method="poisson")
 
 features_vec <- unique(as.vector(features));
@@ -76,7 +78,9 @@ Now we consider the relative epxression profile of the cell cycle genes from the
 
 ```{r echo=TRUE, eval=TRUE}
 
-theta <- as.matrix(read.table('Structure/batch_uncorrected_cell_cycle_genes//clus_2/theta_mat.txt'));
+ipsc_lcl_topics_cellcycle <- get(load("../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda"));
+
+theta <- ipsc_lcl_topics_cellcycle[[1]]$theta;
 features <- ExtractTopFeatures(theta,top_features=10,method="poisson")
 
 features_vec <- unique(as.vector(features));
