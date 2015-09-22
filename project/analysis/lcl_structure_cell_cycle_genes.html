@@ -192,17 +192,15 @@ colnames(samp_metadata) = c(&quot;cell_phase&quot;);
 
 nclus_vec &lt;- 2:5;
 
-#StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_lcl_cellcycle.rda&quot;,partition=c('TRUE'),path_struct = NULL);
+if(!dir.exists(&quot;../../figures/lcl_cellcycle_structure&quot;)) dir.create(&quot;../../figures/lcl_cellcycle_structure&quot;)
 
+#StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_lcl_cellcycle.rda&quot;,partition=c('TRUE'),path_struct = &quot;../../figures/lcl_cellcycle_structure&quot;);
 
 lcl_cellcycle_topics &lt;- get(load(&quot;../../../project/rdas/topic_fit_lcl_cellcycle.rda&quot;));
 
-if(!dir.exists(&quot;../../figures/lcl_cellcycle_structure&quot;)) dir.create(&quot;../../figures/lcl_cellcycle_structure&quot;)
-
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0(&quot;../../figures/lcl_cellcycle_structure/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/lcl_cellcycle_structure/clus_&quot;,nclus_vec[num]))
-obj &lt;- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct=paste0('../../figures/lcl_cellcycle_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
+obj &lt;- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_structure',control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -220,17 +218,16 @@ colnames(samp_metadata) = c(&quot;cell_phase&quot;);
 
 nclus_vec &lt;- 2:5;
 
-#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda&quot;,partition=c('TRUE'),path_struct = NULL);
+if(!dir.exists(&quot;../../figures/lcl_cellcycle_batchcorrect_structure&quot;)) dir.create(&quot;../../figures/lcl_cellcycle_batchcorrect_structure&quot;)
+
+#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda&quot;,partition=c('TRUE'),path_struct = &quot;../../figures/lcl_cellcycle_batchcorrect_structure&quot;);
 
 
 lcl_cellcycle_topics_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda&quot;));
 
-if(!dir.exists(&quot;../../figures/lcl_cellcycle_batchcorrect_structure&quot;)) dir.create(&quot;../../figures/lcl_cellcycle_batchcorrect_structure&quot;)
-
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0(&quot;../../figures/lcl_cellcycle_batchcorrect_structure/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/lcl_cellcycle_batchcorrect_structure/clus_&quot;,nclus_vec[num]))
-obj &lt;- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct=paste0('../../figures/lcl_cellcycle_batchcorrect_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
+obj &lt;- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_batchcorrect_structure',control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots

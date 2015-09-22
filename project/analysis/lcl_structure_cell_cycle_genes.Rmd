@@ -144,17 +144,15 @@ colnames(samp_metadata) = c("cell_phase");
 
 nclus_vec <- 2:5;
 
-#StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle.rda",partition=c('TRUE'),path_struct = NULL);
+if(!dir.exists("../../figures/lcl_cellcycle_structure")) dir.create("../../figures/lcl_cellcycle_structure")
 
+#StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_cellcycle_structure");
 
 lcl_cellcycle_topics <- get(load("../../../project/rdas/topic_fit_lcl_cellcycle.rda"));
 
-if(!dir.exists("../../figures/lcl_cellcycle_structure")) dir.create("../../figures/lcl_cellcycle_structure")
-
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0("../../figures/lcl_cellcycle_structure/clus_",nclus_vec[num]))) dir.create(paste0("../../figures/lcl_cellcycle_structure/clus_",nclus_vec[num]))
-obj <- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct=paste0('../../figures/lcl_cellcycle_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_structure',control=list(cex.axis=1));
 }
 
 ```
@@ -182,17 +180,16 @@ colnames(samp_metadata) = c("cell_phase");
 
 nclus_vec <- 2:5;
 
-#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda",partition=c('TRUE'),path_struct = NULL);
+if(!dir.exists("../../figures/lcl_cellcycle_batchcorrect_structure")) dir.create("../../figures/lcl_cellcycle_batchcorrect_structure")
+
+#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_cellcycle_batchcorrect_structure");
 
 
 lcl_cellcycle_topics_batchcorrect <- get(load("../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda"));
 
-if(!dir.exists("../../figures/lcl_cellcycle_batchcorrect_structure")) dir.create("../../figures/lcl_cellcycle_batchcorrect_structure")
-
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0("../../figures/lcl_cellcycle_batchcorrect_structure/clus_",nclus_vec[num]))) dir.create(paste0("../../figures/lcl_cellcycle_batchcorrect_structure/clus_",nclus_vec[num]))
-obj <- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct=paste0('../../figures/lcl_cellcycle_batchcorrect_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_batchcorrect_structure',control=list(cex.axis=1));
 }
 
 ```
