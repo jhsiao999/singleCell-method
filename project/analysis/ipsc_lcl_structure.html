@@ -308,16 +308,16 @@ if(!dir.exists(&quot;Structure/batch_uncorrected_single&quot;)) dir.create(&quot
 
 nclus_vec &lt;- 2:5;
 
-#StructureObj(molecules_single_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_LCL.rda&quot;,partition=c('TRUE'),path_struct = NULL);
+#StructureObj(molecules_single_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl.rda&quot;,partition=c('TRUE'),path_struct = NULL);
 
-lcl_topics &lt;- get(load(&quot;../../../project/rdas/topic_fit_LCL.rda&quot;));
+ipsc_lcl_topics &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl.rda&quot;));
 
-if(!dir.exists(&quot;../../figures/lcl_structure&quot;)) dir.create(&quot;../../figures/lcl_structure&quot;)
+if(!dir.exists(&quot;../../figures/ipsc_lcl_structure&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure&quot;)
 
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0(&quot;../../figures/lcl_structure/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/lcl_structure/clus_&quot;,nclus_vec[num]))
-obj &lt;- StructureObj_omega(lcl_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/lcl_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
+ if(!dir.exists(paste0(&quot;../../figures/ipsc_lcl_structure/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/ipsc_lcl_structure/clus_&quot;,nclus_vec[num]))
+obj &lt;- StructureObj_omega(ipsc_lcl_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/ipsc_lcl_structure/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -351,16 +351,16 @@ obj &lt;- StructureObj_omega(lcl_topics[[num]]$omega, samp_metadata = samp_metad
 <p>Now we perform Structure on this batch corrected data</p>
 <pre class="r"><code>nclus_vec &lt;- 2:5;
 
-#StructureObj(batch_corrected_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_LCL_batchcorrect.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
+#StructureObj(batch_corrected_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
 
-lcl_topics_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_LCL_batchcorrect.rda&quot;));
+ipsc_lcl_topics_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;));
 
-if(!dir.exists(&quot;../../figures/lcl_structure_batchcorrect&quot;)) dir.create(&quot;../../figures/lcl_structure_batchcorrect&quot;)
+if(!dir.exists(&quot;../../figures/ipsc_lcl_structure_batchcorrect&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure_batchcorrect&quot;)
 
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0(&quot;../../figures/lcl_structure_batchcorrect/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/lcl_structure_batchcorrect/clus_&quot;,nclus_vec[num]))
-obj &lt;- StructureObj_omega(lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/lcl_structure_batchcorrect/clus_',nclus_vec[num]),control=list(cex.axis=1));
+ if(!dir.exists(paste0(&quot;../../figures/ipsc_lcl_structure_batchcorrect/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/ipsc_lcl_structure_batchcorrect/clus_&quot;,nclus_vec[num]))
+obj &lt;- StructureObj_omega(ipsc_lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/ipsc_lcl_structure_batchcorrect/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -400,16 +400,16 @@ molecules_pooled_cell_cycle_genes &lt;- molecules_single_pooled[,labs];</code></
 <p>We now perform structure plot on the data</p>
 <pre class="r"><code>nclus_vec &lt;- 2:5;
 
-#StructureObj(molecules_pooled_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_LCL_cellcycle.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
+#StructureObj(molecules_pooled_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
 
-lcl_topics_cellcycle &lt;- get(load(&quot;../../../project/rdas/topic_fit_LCL_cellcycle.rda&quot;));
+ipsc_lcl_topics_cellcycle &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;));
 
-if(!dir.exists(&quot;../../figures/lcl_structure_cellcycle&quot;)) dir.create(&quot;../../figures/lcl_structure_cellcycle&quot;)
+if(!dir.exists(&quot;../../figures/ipsc_lcl_structure_cellcycle&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure_cellcycle&quot;)
 
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0(&quot;../../figures/lcl_structure_cellcycle/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/lcl_structure_cellcycle/clus_&quot;,nclus_vec[num]))
-obj &lt;- StructureObj_omega(lcl_topics_cellcycle[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/lcl_structure_cellcycle/clus_',nclus_vec[num]),control=list(cex.axis=1));
+ if(!dir.exists(paste0(&quot;../../figures/ipsc_lcl_structure_cellcycle/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/ipsc_lcl_structure_cellcycle/clus_&quot;,nclus_vec[num]))
+obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/ipsc_lcl_structure_cellcycle/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -443,16 +443,16 @@ obj &lt;- StructureObj_omega(lcl_topics_cellcycle[[num]]$omega, samp_metadata = 
 <p>Now we perform Structure on this data</p>
 <pre class="r"><code>nclus_vec &lt;- 2:5;
 
-#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_LCL_cellcycle_batchcorrect.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
+#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
 
-lcl_topics_cellcycle_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_LCL_cellcycle_batchcorrect.rda&quot;));
+ipsc_lcl_topics_cellcycle_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;));
 
-if(!dir.exists(&quot;../../figures/lcl_structure_cellcycle_batchcorrect&quot;)) dir.create(&quot;../../figures/lcl_structure_cellcycle_batchcorrect&quot;)
+if(!dir.exists(&quot;../../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;)
 
 for(num in 1:length(nclus_vec))
 {
- if(!dir.exists(paste0(&quot;../../figures/lcl_structure_cellcycle_batchcorrect/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/lcl_structure_cellcycle_batchcorrect/clus_&quot;,nclus_vec[num]))
-obj &lt;- StructureObj_omega(lcl_topics_cellcycle_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/lcl_structure_cellcycle_batchcorrect/clus_',nclus_vec[num]),control=list(cex.axis=1));
+ if(!dir.exists(paste0(&quot;../../figures/ipsc_lcl_structure_cellcycle_batchcorrect/clus_&quot;,nclus_vec[num]))) dir.create(paste0(&quot;../../figures/ipsc_lcl_structure_cellcycle_batchcorrect/clus_&quot;,nclus_vec[num]))
+obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = c(&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;,&quot;TRUE&quot;),path_struct=paste0('../../figures/ipsc_lcl_structure_cellcycle_batchcorrect/clus_',nclus_vec[num]),control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
