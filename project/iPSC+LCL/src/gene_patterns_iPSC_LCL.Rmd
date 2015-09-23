@@ -61,12 +61,12 @@ We use the following animation of these genes and their variation across the iPS
 
 ```{r clock, fig.width=7, fig.height=6, fig.show="animate"}
 
-saveGIF(
+suppressMessages(saveGIF(
 for (num in 1:dim(data_imp_genes)[2])
 {
   plot(data_imp_genes[,num],col=c(rep(2,789),rep(3,84)),main=paste0("gene:",imp_gene_names[num]));
   legend("topright",c('iPSC','LCL'),col=2:3,lty=c(1,1));
-}, movie.name="imp_gene_patterns_ipsc_lcl.gif", interval = 0.5, nmax = 30, ani.width = 600, ani.height = 600)
+}, movie.name="imp_gene_patterns_ipsc_lcl.gif", interval = 0.5, nmax = 30, ani.width = 600, ani.height = 600))
 
 ```
 
@@ -116,14 +116,46 @@ Now we look at the reads expression profile for the pluripotency genes.
 ```{r, echo=TRUE, eval=TRUE}
 
 molecules_pluripotent_genes <- molecules_single_pooled[,labs];
-saveGIF(
+suppressMessages(saveGIF(
 for (num in 1:length(labs))
 {
   plot(molecules_pluripotent_genes[,num],col=c(rep(2,789),rep(3,84)),main=paste0("gene:",pluripotency_gene_names[num]));
   legend("topright",c('iPSC','LCL'),col=2:3,lty=c(1,1));
-}, movie.name="pluripotent_gene_patterns_ipsc_lcl.gif", interval = 0.5, nmax = 30, ani.width = 600, ani.height = 600)
+}, movie.name="pluripotent_gene_patterns_ipsc_lcl.gif", interval = 0.5, nmax = 30, ani.width = 600, ani.height = 600))
 
 
 ```
 
 <img src="pluripotent_gene_patterns_ipsc_lcl.gif" alt="HTML5 Icon" align="middle" style="width:500px;height:350px;">
+
+
+## Admixture model on pluripotent genes 
+
+```{r echo=TRUE, eval=TRUE}
+
+samp_metadata <- cbind.data.frame(c(rep("iPSC",789),rep("LCL",84)));
+names(samp_metadata)="cell_type"
+
+if(!dir.exists("../../figures/ipsc_lcl_pluripotent_genes_structure")) dir.create("../../figures/ipsc_lcl_pluripotent_genes_structure")
+
+nclus_vec <- 2:5;
+
+#StructureObj(as.matrix(molecules_pluripotent_genes),nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_ipsc_lcl_pluripotent_genes.rda",partition=c('TRUE'),path_struct = "../../figures/ipsc_lcl_pluripotent_genes_structure");
+
+ipsc_lcl_pluripotent_genes_topics <- get(load("../../../project/rdas/topic_fit_ipsc_lcl_pluripotent_genes.rda"));
+
+for(num in 1:length(nclus_vec))
+{
+obj <- StructureObj_omega(ipsc_lcl_pluripotent_genes_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/ipsc_lcl_pluripotent_genes_structure',control=list(cex.axis=1));
+}
+
+
+
+```
+
+The admixture plots are provided as follows 
+
+<img src='../../figures/ipsc_lcl_pluripotent_genes_structure/clus_2/struct_clus_2_cell_type.png' style="width:350px;height:300px;">
+<img src='../../figures/ipsc_lcl_pluripotent_genes_structure/clus_3/struct_clus_3_cell_type.png' style="width:350px;height:300px;">
+<img src='../../figures/ipsc_lcl_pluripotent_genes_structure/clus_4/struct_clus_4_cell_type.png' style="width:350px;height:300px;">
+<img src='../../figures/ipsc_lcl_pluripotent_genes_structure/clus_5/struct_clus_5_cell_type.png' style="width:350px;height:300px;">
