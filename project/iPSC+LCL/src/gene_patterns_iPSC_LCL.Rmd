@@ -1,0 +1,67 @@
+---
+title: 'Behavior of cluster driving genes : iPSC +LCL'
+author: "Kushal K Dey & Joyce Hsiao"
+date: "September 22, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+  
+```{r echo=FALSE, eval=TRUE}
+rm(list=ls())
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(CountClust)
+suppressMessages(library(mygene))
+library(knitr)
+suppressMessages(library(data.table))
+
+```
+
+## Objective
+
+In this script, we compare the patterns of expression of the cluster driving genes across the iPSCs and LCLs. We also extract the pluripotency genes and observe the patterns of relative expression of the genes between the iPSCs and the LCLs.
+
+```{r echo=TRUE, eval=TRUE}
+setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
+ipsc_lcl_topics <- get(load("../../../project/rdas/topic_fit_ipsc_lcl.rda"));
+
+theta <- ipsc_lcl_topics[[1]]$theta;
+features <- ExtractTopFeatures(theta,top_features=30,method="poisson")
+
+features_vec <- unique(as.vector(features));
+
+class <- as.numeric(apply(theta[features_vec,], 1, which.max))
+
+imp_gene_names <- rownames(theta[features_vec,]);
+
+imp_genes_per_class <- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(class==x)]);
+
+```
+
+We now consider the expression patterns for these selected genes which are the top genes driving the iPSC and LCL clustering.
+
+```{r echo=TRUE, eval=TRUE}
+
+molecules_single_pooled <- data.frame(fread('../data/molecules-ipsc-lcl-single.txt'))[,-1];
+
+data_imp_genes <- molecules_single_pooled[,features_vec];
+```
+
+We use the following animation of these genes and their variation across the iPSCs and the LCLs. There are 84 LCLs and there are 789 iPSCs. 
+
+```{r clock, fig.width=7, fig.height=6, fig.show="animate"}
+library(animation)
+ani.options(interval = 0.5, nmax = 100)
+
+saveGIF(
+for (num in 1:dim(data_imp_genes)[2])
+{
+  plot(data_imp_genes[,num],col=c(rep(2,789),rep(3,84)),main=paste0("gene:",imp_gene_names[num]));
+  legend("topright",c('iPSC','LCL'),col=2:3,lty=c(1,1));
+}, movie.name="gene_patterns_ipsc_lcl.gif", interval = 0.5, nmax = 30, ani.width = 600, ani.height = 600)
+
+```
+
