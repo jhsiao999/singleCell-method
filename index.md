@@ -30,4 +30,5 @@ tagline:
 
 * [Admixture analysis (All genes + Cell cycle genes)](project/analysis/ipsc_lcl_structure.html)
 * [Gene annotations of iPSC and LCL data](project/analysis/gene_annotations_ipsc_lcl.html)
+* [Patterns of counts for cluster driving genes](project/analysis/gene_patterns_iPSC_LCL.html)
 
