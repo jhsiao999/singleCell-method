@@ -162,7 +162,6 @@ It seems from the above plots there is batch effect in the data and that is most
 ```{r batch_correct, echo=TRUE, eval=TRUE}
 
 batch_corrected_lcl_molecules <- BatchCorrectedCounts(lcl_molecules_refined,batch_lab,use_parallel=TRUE)
-
 ```
 
 Now we apply StructureObj on the batch corrected new counts data and see what patterns we get from the new data analysis, ideally we should not see the batch patterns that we saw in the previous run.
