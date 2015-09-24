@@ -2,23 +2,35 @@
 title: "LCL structure cell cycle genes"
 author: "Kushal K Dey & Joyce Hsiao"
 date: "September 16, 2015"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
-In this script, we perform Structure analysis on LCLs based on the cell cycle genes only. We first extract the single cells in LCL. 
+### Objective
+
+In this script, we perform Structure analysis on LCLs based on the cell cycle genes only. 
 
 ```{r echo=TRUE, eval=TRUE}
+rm(list=ls())
 setwd('/Users/kushal/Documents/singleCell-method/project/LCL/src')
-library(readr)
-library(data.table)
-library(devtools)
-library(CountClust)
-library(maptpx)
-library(parallel)
-library(dplyr)
-library(ggplot2)
-library(edgeR)
-library(gplots)
+suppressMessages(suppressWarnings(library(CountClust)))
+suppressMessages(suppressWarnings(library(data.table)))
+suppressMessages(suppressWarnings(library(gplots)))
+suppressMessages(suppressWarnings(library(philentropy)))
+suppressMessages(suppressWarnings(library(dplyr)))
+suppressMessages(suppressWarnings(library(edgeR)))
+suppressMessages(suppressWarnings(library(qtlcharts)))
+suppressMessages(suppressWarnings(library(limma)))
+suppressMessages(suppressWarnings(library(readr)))
+```
+
+
+### Prepare the LCL data
+
+We first prepare the LCL single cell data. 
+
+```{r echo=TRUE, eval=TRUE}
 
 lcl_qc_data <- read_csv("../data/qc-lcl.csv");
 lcl_annotations <- read.table('../data/annotation-lcl.txt',header=TRUE);
@@ -44,7 +56,7 @@ batch_lab_single_cells <- batch_lab[which(lcl_qc_data$cell.num==1)];
 
 We next assign the cell phase scores for each phase to the single cell data and then normalize the results. 
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, results='hide'}
 reads_lcl <- data.frame(fread('../data/reads-lcl.txt'),row.names=TRUE);
 reads_lcl <- reads_lcl[,lcl_indices];
 reads_lcl_single <- reads_lcl[,which(lcl_qc_data$cell.num==1)];
@@ -66,7 +78,7 @@ sapply(cell_cycle_genes_list,function(xx){
   #### add average expression of all genes in the phase
   combined_matrix <- rbind(reads_single_phase,average=apply(reads_single_phase,2,mean))
   #### use transpose to compute cor matrix
-  cor_matrix <- cor(t(combined_matrix))
+  suppressWarnings(cor_matrix <- cor(t(combined_matrix)))
   #### take the numbers
   cor_vector <- cor_matrix[,dim(cor_matrix)[1]]
   #### restrict to correlation >= 0.3 
@@ -122,34 +134,35 @@ lcl_single_cell_cycle_genes <- lcl_single_cells[,labs];
 
 ```
 
+### Batch Uncorrected Model
+
 We have in total `r length(labs) ` cell cycle genes that we use in our analysis and now we perform the Structure analysis on the counts data of the LCLs and the cell cycle genes without the batch effect correction.
 
 ```{r echo=TRUE, eval=TRUE}
 samp_metadata <- cbind.data.frame(as.vector(as.matrix(assign_cell_phase)));
 colnames(samp_metadata) = c("cell_phase");
-if(!dir.exists("Structure/batch_uncorrected_cell_cycle_genes")) dir.create("Structure/batch_uncorrected_cell_cycle_genes")
 
 nclus_vec <- 2:5;
 
-#for(num in 1:length(nclus_vec))
-#{
-#  if(!dir.exists(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))
-#  obj <- StructureObj(lcl_single_cell_cycle_genes,nclus_vec[num],samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]),partition=c('TRUE'));
-#}
+if(!dir.exists("../../figures/lcl_cellcycle_structure")) dir.create("../../figures/lcl_cellcycle_structure")
+
+#StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_cellcycle_structure");
+
+lcl_cellcycle_topics <- get(load("../../../project/rdas/topic_fit_lcl_cellcycle.rda"));
 
 for(num in 1:length(nclus_vec))
 {
-  if(!dir.exists(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]))
-  omega <- as.matrix(read.table(paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num],"/omega_mat.txt")));
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_uncorrected_cell_cycle_genes/clus_",nclus_vec[num]),partition = c("TRUE"));
+obj <- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_structure',control=list(cex.axis=1));
 }
 
 ```
 
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
-<img src='Structure/batch_uncorrected_cell_cycle_genes/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+
+### Batch Corrected Model
 
 Now we perform batch level correction on the counts data over the cell cycle genes. 
 
@@ -164,25 +177,24 @@ We now perform the Structure plot analysis on the LCL single data, using only th
 
 samp_metadata <- cbind.data.frame(as.vector(as.matrix(assign_cell_phase)));
 colnames(samp_metadata) = c("cell_phase");
-if(!dir.exists("Structure/batch_corrected_cell_cycle_genes")) dir.create("Structure/batch_corrected_cell_cycle_genes")
 
 nclus_vec <- 2:5;
 
-#for(num in 1:length(nclus_vec))
-#{
-#  if(!dir.exists(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))
-#  obj <- StructureObj(batch_corrected_cell_cycle_genes,nclus_vec[num],samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]),partition=c('TRUE'));
-#}
+if(!dir.exists("../../figures/lcl_cellcycle_batchcorrect_structure")) dir.create("../../figures/lcl_cellcycle_batchcorrect_structure")
+
+#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_cellcycle_batchcorrect_structure");
+
+
+lcl_cellcycle_topics_batchcorrect <- get(load("../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda"));
 
 for(num in 1:length(nclus_vec))
 {
-  if(!dir.exists(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))) dir.create(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]))
-  omega <- as.matrix(read.table(paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num],"/omega_mat.txt")));
-    obj <- StructureObj_omega(omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells, path=paste0("Structure/batch_corrected_cell_cycle_genes/clus_",nclus_vec[num]),partition = c("TRUE"));
+obj <- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_batchcorrect_structure',control=list(cex.axis=1));
 }
+
 ```
 
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
-<img src='Structure/batch_corrected_cell_cycle_genes/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
