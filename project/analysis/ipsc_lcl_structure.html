@@ -88,16 +88,16 @@ img {
 <h2>Objective</h2>
 <p>In this script, we consider the pooled data from iPSC and LCL and try to cluster them to see what patterns show up in the analysis. In this script, we shall consider throughout only the single cells from the iPSC study and the single cells from the LCL study and then apply the Structure model on the combined single cell level data from these two sources.</p>
 <pre class="r"><code>rm(list=ls())
-setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
-suppressMessages(suppressWarnings(library(CountClust)))
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
-suppressMessages(suppressWarnings(library(qtlcharts)))
-suppressMessages(suppressWarnings(library(limma)))
-suppressMessages(suppressWarnings(library(readr)))</code></pre>
+setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+library(CountClust)
+library(data.table)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+library(qtlcharts)
+library(limma)
+library(readr)</code></pre>
 </div>
 <div id="preparing-the-lcl-data" class="section level2">
 <h2>Preparing the LCL data</h2>
@@ -195,6 +195,9 @@ ans_normed_normed &lt;- flexible_normalization(ans_normed,by_row=TRUE)
 
 cell_phase &lt;- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase &lt;- data.frame(cell_phase)
+cell_phase_vector &lt;- as.vector(as.matrix(assign_cell_phase));
+cell_phase_vector &lt;- factor(cell_phase_vector, 
+                            levels = c(&quot;G1.S&quot;, &quot;S&quot;, &quot;G2.M&quot;, &quot;M&quot;, &quot;M.G1&quot;))
 
 labs=unique(unlist(lapply(1:5, function(k) match(cell_cycle_genes_list[[k]],colnames(lcl_single_cells)))));
 labs = labs[!is.na(labs)];
@@ -202,7 +205,7 @@ lcl_single_cell_cycle_genes &lt;- lcl_single_cells[,labs];
 
 molecules_single_LCL &lt;- t(lcl_single_cells);
 
-cell_phase_LCL &lt;- paste0(as.vector(as.matrix(assign_cell_phase)),&quot;_&quot;,&quot;LCL&quot;);</code></pre>
+cell_phase_LCL &lt;- paste0(as.vector(as.matrix(cell_phase_vector)),&quot;_&quot;,&quot;LCL&quot;);</code></pre>
 </div>
 <div id="preparing-the-ipsc-data" class="section level2">
 <h2>Preparing the iPSC data</h2>
@@ -284,8 +287,11 @@ ans_normed_normed &lt;- flexible_normalization(ans_normed,by_row=TRUE)
 
 cell_phase &lt;- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase &lt;- data.frame(cell_phase)
+cell_phase_vector &lt;- as.vector(as.matrix(assign_cell_phase));
+cell_phase_vector &lt;- factor(cell_phase_vector, 
+                            levels = c(&quot;G1.S&quot;, &quot;S&quot;, &quot;G2.M&quot;, &quot;M&quot;, &quot;M.G1&quot;))
 
-cell_phase_iPSC &lt;- paste0(as.vector(as.matrix(assign_cell_phase)),&quot;_&quot;,&quot;iPSC&quot;);</code></pre>
+cell_phase_iPSC &lt;- paste0(as.vector(as.matrix(cell_phase_vector)),&quot;_&quot;,&quot;iPSC&quot;);</code></pre>
 </div>
 <div id="pooling-lcl-and-ipsc-cells" class="section level2">
 <h2>Pooling LCL and iPSC cells</h2>
@@ -305,17 +311,21 @@ cell_phase_pooled &lt;- c(cell_phase_iPSC, cell_phase_LCL);</code></pre>
 samp_metadata &lt;- cbind.data.frame(indiv_lab_pooled, lane_lab_pooled, batch_lab_pooled, cell_phase_pooled, batch_indiv_pooled);
 colnames(samp_metadata) = c(&quot;individual&quot;, &quot;lane&quot;, &quot;batch&quot;, &quot;cell_phase&quot;, &quot;indiv.batch&quot;);
 
-if(!dir.exists(&quot;../../figures/ipsc_lcl_structure&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure&quot;)
+if(!dir.exists(&quot;../figures/ipsc_lcl_structure&quot;)) dir.create(&quot;../figures/ipsc_lcl_structure&quot;)
 
 nclus_vec &lt;- 2:5;
 
-#StructureObj(molecules_single_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl.rda&quot;,partition=c('TRUE'),path_struct = &quot;../../figures/ipsc_lcl_structure&quot;);
-
-ipsc_lcl_topics &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl.rda&quot;));
+if(file.exists(&quot;../../project/rdas/topic_fit_ipsc_lcl.rda&quot;)) {
+ipsc_lcl_topics &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl.rda&quot;));
+} else {
+StructureObj(molecules_single_pooled ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda=&quot;../../project/rdas/topic_fit_ipsc_lcl.rda&quot;,partition=c('TRUE'),path_struct = &quot;../figures/ipsc_lcl_structure&quot;);
+  
+ipsc_lcl_topics &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl.rda&quot;));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj &lt;- StructureObj_omega(ipsc_lcl_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../../figures/ipsc_lcl_structure',control=list(cex.axis=1));
+obj &lt;- StructureObj_omega(ipsc_lcl_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../figures/ipsc_lcl_structure',control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -349,16 +359,18 @@ obj &lt;- StructureObj_omega(ipsc_lcl_topics[[num]]$omega, samp_metadata = samp_
 <p>Now we perform Structure on this batch corrected data</p>
 <pre class="r"><code>nclus_vec &lt;- 2:5;
 
-if(!dir.exists(&quot;../../figures/ipsc_lcl_structure_batchcorrect&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure_batchcorrect&quot;)
+if(!dir.exists(&quot;../figures/ipsc_lcl_structure_batchcorrect&quot;)) dir.create(&quot;../figures/ipsc_lcl_structure_batchcorrect&quot;)
 
-#StructureObj(batch_corrected_pooled,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = &quot;../../figures/ipsc_lcl_structure_batchcorrect&quot;);
-
-ipsc_lcl_topics_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;));
-
+if(file.exists(&quot;../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;)) {
+ipsc_lcl_topics_batchcorrect &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;));
+} else {
+StructureObj(batch_corrected_pooled ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda=&quot;../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;,partition=c('TRUE'),path_struct = &quot;../figures/ipsc_lcl_structure_batchcorrect&quot;);
+ipsc_lcl_topics_batchcorrect &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda&quot;));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj &lt;- StructureObj_omega(ipsc_lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../../figures/ipsc_lcl_structure_batchcorrect',control=list(cex.axis=1));
+obj &lt;- StructureObj_omega(ipsc_lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../figures/ipsc_lcl_structure_batchcorrect',control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -398,15 +410,18 @@ molecules_pooled_cell_cycle_genes &lt;- molecules_single_pooled[,labs];</code></
 <p>We now perform structure plot on the data</p>
 <pre class="r"><code>nclus_vec &lt;- 2:5;
 
-if(!dir.exists(&quot;../../figures/ipsc_lcl_structure_cellcycle&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure_cellcycle&quot;)
+if(!dir.exists(&quot;../figures/ipsc_lcl_structure_cellcycle&quot;)) dir.create(&quot;../figures/ipsc_lcl_structure_cellcycle&quot;)
 
-#StructureObj(molecules_pooled_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = &quot;../../figures/ipsc_lcl_structure_cellcycle&quot;);
-
-ipsc_lcl_topics_cellcycle &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;));
+if(file.exists(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;)) {
+ipsc_lcl_topics_cellcycle &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;));
+} else {
+StructureObj(molecules_pooled_cell_cycle_genes ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda=&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;,partition=c('TRUE'),path_struct = &quot;../figures/ipsc_lcl_structure_cellcycle&quot;);
+ipsc_lcl_topics_cellcycle &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../../figures/ipsc_lcl_structure_cellcycle',control=list(cex.axis=1));
+obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../figures/ipsc_lcl_structure_cellcycle',control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -440,15 +455,18 @@ obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle[[num]]$omega, samp_metada
 <p>Now we perform Structure on this data</p>
 <pre class="r"><code>nclus_vec &lt;- 2:5;
 
-if(!dir.exists(&quot;../../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;)) dir.create(&quot;../../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;)
+if(!dir.exists(&quot;../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;)) dir.create(&quot;../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;)
 
-#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda=&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;,partition=rep('TRUE',dim(samp_metadata)[2]),path_struct = NULL);
-
-ipsc_lcl_topics_cellcycle_batchcorrect &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;));
+if(file.exists(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;)) {
+ipsc_lcl_topics_cellcycle_batchcorrect &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;));
+} else {
+StructureObj(batch_corrected_cell_cycle_genes ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda=&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;,partition=c('TRUE'),path_struct = &quot;../figures/ipsc_lcl_structure_cellcycle_batchcorrect&quot;);
+ipsc_lcl_topics_cellcycle_batchcorrect &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda&quot;));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../../figures/ipsc_lcl_structure_cellcycle_batchcorrect',control=list(cex.axis=1));
+obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep(&quot;TRUE&quot;,dim(samp_metadata)[2]),path_struct='../figures/ipsc_lcl_structure_cellcycle_batchcorrect',control=list(cex.axis=1));
 }</code></pre>
 <pre><code>## Creating the Structure plots
 ## Creating the Structure plots
@@ -486,12 +504,12 @@ obj &lt;- StructureObj_omega(ipsc_lcl_topics_cellcycle_batchcorrect[[num]]$omega
 ## 
 ## other attached packages:
 ## [1] readr_0.1.1.9000  qtlcharts_0.5-13  edgeR_3.10.2      limma_3.24.15    
-## [5] dplyr_0.4.2       philentropy_0.0.1 gplots_2.17.0     data.table_1.9.4 
+## [5] dplyr_0.4.3       philentropy_0.0.1 gplots_2.17.0     data.table_1.9.4 
 ## [9] CountClust_0.1.0 
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_0.12.1        knitr_1.11         magrittr_1.5      
-##  [4] R6_2.1.0           stringr_1.0.0      plyr_1.8.3        
+##  [4] R6_2.1.1           stringr_1.0.0      plyr_1.8.3        
 ##  [7] caTools_1.17.1     tools_3.2.0        parallel_3.2.0    
 ## [10] KernSmooth_2.23-14 DBI_0.3.1          htmltools_0.2.6   
 ## [13] gtools_3.5.0       yaml_2.1.13        digest_0.6.8      

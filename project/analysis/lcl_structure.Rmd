@@ -332,7 +332,7 @@ batch_corrected_lcl_single <- BatchCorrectedCounts(lcl_single_cells,batch_lab_si
 
 Now we use the Structure model on the batch corrected counts.
 
-```{r echo=TRUE, eval=TRUE, cache=TRUE}
+```{r echo=TRUE, eval=TRUE}
 
 nclus_vec <- 2:5;
 samp_metadata <- cbind.data.frame(as.vector(as.matrix(cell_phase_vector)));
