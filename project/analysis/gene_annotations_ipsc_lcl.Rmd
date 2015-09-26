@@ -23,11 +23,12 @@ From the Structure analysis, it seemed apparent that the iPSC and the LCL were c
 ### Extracting Cluster annotations of genes
 
 ```{r echo=TRUE, eval=TRUE}
-setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
-ipsc_lcl_topics <- get(load("../../../project/rdas/topic_fit_ipsc_lcl.rda"));
+#setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+
+ipsc_lcl_topics <- get(load("../../project/rdas/topic_fit_ipsc_lcl.rda"));
 
 theta <- ipsc_lcl_topics[[1]]$theta;
-features <- ExtractTopFeatures(theta,top_features=10,method="poisson")
+features <- ExtractTopFeatures(theta,top_features=30,method="poisson")
 
 features_vec <- unique(as.vector(features));
 
@@ -53,7 +54,7 @@ barplot(rep(1,dim(theta)[2]),col=(2:(dim(theta)[2]+1)))
 
 The Ensemble IDS of the top genes that are highly expressed in iPSCs compared to the LCLs are the following. The summary information on genes which are significantly highly epressed in iPSCs compared to LCLs are the following.
 
-```{r echo=TRUE, eval=TRUE, cache=TRUE}
+```{r echo=TRUE, eval=TRUE}
 
 out <- queryMany(imp_genes_per_class[[1]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
 
@@ -63,7 +64,7 @@ kable(as.data.frame(out))
 
 The summary information of the genes which are significantly highly expressed in LCL compared to iPSCs
 
-```{r echo=TRUE, eval=TRUE, cache=TRUE}
+```{r echo=TRUE, eval=TRUE}
 
 out <- queryMany(imp_genes_per_class[[2]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
 
@@ -78,7 +79,7 @@ Now we consider the relative epxression profile of the cell cycle genes from the
 
 ```{r echo=TRUE, eval=TRUE}
 
-ipsc_lcl_topics_cellcycle <- get(load("../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda"));
+ipsc_lcl_topics_cellcycle <- get(load("../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda"));
 
 theta <- ipsc_lcl_topics_cellcycle[[1]]$theta;
 features <- ExtractTopFeatures(theta,top_features=10,method="poisson")
@@ -98,7 +99,7 @@ imp_genes_per_class <- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(
 
 The gene annotations of the driving genes with higher expression in first cluster mainly represented by iPSCs.
 
-```{r echo=TRUE, eval=TRUE, cache=TRUE}
+```{r echo=TRUE, eval=TRUE}
 
 out <- queryMany(imp_genes_per_class[[1]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
 
@@ -109,7 +110,7 @@ kable(as.data.frame(out))
 
 Now the same analysis done on LCLs gives us the following 
 
-```{r echo=TRUE, eval=TRUE, cache=TRUE}
+```{r echo=TRUE, eval=TRUE}
 
 out <- queryMany(imp_genes_per_class[[2]], scopes="ensembl.gene", fields=c("name", "summary"), species="human");
 
