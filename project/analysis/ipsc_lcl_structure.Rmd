@@ -271,7 +271,7 @@ nclus_vec <- 2:5;
 if(file.exists("../../project/rdas/topic_fit_ipsc_lcl.rda")) {
 ipsc_lcl_topics <- get(load("../../project/rdas/topic_fit_ipsc_lcl.rda"));
 } else {
-StructureObj(molecules_single_pooled ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl.rda",partition=c('TRUE'),path_struct = "../figures/ipsc_lcl_structure");
+StructureObj(molecules_single_pooled ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl.rda",partition=c('TRUE'),path_struct = "../figures/ipsc_lcl_structure");
   
 ipsc_lcl_topics <- get(load("../../project/rdas/topic_fit_ipsc_lcl.rda"));
 }
@@ -341,7 +341,7 @@ if(!dir.exists("../figures/ipsc_lcl_structure_batchcorrect")) dir.create("../fig
 if(file.exists("../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda")) {
 ipsc_lcl_topics_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda"));
 } else {
-StructureObj(batch_corrected_pooled ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda",partition=c('TRUE'),path_struct = "../figures/ipsc_lcl_structure_batchcorrect");
+StructureObj(batch_corrected_pooled ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda",path_struct = "../figures/ipsc_lcl_structure_batchcorrect");
 ipsc_lcl_topics_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_lcl_batchcorrect.rda"));
 }
 
@@ -414,7 +414,7 @@ if(!dir.exists("../figures/ipsc_lcl_structure_cellcycle")) dir.create("../figure
 if(file.exists("../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda")) {
 ipsc_lcl_topics_cellcycle <- get(load("../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda"));
 } else {
-StructureObj(molecules_pooled_cell_cycle_genes ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda",partition=c('TRUE'),path_struct = "../figures/ipsc_lcl_structure_cellcycle");
+StructureObj(molecules_pooled_cell_cycle_genes ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda",partition = rep("TRUE",dim(samp_metadata)[2]),path_struct = "../figures/ipsc_lcl_structure_cellcycle");
 ipsc_lcl_topics_cellcycle <- get(load("../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda"));
 }
 
@@ -482,7 +482,7 @@ if(!dir.exists("../figures/ipsc_lcl_structure_cellcycle_batchcorrect")) dir.crea
 if(file.exists("../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda")) {
 ipsc_lcl_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda"));
 } else {
-StructureObj(batch_corrected_cell_cycle_genes ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda",partition=c('TRUE'),path_struct = "../figures/ipsc_lcl_structure_cellcycle_batchcorrect");
+StructureObj(batch_corrected_cell_cycle_genes ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda",path_struct = "../figures/ipsc_lcl_structure_cellcycle_batchcorrect");
 ipsc_lcl_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_lcl_cellcycle_batchcorrect.rda"));
 }
 
