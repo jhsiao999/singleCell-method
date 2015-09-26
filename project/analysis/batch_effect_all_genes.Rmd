@@ -7,6 +7,8 @@ output:
     toc: true
 ---
 
+## Objective
+
 In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not. 
 
 
@@ -23,6 +25,8 @@ library(edgeR)
 library(qtlcharts)
 library(limma)
 ```
+
+## Preparing the Data 
 
 ```{r}
 reads <- data.frame(fread('../data/reads.txt'),row.names=1);

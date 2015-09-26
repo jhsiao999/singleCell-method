@@ -69,6 +69,8 @@ img {
 
 <div id="TOC">
 <ul>
+<li><a href="#objective">Objective</a></li>
+<li><a href="#preparing-the-data">Preparing the Data</a></li>
 <li><a href="#batch-uncorrected-structure-plot">Batch Uncorrected Structure Plot</a><ul>
 <li><a href="#structure-plot-by-individual">Structure plot by individual</a></li>
 <li><a href="#structure-plot-by-batch">Structure plot by batch</a></li>
@@ -82,8 +84,13 @@ img {
 </ul>
 </div>
 
+<div id="objective" class="section level2">
+<h2>Objective</h2>
 <p>In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not.</p>
 <p>We first load the packages and the data.</p>
+</div>
+<div id="preparing-the-data" class="section level2">
+<h2>Preparing the Data</h2>
 <pre class="r"><code>reads &lt;- data.frame(fread('../data/reads.txt'),row.names=1);
 molecules &lt;-  data.frame(fread('../data/molecules.txt'),row.names=1);</code></pre>
 <pre class="r"><code>quality_single_cells &lt;- scan(&quot;../data/quality-single-cells.txt&quot;,
@@ -221,6 +228,7 @@ obj &lt;- StructureObj_omega(ipsc_topics_single[[num]]$omega, samp_metadata = sa
 ## Creating the Structure plots
 ## Creating the Structure plots
 ## Creating the Structure plots</code></pre>
+</div>
 <div id="batch-uncorrected-structure-plot" class="section level2">
 <h2>Batch Uncorrected Structure Plot</h2>
 <div id="structure-plot-by-individual" class="section level3">
