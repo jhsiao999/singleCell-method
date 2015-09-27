@@ -246,8 +246,11 @@ if(!dir.exists("../figures/ipsc_structure_batchcorrect_cellcycle")) dir.create("
 if(file.exists("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda")) {
 ipsc_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
 } else {
-    batch_corrected_counts <- BatchCorrectedCounts(counts_data,batch_id);
+    individual.batch.id <- paste0(individual_id,"_", batch_id);
+    batch_corrected_counts <- BatchCorrectedCounts(counts_data,individual.batch.id);
     StructureObj(batch_corrected_counts ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_id, path_rda="../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda",path_struct = "../figures/ipsc_structure_batchcorrect_cellcycle");
+    
+ipsc_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
 }
 
 for(num in 1:length(nclus_vec))
