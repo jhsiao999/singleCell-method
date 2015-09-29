@@ -1,5 +1,5 @@
 ---
-title: "Batch effect modeling"
+title: "iPSC: Batch effect modeling using cell cycle genes"
 author: "Kushal K Dey and Joyce Hsiao"
 date: "2015-09-16"
 output: 
@@ -15,6 +15,7 @@ In this script, we use a batch effect modeling of the single cells using only th
 We first load the packages and the data.
 
 ```{r message = FALSE, warning = FALSE}
+library(CountClust)
 library(data.table)
 library(maptpx)
 library(gplots)
@@ -237,46 +238,36 @@ Check if the admixture output exists already. If not, compute clustering
 assignment for possible groupings of 2 to 7. 
 
 ```{r}
-clust_vec <- 2:7
-if(file.exists("../rdas/batch_effect_cell_cycle_genes.rda")) {
-    load("../rdas/batch_effect_cell_cycle_genes.rda")
+nclus_vec <- 2:7
+samp_metadata <- cbind.data.frame(individual_id, cell_phase_vector);
+colnames(samp_metadata) <- c("individual","cell_phase");
+if(!dir.exists("../figures/ipsc_structure_batchcorrect_cellcycle")) dir.create("../figures/ipsc_structure_batchcorrect_cellcycle")
+
+if(file.exists("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda")) {
+ipsc_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
 } else {
-    exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm))
-    topics_list <- lapply(clust_vec, function(per_clust) {
-        topics(exp_batch_removed_cpm_data, K = per_clust, tol=0.005)
-        })    
-    names(topics_list) <- paste0("clust",clust_vec)
-    save(topics_list, file = "../rdas/batch_effect_cell_cycle_genes.rda")
+    individual.batch.id <- paste0(individual_id,"_", batch_id);
+    batch_corrected_counts <- BatchCorrectedCounts(counts_data,individual.batch.id);
+    StructureObj(batch_corrected_counts ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_id, path_rda="../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda",path_struct = "../figures/ipsc_structure_batchcorrect_cellcycle");
+    
+ipsc_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
 }
+
+for(num in 1:length(nclus_vec))
+{
+obj <- StructureObj_omega(ipsc_topics_cellcycle_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_id,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/ipsc_structure_batchcorrect_cellcycle",control=list(cex.axis=1));
+}
+
 ```
 
-Making structure plots.
+Structure plots by cell phase
 
-```{r}
-nclust <- length(topics_list)
-type_info <- cell_phase_vector
-
-for (per_clust in 1:nclust) {
-    topics_clust <- topics_list[[per_clust]]
-    clust <- topics_clust$K
-    docweights <- topics_clust$omega
-    type_ordered <- type_info[order(type_info)]
-    docweights_ordered <- docweights[order(type_info),]
-    barplot( t(docweights_ordered), 
-             col = 2:(clust+1), axisnames = F,
-             space = 0, border=NA,
-             main = paste("No. of clusters=", clust), las = 1,
-             ylim = c(0,1), cex.axis = 0.3, cex.main=1.4)
-    labels <- match(unique(type_ordered), type_ordered)
-    abline(v=labels-1)
-    labels_low <- labels-1
-    labels_up <- c(labels_low[2:length(labels_low)], dim(docweights_ordered)[1])
-    mid_point <- labels_low +0.5*(labels_up-labels_low)
-    axis(1, at = mid_point, unique(type_ordered), las = 2, cex.axis=0.3)
-}
-```
-
-
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_6/struct_clus_6_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_7/struct_clus_7_cell_phase.png' style="width:304px;height:228px;">
 
 
 #### Gene assignment weights (Theta)
@@ -289,7 +280,7 @@ relative contribution to the cluster.
 Consider a 2-cluster scenario.
 
 ```{r}
-topics_clust <- topics_list[[1]]
+topics_clust <- ipsc_topics_cellcycle_batchcorrect[[1]]
 clust <- topics_clust$K
 word_weights <- topics_clust$theta
 ```
@@ -335,7 +326,7 @@ kable(as.data.frame(results))
 ##### 3 clusters
 
 ```{r}
-topics_clust <- topics_list[[2]]
+topics_clust <- ipsc_topics_cellcycle_batchcorrect[[2]]
 clust <- topics_clust$K
 word_weights <- topics_clust$theta
 ```

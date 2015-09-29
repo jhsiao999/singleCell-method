@@ -11,7 +11,7 @@ tagline:
 * [Structure plot per individual and per individual & batch](project/analysis/structure_per_individual.html)
 * [Investigating the properties of genes - low counts](project/analysis/low_counts_genes.html)
 * [Investigating ERCC spike ins - RUV normalization](project/analysis/RUV_normalization.html)
-
+# [iPSC Structure plots before and after batch correction](project/analysis/batch_effect_all_genes.html)
 
 ###  Cell-cycle genes analysis
 

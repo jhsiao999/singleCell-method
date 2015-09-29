@@ -11,18 +11,18 @@ output:
 
 In this script, we perform Structure analysis on LCLs based on the cell cycle genes only. 
 
-```{r echo=TRUE, eval=TRUE}
+```{r message=FALSE, warning=FALSE}
 rm(list=ls())
-setwd('/Users/kushal/Documents/singleCell-method/project/LCL/src')
-suppressMessages(suppressWarnings(library(CountClust)))
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
-suppressMessages(suppressWarnings(library(qtlcharts)))
-suppressMessages(suppressWarnings(library(limma)))
-suppressMessages(suppressWarnings(library(readr)))
+#setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+library(CountClust)
+library(data.table)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+library(qtlcharts)
+library(limma)
+library(readr)
 ```
 
 
@@ -121,6 +121,9 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
+cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
+cell_phase_vector <- factor(cell_phase_vector, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 
 ```
 
@@ -139,28 +142,40 @@ lcl_single_cell_cycle_genes <- lcl_single_cells[,labs];
 We have in total `r length(labs) ` cell cycle genes that we use in our analysis and now we perform the Structure analysis on the counts data of the LCLs and the cell cycle genes without the batch effect correction.
 
 ```{r echo=TRUE, eval=TRUE}
-samp_metadata <- cbind.data.frame(as.vector(as.matrix(assign_cell_phase)));
+samp_metadata <- cbind.data.frame(as.vector(as.matrix(cell_phase_vector)));
 colnames(samp_metadata) = c("cell_phase");
 
 nclus_vec <- 2:5;
 
-if(!dir.exists("../../figures/lcl_cellcycle_structure")) dir.create("../../figures/lcl_cellcycle_structure")
+if(!dir.exists("../figures/lcl_cellcycle_structure")) dir.create("../figures/lcl_cellcycle_structure")
 
-#StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_cellcycle_structure");
-
-lcl_cellcycle_topics <- get(load("../../../project/rdas/topic_fit_lcl_cellcycle.rda"));
-
+if(file.exists("../../project/rdas/topic_fit_lcl_batchcorrect_single.rda")) {
+lcl_cellcycle_topics <- get(load("../../project/rdas/topic_fit_lcl_cellcycle.rda"));
+} else {
+StructureObj(lcl_single_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = batch_lab_single_cells, path_rda="../../project/rdas/topic_fit_lcl_cellcycle.rda",partition=c('TRUE'),path_struct = "../figures/lcl_cellcycle_structure");
+lcl_cellcycle_topics <- get(load("../../project/rdas/topic_fit_lcl_cellcycle.rda"));
+}
+  
 for(num in 1:length(nclus_vec))
 {
-obj <- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_structure',control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_cellcycle_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/lcl_cellcycle_structure',control=list(cex.axis=1));
 }
 
 ```
 
-<img src='../../figures/lcl_cellcycle_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_cellcycle_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_cellcycle_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_cellcycle_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+Structure plots arranged by cell phase
+
+<img src='../figures/lcl_cellcycle_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+
+Structure plots arranged by batch
+
+<img src='../figures/lcl_cellcycle_structure/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_structure/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_structure/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_structure/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
 
 ### Batch Corrected Model
 
@@ -180,21 +195,33 @@ colnames(samp_metadata) = c("cell_phase");
 
 nclus_vec <- 2:5;
 
-if(!dir.exists("../../figures/lcl_cellcycle_batchcorrect_structure")) dir.create("../../figures/lcl_cellcycle_batchcorrect_structure")
+if(!dir.exists("../figures/lcl_cellcycle_batchcorrect_structure")) dir.create("../figures/lcl_cellcycle_batchcorrect_structure")
 
-#StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_cellcycle_batchcorrect_structure");
+if(file.exists("../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda")) {
+lcl_cellcycle_topics_batchcorrect <- get(load("../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda"));
+} else {
+StructureObj(batch_corrected_cell_cycle_genes,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = batch_lab_single_cells, path_rda="../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda",partition=c('TRUE'),path_struct = "../figures/lcl_cellcycle_batchcorrect_structure");
+lcl_cellcycle_topics_batchcorrect <- get(load("../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda"));
+}
 
-
-lcl_cellcycle_topics_batchcorrect <- get(load("../../../project/rdas/topic_fit_lcl_cellcycle_batchcorrect.rda"));
 
 for(num in 1:length(nclus_vec))
 {
-obj <- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_cellcycle_batchcorrect_structure',control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_cellcycle_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_lab_single_cells,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/lcl_cellcycle_batchcorrect_structure',control=list(cex.axis=1));
 }
 
 ```
 
-<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_cellcycle_batchcorrect_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+Structure plots arranged by cell phase
+
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+
+Structure plots arranged by batch
+
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_cellcycle_batchcorrect_structure/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">

@@ -86,11 +86,12 @@ library(knitr)</code></pre>
 </div>
 <div id="extracting-cluster-annotations-of-genes" class="section level3">
 <h3>Extracting Cluster annotations of genes</h3>
-<pre class="r"><code>setwd('/Users/kushal/Documents/singleCell-method/project/iPSC+LCL/src')
-ipsc_lcl_topics &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl.rda&quot;));
+<pre class="r"><code>#setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+
+ipsc_lcl_topics &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl.rda&quot;));
 
 theta &lt;- ipsc_lcl_topics[[1]]$theta;
-features &lt;- ExtractTopFeatures(theta,top_features=10,method=&quot;poisson&quot;)
+features &lt;- ExtractTopFeatures(theta,top_features=30,method=&quot;poisson&quot;)
 
 features_vec &lt;- unique(as.vector(features));
 
@@ -107,84 +108,197 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <h3>Gene Annotations - Top genes driving clusters</h3>
 <p>The Ensemble IDS of the top genes that are highly expressed in iPSCs compared to the LCLs are the following. The summary information on genes which are significantly highly epressed in iPSCs compared to LCLs are the following.</p>
 <pre class="r"><code>out &lt;- queryMany(imp_genes_per_class[[1]], scopes=&quot;ensembl.gene&quot;, fields=c(&quot;name&quot;, &quot;summary&quot;), species=&quot;human&quot;);</code></pre>
-<pre><code>## Finished
-## Pass returnall=TRUE to return lists of duplicate or missing query terms.</code></pre>
+<pre><code>## Finished</code></pre>
 <pre class="r"><code>kable(as.data.frame(out))</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="left">query</th>
 <th align="left">X_id</th>
-<th align="left">name</th>
+<th align="left">query</th>
 <th align="left">summary</th>
+<th align="left">name</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ENSG00000198712</td>
-<td align="left">4513</td>
-<td align="left">cytochrome c oxidase subunit II</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">ENSG00000198938</td>
-<td align="left">4514</td>
-<td align="left">cytochrome c oxidase III</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">ENSG00000187514</td>
-<td align="left">728026</td>
-<td align="left">prothymosin alpha-like</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="left">ENSG00000187514</td>
-<td align="left">5757</td>
-<td align="left">prothymosin, alpha</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">ENSG00000174720</td>
 <td align="left">51574</td>
-<td align="left">La ribonucleoprotein domain family, member 7</td>
+<td align="left">ENSG00000174720</td>
 <td align="left">This gene encodes a protein which is found in the 7SK snRNP (small nuclear ribonucleoprotein). This snRNP complex inhibits a cyclin-dependent kinase, positive transcription elongation factor b, which is required for paused RNA polymerase II at a promoter to begin transcription elongation. A pseudogene of this gene is located on chromosome 3. Alternative splicing results in multiple transcript variants.</td>
+<td align="left">La ribonucleoprotein domain family, member 7</td>
 </tr>
 <tr class="even">
-<td align="left">ENSG00000198899</td>
-<td align="left">4508</td>
-<td align="left">ATP synthase F0 subunit 6</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="left">ENSG00000181163</td>
-<td align="left">4869</td>
-<td align="left">nucleophosmin (nucleolar phosphoprotein B23, numatrin)</td>
-<td align="left">This gene encodes a phosphoprotein which moves between the nucleus and the cytoplasm. The gene product is thought to be involved in several processes including regulation of the ARF/p53 pathway. A number of genes are fusion partners have been characterized, in particular the anaplastic lymphoma kinase gene on chromosome 2. Mutations in this gene are associated with acute myeloid leukemia. More than a dozen pseudogenes of this gene have been identified. Alternative splicing results in multiple transcript variants.</td>
-</tr>
-<tr class="even">
-<td align="left">ENSG00000117450</td>
 <td align="left">5052</td>
-<td align="left">peroxiredoxin 1</td>
+<td align="left">ENSG00000117450</td>
 <td align="left">This gene encodes a member of the peroxiredoxin family of antioxidant enzymes, which reduce hydrogen peroxide and alkyl hydroperoxides. The encoded protein may play an antioxidant protective role in cells, and may contribute to the antiviral activity of CD8(+) T-cells. This protein may have a proliferative effect and play a role in cancer development or progression. Four transcript variants encoding the same protein have been identified for this gene.</td>
+<td align="left">peroxiredoxin 1</td>
 </tr>
 <tr class="odd">
-<td align="left">ENSG00000080824</td>
-<td align="left">3320</td>
-<td align="left">heat shock protein 90kDa alpha (cytosolic), class A member 1</td>
-<td align="left">The protein encoded by this gene is an inducible molecular chaperone that functions as a homodimer. The encoded protein aids in the proper folding of specific target proteins by use of an ATPase activity that is modulated by co-chaperones. Two transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">54596</td>
+<td align="left">ENSG00000240563</td>
+<td align="left">NA</td>
+<td align="left">LINE-1 type transposase domain containing 1</td>
 </tr>
 <tr class="even">
-<td align="left">ENSG00000119705</td>
 <td align="left">81892</td>
-<td align="left">SRA stem-loop interacting RNA binding protein</td>
+<td align="left">ENSG00000119705</td>
 <td align="left">Steroid receptor RNA activator (SRA, or SRA1; MIM 603819) is a complex RNA molecule containing multiple stable stem-loop structures that functions in coactivation of nuclear receptors. SLIRP interacts with stem-loop structure-7 of SRA (STR7) and modulates nuclear receptor transactivation (Hatchell et al., 2006 [PubMed 16762838]).</td>
+<td align="left">SRA stem-loop interacting RNA binding protein</td>
 </tr>
 <tr class="odd">
-<td align="left">ENSG00000164032</td>
-<td align="left">3015</td>
-<td align="left">H2A histone family, member Z</td>
-<td align="left">Histones are basic nuclear proteins that are responsible for the nucleosome structure of the chromosomal fiber in eukaryotes. Nucleosomes consist of approximately 146 bp of DNA wrapped around a histone octamer composed of pairs of each of the four core histones (H2A, H2B, H3, and H4). The chromatin fiber is further compacted through the interaction of a linker histone, H1, with the DNA between the nucleosomes to form higher order chromatin structures. This gene encodes a replication-independent member of the histone H2A family that is distinct from other members of the family. Studies in mice have shown that this particular histone is required for embryonic development and indicate that lack of functional histone H2A leads to embryonic lethality.</td>
+<td align="left">27018</td>
+<td align="left">ENSG00000166681</td>
+<td align="left">NA</td>
+<td align="left">nerve growth factor receptor (TNFRSF16) associated protein 1</td>
+</tr>
+<tr class="even">
+<td align="left">6659</td>
+<td align="left">ENSG00000124766</td>
+<td align="left">This intronless gene encodes a member of the SOX (SRY-related HMG-box) family of transcription factors involved in the regulation of embryonic development and in the determination of the cell fate. The encoded protein may act as a transcriptional regulator after forming a protein complex with other proteins, such as syndecan binding protein (syntenin). The protein may function in the apoptosis pathway leading to cell death as well as to tumorigenesis and may mediate downstream effects of parathyroid hormone (PTH) and PTH-related protein (PTHrP) in bone development. The solution structure has been resolved for the HMG-box of a similar mouse protein.</td>
+<td align="left">SRY (sex determining region Y)-box 4</td>
+</tr>
+<tr class="odd">
+<td align="left">3312</td>
+<td align="left">ENSG00000109971</td>
+<td align="left">This gene encodes a member of the heat shock protein 70 family, which contains both heat-inducible and constitutively expressed members. This protein belongs to the latter group, which are also referred to as heat-shock cognate proteins. It functions as a chaperone, and binds to nascent polypeptides to facilitate correct folding. It also functions as an ATPase in the disassembly of clathrin-coated vesicles during transport of membrane components through the cell. Alternatively spliced transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">heat shock 70kDa protein 8</td>
+</tr>
+<tr class="even">
+<td align="left">6418</td>
+<td align="left">ENSG00000119335</td>
+<td align="left">The protein encoded by this gene inhibits acetylation of nucleosomes, especially histone H4, by histone acetylases (HAT). This inhibition is most likely accomplished by masking histone lysines from being acetylated, and the consequence is to silence HAT-dependent transcription. The encoded protein is part of a complex localized to the endoplasmic reticulum but is found in the nucleus and inhibits apoptosis following attack by cytotoxic T lymphocytes. This protein can also enhance DNA replication of the adenovirus genome. Several transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">SET nuclear proto-oncogene</td>
+</tr>
+<tr class="odd">
+<td align="left">3020</td>
+<td align="left">ENSG00000163041</td>
+<td align="left">Histones are basic nuclear proteins that are responsible for the nucleosome structure of the chromosomal fiber in eukaryotes. Two molecules of each of the four core histones (H2A, H2B, H3, and H4) form an octamer, around which approximately 146 bp of DNA is wrapped in repeating units, called nucleosomes. The linker histone, H1, interacts with linker DNA between nucleosomes and functions in the compaction of chromatin into higher order structures. This gene contains introns and its mRNA is polyadenylated, unlike most histone genes. The protein encoded is a replication-independent member of the histone H3 family.</td>
+<td align="left">H3 histone, family 3A</td>
+</tr>
+<tr class="even">
+<td align="left">7360</td>
+<td align="left">ENSG00000169764</td>
+<td align="left">The enzyme encoded by this gene is an important intermediary in mammalian carbohydrate interconversions. It transfers a glucose moiety from glucose-1-phosphate to MgUTP and forms UDP-glucose and MgPPi. In liver and muscle tissue, UDP-glucose is a direct precursor of glycogen; in lactating mammary gland it is converted to UDP-galactose which is then converted to lactose. The eukaryotic enzyme has no significant sequence similarity to the prokaryotic enzyme. Two transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">UDP-glucose pyrophosphorylase 2</td>
+</tr>
+<tr class="odd">
+<td align="left">3159</td>
+<td align="left">ENSG00000137309</td>
+<td align="left">This gene encodes a non-histone protein involved in many cellular processes, including regulation of inducible gene transcription, integration of retroviruses into chromosomes, and the metastatic progression of cancer cells. The encoded protein preferentially binds to the minor groove of A+T-rich regions in double-stranded DNA. It has little secondary structure in solution but assumes distinct conformations when bound to substrates such as DNA or other proteins. The encoded protein is frequently acetylated and is found in the nucleus. At least seven transcript variants encoding two different isoforms have been found for this gene.</td>
+<td align="left">high mobility group AT-hook 1</td>
+</tr>
+<tr class="even">
+<td align="left">4257</td>
+<td align="left">ENSG00000008394</td>
+<td align="left">The MAPEG (Membrane Associated Proteins in Eicosanoid and Glutathione metabolism) family consists of six human proteins, two of which are involved in the production of leukotrienes and prostaglandin E, important mediators of inflammation. Other family members, demonstrating glutathione S-transferase and peroxidase activities, are involved in cellular defense against toxic, carcinogenic, and pharmacologically active electrophilic compounds. This gene encodes a protein that catalyzes the conjugation of glutathione to electrophiles and the reduction of lipid hydroperoxides. This protein is localized to the endoplasmic reticulum and outer mitochondrial membrane where it is thought to protect these membranes from oxidative stress. Several transcript variants, some non-protein coding and some protein coding, have been found for this gene.</td>
+<td align="left">microsomal glutathione S-transferase 1</td>
+</tr>
+<tr class="odd">
+<td align="left">5420</td>
+<td align="left">ENSG00000128567</td>
+<td align="left">This gene encodes a member of the sialomucin protein family. The encoded protein was originally identified as an important component of glomerular podocytes. Podocytes are highly differentiated epithelial cells with interdigitating foot processes covering the outer aspect of the glomerular basement membrane. Other biological activities of the encoded protein include: binding in a membrane protein complex with Na+/H+ exchanger regulatory factor to intracellular cytoskeletal elements, playing a role in hematopoetic cell differentiation, and being expressed in vascular endothelium cells and binding to L-selectin.</td>
+<td align="left">podocalyxin-like</td>
+</tr>
+<tr class="even">
+<td align="left">1789</td>
+<td align="left">ENSG00000088305</td>
+<td align="left">CpG methylation is an epigenetic modification that is important for embryonic development, imprinting, and X-chromosome inactivation. Studies in mice have demonstrated that DNA methylation is required for mammalian development. This gene encodes a DNA methyltransferase which is thought to function in de novo methylation, rather than maintenance methylation. The protein localizes primarily to the nucleus and its expression is developmentally regulated. Mutations in this gene cause the immunodeficiency-centromeric instability-facial anomalies (ICF) syndrome. Eight alternatively spliced transcript variants have been described. The full length sequences of variants 4 and 5 have not been determined.</td>
+<td align="left">DNA (cytosine-5-)-methyltransferase 3 beta</td>
+</tr>
+<tr class="odd">
+<td align="left">7013</td>
+<td align="left">ENSG00000147601</td>
+<td align="left">This gene encodes a telomere specific protein which is a component of the telomere nucleoprotein complex. This protein is present at telomeres throughout the cell cycle and functions as an inhibitor of telomerase, acting in cis to limit the elongation of individual chromosome ends. The protein structure contains a C-terminal Myb motif, a dimerization domain near its N-terminus and an acidic N-terminus. Two transcripts of this gene are alternatively spliced products.</td>
+<td align="left">telomeric repeat binding factor (NIMA-interacting) 1</td>
+</tr>
+<tr class="even">
+<td align="left">ENSG00000214265</td>
+<td align="left">ENSG00000214265</td>
+<td align="left">NA</td>
+<td align="left">SNRPN upstream reading frame</td>
+</tr>
+<tr class="odd">
+<td align="left">79727</td>
+<td align="left">ENSG00000131914</td>
+<td align="left">NA</td>
+<td align="left">lin-28 homolog A (C. elegans)</td>
+</tr>
+<tr class="even">
+<td align="left">6997</td>
+<td align="left">ENSG00000241186</td>
+<td align="left">This gene encodes an epidermal growth factor-related protein that contains a cripto, FRL-1, and cryptic domain. The encoded protein is an extracellular, membrane-bound signaling protein that plays an essential role in embryonic development and tumor growth. Mutations in this gene are associated with forebrain defects. Pseudogenes of this gene are found on chromosomes 2, 3, 6, 8, 19 and X. Alternate splicing results in multiple transcript variants.</td>
+<td align="left">teratocarcinoma-derived growth factor 1</td>
+</tr>
+<tr class="odd">
+<td align="left">6422</td>
+<td align="left">ENSG00000104332</td>
+<td align="left">This gene encodes a member of the SFRP family that contains a cysteine-rich domain homologous to the putative Wnt-binding site of Frizzled proteins. Members of this family act as soluble modulators of Wnt signaling; epigenetic silencing of SFRP genes leads to deregulated activation of the Wnt-pathway which is associated with cancer. This gene may also be involved in determining the polarity of photoreceptor cells in the retina.</td>
+<td align="left">secreted frizzled-related protein 1</td>
+</tr>
+<tr class="even">
+<td align="left">10622</td>
+<td align="left">ENSG00000113356</td>
+<td align="left">NA</td>
+<td align="left">polymerase (RNA) III (DNA directed) polypeptide G (32kD)</td>
+</tr>
+<tr class="odd">
+<td align="left">6741</td>
+<td align="left">ENSG00000138385</td>
+<td align="left">The protein encoded by this gene is involved in diverse aspects of RNA metabolism, including binding and protecting poly(U) termini of nascent RNA polymerase III transcripts from exonuclease digestion, processing 5’ and 3’ ends of pre-tRNA precursors, acting as an RNA chaperone, and binding viral RNAs associated with hepatitis C virus. Autoantibodies reacting with this protein are found in the sera of patients with Sjogren syndrome and systemic lupus erythematosus. Alternative promoter usage results in two different transcript variants which encode the same protein.</td>
+<td align="left">Sjogren syndrome antigen B (autoantigen La)</td>
+</tr>
+<tr class="even">
+<td align="left">55211</td>
+<td align="left">ENSG00000121570</td>
+<td align="left">NA</td>
+<td align="left">developmental pluripotency associated 4</td>
+</tr>
+<tr class="odd">
+<td align="left">2697</td>
+<td align="left">ENSG00000152661</td>
+<td align="left">This gene is a member of the connexin gene family. The encoded protein is a component of gap junctions, which are composed of arrays of intercellular channels that provide a route for the diffusion of low molecular weight materials from cell to cell. The encoded protein is the major protein of gap junctions in the heart that are thought to have a crucial role in the synchronized contraction of the heart and in embryonic development. A related intronless pseudogene has been mapped to chromosome 5. Mutations in this gene have been associated with oculodentodigital dysplasia, autosomal recessive craniometaphyseal dysplasia and heart malformations.</td>
+<td align="left">gap junction protein, alpha 1, 43kDa</td>
+</tr>
+<tr class="even">
+<td align="left">4678</td>
+<td align="left">ENSG00000132780</td>
+<td align="left">This gene encodes a H1 histone binding protein that is involved in transporting histones into the nucleus of dividing cells. Multiple isoforms are encoded by transcript variants of this gene. The somatic form is expressed in all mitotic cells, is localized to the nucleus, and is coupled to the cell cycle. The testicular form is expressed in embryonic tissues, tumor cells, and the testis. In male germ cells, this protein is localized to the cytoplasm of primary spermatocytes, the nucleus of spermatids, and the periacrosomal region of mature spermatozoa.</td>
+<td align="left">nuclear autoantigenic sperm protein (histone-binding)</td>
+</tr>
+<tr class="odd">
+<td align="left">7001</td>
+<td align="left">ENSG00000167815</td>
+<td align="left">This gene encodes a member of the peroxiredoxin family of antioxidant enzymes, which reduce hydrogen peroxide and alkyl hydroperoxides. The encoded protein plays an antioxidant protective role in cells, and it may contribute to the antiviral activity of CD8(+) T-cells. The crystal structure of this protein has been resolved to 2.7 angstroms. This protein prevents hemolytic anemia from oxidative stress by stabilizing hemoglobin, thus making this gene a therapeutic target for patients with hemolytic anemia. This protein may have a proliferative effect and play a role in cancer development or progression. Related pseudogenes have been identified on chromosomes 5, 6, 10 and 13.</td>
+<td align="left">peroxiredoxin 2</td>
+</tr>
+<tr class="even">
+<td align="left">6415</td>
+<td align="left">ENSG00000178980</td>
+<td align="left">This gene encodes a selenoprotein, which contains a selenocysteine (Sec) residue at its active site. The selenocysteine is encoded by the UGA codon that normally signals translation termination. The 3’ UTR of selenoprotein genes have a common stem-loop structure, the sec insertion sequence (SECIS), that is necessary for the recognition of UGA as a Sec codon rather than as a stop signal. This protein shows highest expression in skeletal muscle and heart, and may be involved in oxidation-reduction reactions. A retroprocessed pseudogene, SEPW1P, has been identified and mapped to chromosome 1p35-34.</td>
+<td align="left">selenoprotein W, 1</td>
+</tr>
+<tr class="odd">
+<td align="left">6566</td>
+<td align="left">ENSG00000155380</td>
+<td align="left">The protein encoded by this gene is a proton-linked monocarboxylate transporter that catalyzes the movement of many monocarboxylates, such as lactate and pyruvate, across the plasma membrane. Mutations in this gene are associated with erythrocyte lactate transporter defect. Alternatively spliced transcript variants have been found for this gene.</td>
+<td align="left">solute carrier family 16 (monocarboxylate transporter), member 1</td>
+</tr>
+<tr class="even">
+<td align="left">7345</td>
+<td align="left">ENSG00000154277</td>
+<td align="left">The protein encoded by this gene belongs to the peptidase C12 family. This enzyme is a thiol protease that hydrolyzes a peptide bond at the C-terminal glycine of ubiquitin. This gene is specifically expressed in the neurons and in cells of the diffuse neuroendocrine system. Mutations in this gene may be associated with Parkinson disease.</td>
+<td align="left">ubiquitin carboxyl-terminal esterase L1 (ubiquitin thiolesterase)</td>
+</tr>
+<tr class="odd">
+<td align="left">84101</td>
+<td align="left">ENSG00000136014</td>
+<td align="left">Modification of cellular proteins by ubiquitin is an essential regulatory mechanism controlled by the coordinated action of multiple ubiquitin-conjugating and deubiquitinating enzymes. USP44 belongs to a large family of cysteine proteases that function as deubiquitinating enzymes (Quesada et al., 2004 [PubMed 14715245]).</td>
+<td align="left">ubiquitin specific peptidase 44</td>
+</tr>
+<tr class="even">
+<td align="left">3417</td>
+<td align="left">ENSG00000138413</td>
+<td align="left">Isocitrate dehydrogenases catalyze the oxidative decarboxylation of isocitrate to 2-oxoglutarate. These enzymes belong to two distinct subclasses, one of which utilizes NAD(+) as the electron acceptor and the other NADP(+). Five isocitrate dehydrogenases have been reported: three NAD(+)-dependent isocitrate dehydrogenases, which localize to the mitochondrial matrix, and two NADP(+)-dependent isocitrate dehydrogenases, one of which is mitochondrial and the other predominantly cytosolic. Each NADP(+)-dependent isozyme is a homodimer. The protein encoded by this gene is the NADP(+)-dependent isocitrate dehydrogenase found in the cytoplasm and peroxisomes. It contains the PTS-1 peroxisomal targeting signal sequence. The presence of this enzyme in peroxisomes suggests roles in the regeneration of NADPH for intraperoxisomal reductions, such as the conversion of 2, 4-dienoyl-CoAs to 3-enoyl-CoAs, as well as in peroxisomal reactions that consume 2-oxoglutarate, namely the alpha-hydroxylation of phytanic acid. The cytoplasmic enzyme serves a significant role in cytoplasmic NADPH production. Alternatively spliced transcript variants encoding the same protein have been found for this gene.</td>
+<td align="left">isocitrate dehydrogenase 1 (NADP+), soluble</td>
 </tr>
 </tbody>
 </table>
@@ -196,72 +310,198 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
+<th align="left">summary</th>
+<th align="left">name</th>
 <th align="left">query</th>
 <th align="left">X_id</th>
-<th align="left">name</th>
-<th align="left">summary</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ENSG00000166710</td>
-<td align="left">567</td>
-<td align="left">beta-2-microglobulin</td>
-<td align="left">This gene encodes a serum protein found in association with the major histocompatibility complex (MHC) class I heavy chain on the surface of nearly all nucleated cells. The protein has a predominantly beta-pleated sheet structure that can form amyloid fibrils in some pathological conditions. The encoded antimicrobial protein displays antibacterial activity in amniotic fluid. A mutation in this gene has been shown to result in hypercatabolic hypoproteinemia.</td>
-</tr>
-<tr class="even">
+<td align="left">This gene encodes a protein best known as a hematopoietic cell granule proteoglycan. Proteoglycans stored in the secretory granules of many hematopoietic cells also contain a protease-resistant peptide core, which may be important for neutralizing hydrolytic enzymes. This encoded protein was found to be associated with the macromolecular complex of granzymes and perforin, which may serve as a mediator of granule-mediated apoptosis. Two transcript variants, only one of them protein-coding, have been found for this gene.</td>
+<td align="left">serglycin</td>
 <td align="left">ENSG00000122862</td>
 <td align="left">5552</td>
-<td align="left">serglycin</td>
-<td align="left">This gene encodes a protein best known as a hematopoietic cell granule proteoglycan. Proteoglycans stored in the secretory granules of many hematopoietic cells also contain a protease-resistant peptide core, which may be important for neutralizing hydrolytic enzymes. This encoded protein was found to be associated with the macromolecular complex of granzymes and perforin, which may serve as a mediator of granule-mediated apoptosis. Two transcript variants, only one of them protein-coding, have been found for this gene.</td>
-</tr>
-<tr class="odd">
-<td align="left">ENSG00000019582</td>
-<td align="left">972</td>
-<td align="left">CD74 molecule, major histocompatibility complex, class II invariant chain</td>
-<td align="left">The protein encoded by this gene associates with class II major histocompatibility complex (MHC) and is an important chaperone that regulates antigen presentation for immune response. It also serves as cell surface receptor for the cytokine macrophage migration inhibitory factor (MIF) which, when bound to the encoded protein, initiates survival pathways and cell proliferation. This protein also interacts with amyloid precursor protein (APP) and suppresses the production of amyloid beta (Abeta). Multiple alternatively spliced transcript variants encoding different isoforms have been identified.</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
+<td align="left">NA</td>
 <td align="left">ENSG00000006075</td>
 <td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
+<td align="left">CD52 molecule</td>
 <td align="left">ENSG00000169442</td>
 <td align="left">1043</td>
-<td align="left">CD52 molecule</td>
-<td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">This gene encodes a member of the regulator of G-protein signalling family. This protein is located on the cytosolic side of the plasma membrane and contains a conserved, 120 amino acid motif called the RGS domain. The protein attenuates the signalling activity of G-proteins by binding to activated, GTP-bound G alpha subunits and acting as a GTPase activating protein (GAP), increasing the rate of conversion of the GTP to GDP. This hydrolysis allows the G alpha subunits to bind G beta/gamma subunit heterodimers, forming inactive G-protein heterotrimers, thereby terminating the signal.</td>
+<td align="left">regulator of G-protein signaling 1</td>
 <td align="left">ENSG00000090104</td>
 <td align="left">5996</td>
-<td align="left">regulator of G-protein signaling 1</td>
-<td align="left">This gene encodes a member of the regulator of G-protein signalling family. This protein is located on the cytosolic side of the plasma membrane and contains a conserved, 120 amino acid motif called the RGS domain. The protein attenuates the signalling activity of G-proteins by binding to activated, GTP-bound G alpha subunits and acting as a GTPase activating protein (GAP), increasing the rate of conversion of the GTP to GDP. This hydrolysis allows the G alpha subunits to bind G beta/gamma subunit heterodimers, forming inactive G-protein heterotrimers, thereby terminating the signal.</td>
 </tr>
 <tr class="odd">
+<td align="left">This gene encodes a member of the CD2 subfamily of immunoglobulin-like receptors which includes SLAM (signaling lymphocyte activation molecules) proteins. The encoded protein is found on the surface of lymphocytes and other immune cells, dendritic cells and endothelial cells, and participates in activation and differentiation pathways in these cells. The encoded protein does not have a transmembrane domain, however, but is held at the cell surface by a GPI anchor via a C-terminal domain which maybe cleaved to yield a soluble form of the receptor. Multiple transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">CD48 molecule</td>
 <td align="left">ENSG00000117091</td>
 <td align="left">962</td>
-<td align="left">CD48 molecule</td>
-<td align="left">This gene encodes a member of the CD2 subfamily of immunoglobulin-like receptors which includes SLAM (signaling lymphocyte activation molecules) proteins. The encoded protein is found on the surface of lymphocytes and other immune cells, dendritic cells and endothelial cells, and participates in activation and differentiation pathways in these cells. The encoded protein does not have a transmembrane domain, however, but is held at the cell surface by a GPI anchor via a C-terminal domain which maybe cleaved to yield a soluble form of the receptor. Multiple transcript variants encoding different isoforms have been found for this gene.</td>
 </tr>
 <tr class="even">
+<td align="left">HLA-DRA is one of the HLA class II alpha chain paralogues. This class II molecule is a heterodimer consisting of an alpha and a beta chain, both anchored in the membrane. It plays a central role in the immune system by presenting peptides derived from extracellular proteins. Class II molecules are expressed in antigen presenting cells (APC: B lymphocytes, dendritic cells, macrophages). The alpha chain is approximately 33-35 kDa and its gene contains 5 exons. Exon 1 encodes the leader peptide, exons 2 and 3 encode the two extracellular domains, and exon 4 encodes the transmembrane domain and the cytoplasmic tail. DRA does not have polymorphisms in the peptide binding part and acts as the sole alpha chain for DRB1, DRB3, DRB4 and DRB5.</td>
+<td align="left">major histocompatibility complex, class II, DR alpha</td>
 <td align="left">ENSG00000204287</td>
 <td align="left">3122</td>
-<td align="left">major histocompatibility complex, class II, DR alpha</td>
-<td align="left">HLA-DRA is one of the HLA class II alpha chain paralogues. This class II molecule is a heterodimer consisting of an alpha and a beta chain, both anchored in the membrane. It plays a central role in the immune system by presenting peptides derived from extracellular proteins. Class II molecules are expressed in antigen presenting cells (APC: B lymphocytes, dendritic cells, macrophages). The alpha chain is approximately 33-35 kDa and its gene contains 5 exons. Exon 1 encodes the leader peptide, exons 2 and 3 encode the two extracellular domains, and exon 4 encodes the transmembrane domain and the cytoplasmic tail. DRA does not have polymorphisms in the peptide binding part and acts as the sole alpha chain for DRB1, DRB3, DRB4 and DRB5.</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
+<td align="left">joining chain of multimeric IgA and IgM</td>
 <td align="left">ENSG00000132465</td>
 <td align="left">3512</td>
-<td align="left">joining chain of multimeric IgA and IgM</td>
+</tr>
+<tr class="even">
+<td align="left">This antimicrobial gene is one of several Cys-Cys (CC) cytokine genes clustered on the q arm of chromosome 16. Cytokines are a family of secreted proteins involved in immunoregulatory and inflammatory processes. The CC cytokines are proteins characterized by two adjacent cysteines. The cytokine encoded by this gene displays chemotactic activity for monocytes, dendritic cells, natural killer cells and for chronically activated T lymphocytes. It also displays a mild activity for primary activated T lymphocytes and has no chemoattractant activity for neutrophils, eosinophils and resting T lymphocytes. The product of this gene binds to chemokine receptor CCR4. This chemokine may play a role in the trafficking of activated T lymphocytes to inflammatory sites and other aspects of activated T lymphocyte physiology.</td>
+<td align="left">chemokine (C-C motif) ligand 22</td>
+<td align="left">ENSG00000102962</td>
+<td align="left">6367</td>
+</tr>
+<tr class="odd">
+<td align="left">Members of the Rho (or ARH) protein family (see MIM 165390) and other Ras-related small GTP-binding proteins (see MIM 179520) are involved in diverse cellular events, including cell signaling, proliferation, cytoskeletal organization, and secretion. The GTP-binding proteins are active only in the GTP-bound state. At least 3 classes of proteins tightly regulate cycling between the GTP-bound and GDP-bound states: GTPase-activating proteins (GAPs), guanine nucleotide-releasing factors (GRFs), and GDP-dissociation inhibitors (GDIs). The GDIs, including ARHGDIB, decrease the rate of GDP dissociation from Ras-like GTPases (summary by Scherle et al., 1993 [PubMed 8356058]).</td>
+<td align="left">Rho GDP dissociation inhibitor (GDI) beta</td>
+<td align="left">ENSG00000111348</td>
+<td align="left">397</td>
+</tr>
+<tr class="even">
+<td align="left">Plastins are a family of actin-binding proteins that are conserved throughout eukaryote evolution and expressed in most tissues of higher eukaryotes. In humans, two ubiquitous plastin isoforms (L and T) have been identified. Plastin 1 (otherwise known as Fimbrin) is a third distinct plastin isoform which is specifically expressed at high levels in the small intestine. The L isoform is expressed only in hemopoietic cell lineages, while the T isoform has been found in all other normal cells of solid tissues that have replicative potential (fibroblasts, endothelial cells, epithelial cells, melanocytes, etc.). However, L-plastin has been found in many types of malignant human cells of non-hemopoietic origin suggesting that its expression is induced accompanying tumorigenesis in solid tissues.</td>
+<td align="left">lymphocyte cytosolic protein 1 (L-plastin)</td>
+<td align="left">ENSG00000136167</td>
+<td align="left">3936</td>
+</tr>
+<tr class="odd">
+<td align="left">This gene encodes a transmembrane receptor that is associated with lysosomes. The encoded protein, also known as E3 protein, may play a role in hematopoiesis.</td>
+<td align="left">lysosomal protein transmembrane 5</td>
+<td align="left">ENSG00000162511</td>
+<td align="left">7805</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">ENSG00000129277</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">This gene encodes a member of the membrane-spanning 4A gene family. Members of this nascent protein family are characterized by common structural features and similar intron/exon splice boundaries and display unique expression patterns among hematopoietic cells and nonlymphoid tissues. This gene encodes a B-lymphocyte surface molecule which plays a role in the development and differentiation of B-cells into plasma cells. This family member is localized to 11q12, among a cluster of family members. Alternative splicing of this gene results in two transcript variants which encode the same protein.</td>
+<td align="left">membrane-spanning 4-domains, subfamily A, member 1</td>
+<td align="left">ENSG00000156738</td>
+<td align="left">931</td>
+</tr>
+<tr class="even">
+<td align="left">HLA-DQA1 belongs to the HLA class II alpha chain paralogues. The class II molecule is a heterodimer consisting of an alpha (DQA) and a beta chain (DQB), both anchored in the membrane. It plays a central role in the immune system by presenting peptides derived from extracellular proteins. Class II molecules are expressed in antigen presenting cells (APC: B Lymphocytes, dendritic cells, macrophages). The alpha chain is approximately 33-35 kDa. It is encoded by 5 exons; exon 1 encodes the leader peptide, exons 2 and 3 encode the two extracellular domains, and exon 4 encodes the transmembrane domain and the cytoplasmic tail. Within the DQ molecule both the alpha chain and the beta chain contain the polymorphisms specifying the peptide binding specificities, resulting in up to four different molecules. Typing for these polymorphisms is routinely done for bone marrow transplantation.</td>
+<td align="left">major histocompatibility complex, class II, DQ alpha 1</td>
+<td align="left">ENSG00000196735</td>
+<td align="left">3117</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">ENSG00000197262</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">ENSG00000102962</td>
-<td align="left">6367</td>
-<td align="left">chemokine (C-C motif) ligand 22</td>
-<td align="left">This antimicrobial gene is one of several Cys-Cys (CC) cytokine genes clustered on the q arm of chromosome 16. Cytokines are a family of secreted proteins involved in immunoregulatory and inflammatory processes. The CC cytokines are proteins characterized by two adjacent cysteines. The cytokine encoded by this gene displays chemotactic activity for monocytes, dendritic cells, natural killer cells and for chronically activated T lymphocytes. It also displays a mild activity for primary activated T lymphocytes and has no chemoattractant activity for neutrophils, eosinophils and resting T lymphocytes. The product of this gene binds to chemokine receptor CCR4. This chemokine may play a role in the trafficking of activated T lymphocytes to inflammatory sites and other aspects of activated T lymphocyte physiology.</td>
+<td align="left">The galectins are a family of beta-galactoside-binding proteins implicated in modulating cell-cell and cell-matrix interactions. This gene product may act as an autocrine negative growth factor that regulates cell proliferation.</td>
+<td align="left">lectin, galactoside-binding, soluble, 1</td>
+<td align="left">ENSG00000100097</td>
+<td align="left">3956</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">pleckstrin</td>
+<td align="left">ENSG00000115956</td>
+<td align="left">5341</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="left">marginal zone B and B1 cell-specific protein</td>
+<td align="left">ENSG00000170476</td>
+<td align="left">51237</td>
+</tr>
+<tr class="odd">
+<td align="left">The protein encoded by this gene is similar to bacterial chitinases but lacks chitinase activity. The encoded protein is secreted and is involved in cartilage biogenesis. Several transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">chitinase 3-like 2</td>
+<td align="left">ENSG00000064886</td>
+<td align="left">1117</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="left">interferon-induced protein 44-like</td>
+<td align="left">ENSG00000137959</td>
+<td align="left">10964</td>
+</tr>
+<tr class="odd">
+<td align="left">HLA-DPA1 belongs to the HLA class II alpha chain paralogues. This class II molecule is a heterodimer consisting of an alpha (DPA) and a beta (DPB) chain, both anchored in the membrane. It plays a central role in the immune system by presenting peptides derived from extracellular proteins. Class II molecules are expressed in antigen presenting cells (APC: B lymphocytes, dendritic cells, macrophages). The alpha chain is approximately 33-35 kDa and its gene contains 5 exons. Exon one encodes the leader peptide, exons 2 and 3 encode the two extracellular domains, exon 4 encodes the transmembrane domain and the cytoplasmic tail. Within the DP molecule both the alpha chain and the beta chain contain the polymorphisms specifying the peptide binding specificities, resulting in up to 4 different molecules.</td>
+<td align="left">major histocompatibility complex, class II, DP alpha 1</td>
+<td align="left">ENSG00000231389</td>
+<td align="left">3113</td>
+</tr>
+<tr class="even">
+<td align="left">The encoded protein, a member of the tumor necrosis factor family, is a cytokine produced by lymphocytes. The protein is highly inducible, secreted, and forms heterotrimers with lymphotoxin-beta which anchor lymphotoxin-alpha to the cell surface. This protein also mediates a large variety of inflammatory, immunostimulatory, and antiviral responses, is involved in the formation of secondary lymphoid organs during development and plays a role in apoptosis. Genetic variations in this gene are associated with susceptibility to leprosy type 4, myocardial infarction, non-Hodgkin’s lymphoma, and psoriatic arthritis. Alternatively spliced transcript variants have been observed for this gene.</td>
+<td align="left">lymphotoxin alpha</td>
+<td align="left">ENSG00000226979</td>
+<td align="left">4049</td>
+</tr>
+<tr class="odd">
+<td align="left">The protein encoded by this gene is an important signaling component of many interleukin receptors, including those of interleukin -2, -4, -7 and -21, and is thus referred to as the common gamma chain. Mutations in this gene cause X-linked severe combined immunodeficiency (XSCID), as well as X-linked combined immunodeficiency (XCID), a less severe immunodeficiency disorder.</td>
+<td align="left">interleukin 2 receptor, gamma</td>
+<td align="left">ENSG00000147168</td>
+<td align="left">3561</td>
+</tr>
+<tr class="even">
+<td align="left">This gene encodes a member of the calcium dependent lectin superfamily of type II transmembrane receptors. Expression of the encoded protein is induced upon activation of T lymphocytes, and may play a role in proliferation. Furthermore, the protein may act to transmit signals in natural killer cells and platelets.</td>
+<td align="left">CD69 molecule</td>
+<td align="left">ENSG00000110848</td>
+<td align="left">969</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">signaling lymphocytic activation molecule family member 1</td>
+<td align="left">ENSG00000117090</td>
+<td align="left">6504</td>
+</tr>
+<tr class="even">
+<td align="left">This gene encodes a member of the 2-5A synthetase family, essential proteins involved in the innate immune response to viral infection. The encoded protein is induced by interferons and uses adenosine triphosphate in 2’-specific nucleotidyl transfer reactions to synthesize 2’,5’-oligoadenylates (2-5As). These molecules activate latent RNase L, which results in viral RNA degradation and the inhibition of viral replication. The three known members of this gene family are located in a cluster on chromosome 12. Mutations in this gene have been associated with host susceptibility to viral infection. Alternatively spliced transcript variants encoding different isoforms have been described.</td>
+<td align="left">2’-5’-oligoadenylate synthetase 1, 40/46kDa</td>
+<td align="left">ENSG00000089127</td>
+<td align="left">4938</td>
+</tr>
+<tr class="odd">
+<td align="left">This gene encodes a cytoplasmic linker or adaptor protein that plays a critical role in B cell development. This protein bridges B cell receptor-associated kinase activation with downstream signaling pathways, thereby affecting various biological functions. The phosphorylation of five tyrosine residues is necessary for this protein to nucleate distinct signaling effectors following B cell receptor activation. Mutations in this gene cause hypoglobulinemia and absent B cells, a disease in which the pro- to pre-B-cell transition is developmentally blocked. Deficiency in this protein has also been shown in some cases of pre-B acute lymphoblastic leukemia. Alternatively spliced transcript variants have been found for this gene.</td>
+<td align="left">B-cell linker</td>
+<td align="left">ENSG00000095585</td>
+<td align="left">29760</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="left">SLAM family member 7</td>
+<td align="left">ENSG00000026751</td>
+<td align="left">57823</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">HLA class II histocompatibility antigen, DRB1-7 beta chain</td>
+<td align="left">ENSG00000196126</td>
+<td align="left">105369230</td>
+</tr>
+<tr class="even">
+<td align="left">HLA-DRB1 belongs to the HLA class II beta chain paralogs. The class II molecule is a heterodimer consisting of an alpha (DRA) and a beta chain (DRB), both anchored in the membrane. It plays a central role in the immune system by presenting peptides derived from extracellular proteins. Class II molecules are expressed in antigen presenting cells (APC: B lymphocytes, dendritic cells, macrophages). The beta chain is approximately 26-28 kDa. It is encoded by 6 exons. Exon one encodes the leader peptide; exons 2 and 3 encode the two extracellular domains; exon 4 encodes the transmembrane domain; and exon 5 encodes the cytoplasmic tail. Within the DR molecule the beta chain contains all the polymorphisms specifying the peptide binding specificities. Hundreds of DRB1 alleles have been described and typing for these polymorphisms is routinely done for bone marrow and kidney transplantation. DRB1 is expressed at a level five times higher than its paralogs DRB3, DRB4 and DRB5. DRB1 is present in all individuals. Allelic variants of DRB1 are linked with either none or one of the genes DRB3, DRB4 and DRB5. There are 4 related pseudogenes: DRB2, DRB6, DRB7, DRB8 and DRB9.</td>
+<td align="left">major histocompatibility complex, class II, DR beta 1</td>
+<td align="left">ENSG00000196126</td>
+<td align="left">3123</td>
+</tr>
+<tr class="odd">
+<td align="left">The protein encoded by this gene contains 2 leucine zipper domains and a putative C-terminal nuclear targeting signal, but does not have any hydrophobic regions. This protein is expressed weakly in resting NK and T cells. The encoded protein modulates the activation of ARF genes by CYTH1. This protein interacts with CYTH1 and SNX27 proteins and may act to sequester CYTH1 protein in the cytoplasm.</td>
+<td align="left">cytohesin 1 interacting protein</td>
+<td align="left">ENSG00000115165</td>
+<td align="left">9595</td>
 </tr>
 </tbody>
 </table>
@@ -269,7 +509,7 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <div id="extracting-cluster-annotation-of-cell-cycle-genes" class="section level3">
 <h3>Extracting cluster annotation of cell cycle genes</h3>
 <p>Now we consider the relative epxression profile of the cell cycle genes from the analysis constrained to cell cycle genes only and now we shall look at the similar analysis as above for <span class="math">\(k=2\)</span> but constraining the genes to be the cell cycle genes.</p>
-<pre class="r"><code>ipsc_lcl_topics_cellcycle &lt;- get(load(&quot;../../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;));
+<pre class="r"><code>ipsc_lcl_topics_cellcycle &lt;- get(load(&quot;../../project/rdas/topic_fit_ipsc_lcl_cellcycle.rda&quot;));
 
 theta &lt;- ipsc_lcl_topics_cellcycle[[1]]$theta;
 features &lt;- ExtractTopFeatures(theta,top_features=10,method=&quot;poisson&quot;)
@@ -291,72 +531,72 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
+<th align="left">summary</th>
+<th align="left">name</th>
 <th align="left">query</th>
 <th align="left">X_id</th>
-<th align="left">name</th>
-<th align="left">summary</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">This gene encodes a protein which is found in the 7SK snRNP (small nuclear ribonucleoprotein). This snRNP complex inhibits a cyclin-dependent kinase, positive transcription elongation factor b, which is required for paused RNA polymerase II at a promoter to begin transcription elongation. A pseudogene of this gene is located on chromosome 3. Alternative splicing results in multiple transcript variants.</td>
+<td align="left">La ribonucleoprotein domain family, member 7</td>
 <td align="left">ENSG00000174720</td>
 <td align="left">51574</td>
-<td align="left">La ribonucleoprotein domain family, member 7</td>
-<td align="left">This gene encodes a protein which is found in the 7SK snRNP (small nuclear ribonucleoprotein). This snRNP complex inhibits a cyclin-dependent kinase, positive transcription elongation factor b, which is required for paused RNA polymerase II at a promoter to begin transcription elongation. A pseudogene of this gene is located on chromosome 3. Alternative splicing results in multiple transcript variants.</td>
 </tr>
 <tr class="even">
+<td align="left">This gene encodes a member of the heat shock protein 70 family, which contains both heat-inducible and constitutively expressed members. This protein belongs to the latter group, which are also referred to as heat-shock cognate proteins. It functions as a chaperone, and binds to nascent polypeptides to facilitate correct folding. It also functions as an ATPase in the disassembly of clathrin-coated vesicles during transport of membrane components through the cell. Alternatively spliced transcript variants encoding different isoforms have been found for this gene.</td>
+<td align="left">heat shock 70kDa protein 8</td>
 <td align="left">ENSG00000109971</td>
 <td align="left">3312</td>
-<td align="left">heat shock 70kDa protein 8</td>
-<td align="left">This gene encodes a member of the heat shock protein 70 family, which contains both heat-inducible and constitutively expressed members. This protein belongs to the latter group, which are also referred to as heat-shock cognate proteins. It functions as a chaperone, and binds to nascent polypeptides to facilitate correct folding. It also functions as an ATPase in the disassembly of clathrin-coated vesicles during transport of membrane components through the cell. Alternatively spliced transcript variants encoding different isoforms have been found for this gene.</td>
 </tr>
 <tr class="odd">
+<td align="left">This gene encodes a H1 histone binding protein that is involved in transporting histones into the nucleus of dividing cells. Multiple isoforms are encoded by transcript variants of this gene. The somatic form is expressed in all mitotic cells, is localized to the nucleus, and is coupled to the cell cycle. The testicular form is expressed in embryonic tissues, tumor cells, and the testis. In male germ cells, this protein is localized to the cytoplasm of primary spermatocytes, the nucleus of spermatids, and the periacrosomal region of mature spermatozoa.</td>
+<td align="left">nuclear autoantigenic sperm protein (histone-binding)</td>
 <td align="left">ENSG00000132780</td>
 <td align="left">4678</td>
-<td align="left">nuclear autoantigenic sperm protein (histone-binding)</td>
-<td align="left">This gene encodes a H1 histone binding protein that is involved in transporting histones into the nucleus of dividing cells. Multiple isoforms are encoded by transcript variants of this gene. The somatic form is expressed in all mitotic cells, is localized to the nucleus, and is coupled to the cell cycle. The testicular form is expressed in embryonic tissues, tumor cells, and the testis. In male germ cells, this protein is localized to the cytoplasm of primary spermatocytes, the nucleus of spermatids, and the periacrosomal region of mature spermatozoa.</td>
 </tr>
 <tr class="even">
+<td align="left">This gene encodes a nuclear protein that is highly conserved in vertebrates. The conserved regions of the protein contain several consensus phosphorylation sites for casein kinase II and cyclin-dependent kinases, two putative nuclear localization signals, and a basic DNA-binding domain. It is phosphorylated in vivo by Cdk1 during mitosis of the cell cycle.</td>
+<td align="left">nuclear casein kinase and cyclin-dependent kinase substrate 1</td>
 <td align="left">ENSG00000069275</td>
 <td align="left">64710</td>
-<td align="left">nuclear casein kinase and cyclin-dependent kinase substrate 1</td>
-<td align="left">This gene encodes a nuclear protein that is highly conserved in vertebrates. The conserved regions of the protein contain several consensus phosphorylation sites for casein kinase II and cyclin-dependent kinases, two putative nuclear localization signals, and a basic DNA-binding domain. It is phosphorylated in vivo by Cdk1 during mitosis of the cell cycle.</td>
 </tr>
 <tr class="odd">
+<td align="left">The import of proteins into the nucleus is a process that involves at least 2 steps. The first is an energy-independent docking of the protein to the nuclear envelope and the second is an energy-dependent translocation through the nuclear pore complex. Imported proteins require a nuclear localization sequence (NLS) which generally consists of a short region of basic amino acids or 2 such regions spaced about 10 amino acids apart. Proteins involved in the first step of nuclear import have been identified in different systems. These include the Xenopus protein importin and its yeast homolog, SRP1 (a suppressor of certain temperature-sensitive mutations of RNA polymerase I in Saccharomyces cerevisiae), which bind to the NLS. KPNA2 protein interacts with the NLSs of DNA helicase Q1 and SV40 T antigen and may be involved in the nuclear transport of proteins. KPNA2 also may play a role in V(D)J recombination</td>
+<td align="left">karyopherin alpha 2 (RAG cohort 1, importin alpha 1)</td>
 <td align="left">ENSG00000182481</td>
 <td align="left">3838</td>
-<td align="left">karyopherin alpha 2 (RAG cohort 1, importin alpha 1)</td>
-<td align="left">The import of proteins into the nucleus is a process that involves at least 2 steps. The first is an energy-independent docking of the protein to the nuclear envelope and the second is an energy-dependent translocation through the nuclear pore complex. Imported proteins require a nuclear localization sequence (NLS) which generally consists of a short region of basic amino acids or 2 such regions spaced about 10 amino acids apart. Proteins involved in the first step of nuclear import have been identified in different systems. These include the Xenopus protein importin and its yeast homolog, SRP1 (a suppressor of certain temperature-sensitive mutations of RNA polymerase I in Saccharomyces cerevisiae), which bind to the NLS. KPNA2 protein interacts with the NLSs of DNA helicase Q1 and SV40 T antigen and may be involved in the nuclear transport of proteins. KPNA2 also may play a role in V(D)J recombination</td>
 </tr>
 <tr class="even">
+<td align="left">This gene encodes an enzyme that synthesizes selenophosphate from selenide and ATP. Selenophosphate is the selenium donor used to synthesize selenocysteine, which is co-translationally incorporated into selenoproteins at in-frame UGA codons.</td>
+<td align="left">selenophosphate synthetase 1</td>
 <td align="left">ENSG00000086475</td>
 <td align="left">22929</td>
-<td align="left">selenophosphate synthetase 1</td>
-<td align="left">This gene encodes an enzyme that synthesizes selenophosphate from selenide and ATP. Selenophosphate is the selenium donor used to synthesize selenocysteine, which is co-translationally incorporated into selenoproteins at in-frame UGA codons.</td>
 </tr>
 <tr class="odd">
+<td align="left">This gene encodes a lymphoid-specific helicase. Other helicases function in processes involving DNA strand separation, including replication, repair, recombination, and transcription. This protein is thought to be involved with cellular proliferation and may play a role in leukemogenesis. Alternatively spliced transcript variants encoding different isoforms have been identified.</td>
+<td align="left">helicase, lymphoid-specific</td>
 <td align="left">ENSG00000119969</td>
 <td align="left">3070</td>
-<td align="left">helicase, lymphoid-specific</td>
-<td align="left">This gene encodes a lymphoid-specific helicase. Other helicases function in processes involving DNA strand separation, including replication, repair, recombination, and transcription. This protein is thought to be involved with cellular proliferation and may play a role in leukemogenesis. Alternatively spliced transcript variants encoding different isoforms have been identified.</td>
 </tr>
 <tr class="even">
+<td align="left">The protein encoded by this gene is a transcription factor required for T-cell expression of the interleukin 2 gene. It also binds RNA and is an essential component for encapsidation and protein priming of hepatitis B viral polymerase. The encoded 45 kDa protein (NF45, ILF2) forms a complex with the 90 kDa interleukin enhancer-binding factor 3 (NF90, ILF3), and this complex has been shown to affect the redistribution of nuclear mRNA to the cytoplasm, to repair DNA breaks by nonhomologous end joining, and to negatively regulate the microRNA processing pathway. Knockdown of NF45 or NF90 protein retards cell growth, possibly by inhibition of mRNA stabilization. Alternative splicing results in multiple transcript variants. Related pseudogenes have been found on chromosomes 3 and 14.</td>
+<td align="left">interleukin enhancer binding factor 2</td>
 <td align="left">ENSG00000143621</td>
 <td align="left">3608</td>
-<td align="left">interleukin enhancer binding factor 2</td>
-<td align="left">The protein encoded by this gene is a transcription factor required for T-cell expression of the interleukin 2 gene. It also binds RNA and is an essential component for encapsidation and protein priming of hepatitis B viral polymerase. The encoded 45 kDa protein (NF45, ILF2) forms a complex with the 90 kDa interleukin enhancer-binding factor 3 (NF90, ILF3), and this complex has been shown to affect the redistribution of nuclear mRNA to the cytoplasm, to repair DNA breaks by nonhomologous end joining, and to negatively regulate the microRNA processing pathway. Knockdown of NF45 or NF90 protein retards cell growth, possibly by inhibition of mRNA stabilization. Alternative splicing results in multiple transcript variants. Related pseudogenes have been found on chromosomes 3 and 14.</td>
 </tr>
 <tr class="odd">
+<td align="left">This gene encodes a protein that associates with the centromere-kinetochore complex. The protein is a component of the nuclear matrix during the G2 phase of interphase. In late G2 the protein associates with the kinetochore and maintains this association through early anaphase. It localizes to the spindle midzone and the intracellular bridge in late anaphase and telophase, respectively, and is thought to be subsequently degraded. The localization of this protein suggests that it may play a role in chromosome segregation during mitotis. It is thought to form either a homodimer or heterodimer. Autoantibodies against this protein have been found in patients with cancer or graft versus host disease.</td>
+<td align="left">centromere protein F, 350/400kDa</td>
 <td align="left">ENSG00000117724</td>
 <td align="left">1063</td>
-<td align="left">centromere protein F, 350/400kDa</td>
-<td align="left">This gene encodes a protein that associates with the centromere-kinetochore complex. The protein is a component of the nuclear matrix during the G2 phase of interphase. In late G2 the protein associates with the kinetochore and maintains this association through early anaphase. It localizes to the spindle midzone and the intracellular bridge in late anaphase and telophase, respectively, and is thought to be subsequently degraded. The localization of this protein suggests that it may play a role in chromosome segregation during mitotis. It is thought to form either a homodimer or heterodimer. Autoantibodies against this protein have been found in patients with cancer or graft versus host disease.</td>
 </tr>
 <tr class="even">
+<td align="left">CKS1B protein binds to the catalytic subunit of the cyclin dependent kinases and is essential for their biological function. The CKS1B mRNA is found to be expressed in different patterns through the cell cycle in HeLa cells, which reflects a specialized role for the encoded protein. At least two transcript variants have been identified for this gene, and it appears that only one of them encodes a protein.</td>
+<td align="left">CDC28 protein kinase regulatory subunit 1B</td>
 <td align="left">ENSG00000173207</td>
 <td align="left">1163</td>
-<td align="left">CDC28 protein kinase regulatory subunit 1B</td>
-<td align="left">CKS1B protein binds to the catalytic subunit of the cyclin dependent kinases and is essential for their biological function. The CKS1B mRNA is found to be expressed in different patterns through the cell cycle in HeLa cells, which reflects a specialized role for the encoded protein. At least two transcript variants have been identified for this gene, and it appears that only one of them encodes a protein.</td>
 </tr>
 </tbody>
 </table>
@@ -368,53 +608,53 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <thead>
 <tr class="header">
 <th align="left">query</th>
-<th align="left">X_id</th>
-<th align="left">name</th>
 <th align="left">summary</th>
+<th align="left">name</th>
+<th align="left">X_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">ENSG00000142541</td>
-<td align="left">23521</td>
-<td align="left">ribosomal protein L13a</td>
 <td align="left">Ribosomes, the organelles that catalyze protein synthesis, consist of a small 40S subunit and a large 60S subunit. Together these subunits are composed of 4 RNA species and approximately 80 structurally distinct proteins. This gene encodes a member of the L13P family of ribosomal proteins that is a component of the 60S subunit. The encoded protein also plays a role in the repression of inflammatory genes as a component of the IFN-gamma-activated inhibitor of translation (GAIT) complex. This gene is co-transcribed with the small nucleolar RNA genes U32, U33, U34, and U35, which are located in the second, fourth, fifth, and sixth introns, respectively. As is typical for genes encoding ribosomal proteins, there are multiple processed pseudogenes of this gene dispersed throughout the genome. Alternatively spliced transcript variants encoding multiple isoforms have been observed for this gene.</td>
+<td align="left">ribosomal protein L13a</td>
+<td align="left">23521</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000003402</td>
-<td align="left">8837</td>
-<td align="left">CASP8 and FADD-like apoptosis regulator</td>
 <td align="left">The protein encoded by this gene is a regulator of apoptosis and is structurally similar to caspase-8. However, the encoded protein lacks caspase activity and appears to be itself cleaved into two peptides by caspase-8. Several transcript variants encoding different isoforms have been found for this gene, and partial evidence for several more variants exists.</td>
+<td align="left">CASP8 and FADD-like apoptosis regulator</td>
+<td align="left">8837</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000113441</td>
-<td align="left">4012</td>
-<td align="left">leucyl/cystinyl aminopeptidase</td>
 <td align="left">This gene encodes a zinc-dependent aminopeptidase that cleaves vasopressin, oxytocin, lys-bradykinin, met-enkephalin, dynorphin A and other peptide hormones. The protein can be secreted in maternal serum, reside in intracellular vesicles with the insulin-responsive glucose transporter GLUT4, or form a type II integral membrane glycoprotein. The protein catalyzes the final step in the conversion of angiotensinogen to angiotensin IV (AT4) and is also a receptor for AT4. Alternative splicing results in multiple transcript variants encoding different isoforms.</td>
+<td align="left">leucyl/cystinyl aminopeptidase</td>
+<td align="left">4012</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000115415</td>
-<td align="left">6772</td>
-<td align="left">signal transducer and activator of transcription 1, 91kDa</td>
 <td align="left">The protein encoded by this gene is a member of the STAT protein family. In response to cytokines and growth factors, STAT family members are phosphorylated by the receptor associated kinases, and then form homo- or heterodimers that translocate to the cell nucleus where they act as transcription activators. This protein can be activated by various ligands including interferon-alpha, interferon-gamma, EGF, PDGF and IL6. This protein mediates the expression of a variety of genes, which is thought to be important for cell viability in response to different cell stimuli and pathogens. Two alternatively spliced transcript variants encoding distinct isoforms have been described.</td>
+<td align="left">signal transducer and activator of transcription 1, 91kDa</td>
+<td align="left">6772</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000113580</td>
-<td align="left">2908</td>
-<td align="left">nuclear receptor subfamily 3, group C, member 1 (glucocorticoid receptor)</td>
 <td align="left">This gene encodes glucocorticoid receptor, which can function both as a transcription factor that binds to glucocorticoid response elements in the promoters of glucocorticoid responsive genes to activate their transcription, and as a regulator of other transcription factors. This receptor is typically found in the cytoplasm, but upon ligand binding, is transported into the nucleus. It is involved in inflammatory responses, cellular proliferation, and differentiation in target tissues. Mutations in this gene are associated with generalized glucocorticoid resistance. Alternative splicing of this gene results in transcript variants encoding either the same or different isoforms. Additional isoforms resulting from the use of alternate in-frame translation initiation sites have also been described, and shown to be functional, displaying diverse cytoplasm-to-nucleus trafficking patterns and distinct transcriptional activities (<a href="PMID:15866175" class="uri">PMID:15866175</a>).</td>
+<td align="left">nuclear receptor subfamily 3, group C, member 1 (glucocorticoid receptor)</td>
+<td align="left">2908</td>
 </tr>
 <tr class="even">
 <td align="left">ENSG00000067082</td>
-<td align="left">1316</td>
-<td align="left">Kruppel-like factor 6</td>
 <td align="left">This gene encodes a member of the Kruppel-like family of transcription factors. The zinc finger protein is a transcriptional activator, and functions as a tumor suppressor. Multiple transcript variants encoding different isoforms have been found for this gene, some of which are implicated in carcinogenesis.</td>
+<td align="left">Kruppel-like factor 6</td>
+<td align="left">1316</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSG00000160216</td>
-<td align="left">56894</td>
-<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 3</td>
 <td align="left">The protein encoded by this gene is an acyltransferase that converts lysophosphatidic acid into phosphatidic acid, which is the second step in the de novo phospholipid biosynthetic pathway. The encoded protein may be an integral membrane protein. Two transcript variants encoding the same protein have been found for this gene.</td>
+<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 3</td>
+<td align="left">56894</td>
 </tr>
 </tbody>
 </table>
@@ -448,24 +688,24 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 ## [17] plyr_1.8.3              stringr_1.0.0          
 ## [19] zlibbioc_1.14.0         Biostrings_2.36.1      
 ## [21] munsell_0.4.2           gtable_0.1.2           
-## [23] futile.logger_1.4.1     codetools_0.2-11       
-## [25] evaluate_0.7.2          latticeExtra_0.6-26    
-## [27] biomaRt_2.24.0          highr_0.5              
-## [29] proto_0.3-10            Rcpp_0.12.1            
-## [31] acepack_1.3-3.3         scales_0.2.5           
-## [33] formatR_1.2             Hmisc_3.16-0           
-## [35] jsonlite_0.9.16         XVector_0.8.0          
-## [37] Rsamtools_1.20.4        gridExtra_0.9.1        
-## [39] ggplot2_1.0.1           digest_0.6.8           
-## [41] stringi_0.5-5           grid_3.2.0             
-## [43] tools_3.2.0             bitops_1.0-6           
-## [45] magrittr_1.5            sqldf_0.4-10           
-## [47] RCurl_1.95-4.6          RSQLite_1.0.0          
-## [49] Formula_1.2-1           cluster_2.0.1          
-## [51] futile.options_1.0.0    MASS_7.3-40            
-## [53] rmarkdown_0.7           httr_0.6.1             
-## [55] rstudioapi_0.3.1        rpart_4.1-9            
-## [57] GenomicAlignments_1.4.1 nnet_7.3-9</code></pre>
+## [23] futile.logger_1.4.1     evaluate_0.7.2         
+## [25] latticeExtra_0.6-26     biomaRt_2.24.0         
+## [27] highr_0.5               proto_0.3-10           
+## [29] Rcpp_0.12.1             acepack_1.3-3.3        
+## [31] scales_0.2.5            formatR_1.2            
+## [33] Hmisc_3.16-0            jsonlite_0.9.16        
+## [35] XVector_0.8.0           Rsamtools_1.20.4       
+## [37] gridExtra_0.9.1         ggplot2_1.0.1          
+## [39] digest_0.6.8            stringi_0.5-5          
+## [41] grid_3.2.0              tools_3.2.0            
+## [43] bitops_1.0-6            magrittr_1.5           
+## [45] sqldf_0.4-10            RCurl_1.95-4.6         
+## [47] RSQLite_1.0.0           Formula_1.2-1          
+## [49] cluster_2.0.1           futile.options_1.0.0   
+## [51] MASS_7.3-40             rmarkdown_0.7          
+## [53] httr_0.6.1              rstudioapi_0.3.1       
+## [55] rpart_4.1-9             GenomicAlignments_1.4.1
+## [57] nnet_7.3-9</code></pre>
 </div>
 
 

@@ -1,5 +1,5 @@
 ---
-title: "Batch effect modeling on all genes"
+title: "iPSC : Batch effect modeling on all genes"
 author: "Kushal K Dey"
 date: "2015-09-03"
 output: 
@@ -7,21 +7,26 @@ output:
     toc: true
 ---
 
+## Objective
+
 In this script, we use a batch effect modeling of the single cells using only the cell cycle genes and then see if on removing the batch effects and the individual effects, the residuals indeed cluster by the cell phase or cell cycle or not. 
 
 
 We first load the packages and the data.
 
-```{r packages, echo=FALSE, eval=TRUE}
-suppressMessages(suppressWarnings(library(data.table)))
-suppressMessages(suppressWarnings(library(maptpx)))
-suppressMessages(suppressWarnings(library(gplots)))
-suppressMessages(suppressWarnings(library(philentropy)))
-suppressMessages(suppressWarnings(library(dplyr)))
-suppressMessages(suppressWarnings(library(edgeR)))
-suppressMessages(suppressWarnings(library(qtlcharts)))
-suppressMessages(suppressWarnings(library(limma)))
+```{r packages, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+library(CountClust)
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+library(qtlcharts)
+library(limma)
 ```
+
+## Preparing the Data 
 
 ```{r}
 reads <- data.frame(fread('../data/reads.txt'),row.names=1);
@@ -59,9 +64,17 @@ reads <- reads[expressed, ]
 molecules_single <- molecules %>% select(-contains("bulk"))
 reads_single <- reads %>% select(-contains("bulk"))
 
-## Remove genes with max molecule numer larger than 1024
+## Remove ERCC genes and genes with max molecule numer larger than 1024
 
-molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+ii_nonERCC <- grep("ERCC", rownames(molecules_single), invert = TRUE)
+
+molecules_single <- molecules_single[ii_nonERCC,];
+
+ii_notOverexpressed <- apply(molecules_single, 2, function(x) any(x < 1024) )
+
+molecules_single <- molecules_single[ii_notOverexpressed,];
+
+dim(molecules_single)
 
 
 ```
@@ -141,65 +154,107 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
 cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
-
+cell_phase_vector <- factor(cell_phase_vector, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 ```
 
-```
 
 Now we apply a linear model taking into account the individual effect and the batch effect and grab the residuals free of individual and batch effects.
 
 ```{r echo=TRUE, eval=TRUE}
 
 counts_data <- t(molecules_single);
-cpm_data <- voom(counts_data)$E;
 
-individual_id <- sapply(1:length(rownames(cpm_data)), function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][1]);
+individual_id <- sapply(1:length(rownames(counts_data)), function(x) strsplit(rownames(counts_data)[x],"[.]")[[1]][1]);
 
-batch_id <- sapply(1:length(rownames(cpm_data)), function(x) strsplit(rownames(cpm_data)[x],"[.]")[[1]][2]);
+batch_id <- sapply(1:length(rownames(counts_data)), function(x) strsplit(rownames(counts_data)[x],"[.]")[[1]][2]);
 
-batch_removed_cpm <- matrix(0,dim(cpm_data)[1], dim(cpm_data)[2]);
-for(g in 1:dim(cpm_data)[2])
-{
-  res <- as.numeric(lm(cpm_data[,g] ~ individual_id+batch_id)$residuals);
-  batch_removed_cpm[,g] <- res;
+individual.batch.id <- paste0(individual_id,"_", batch_id);
+batch_corrected_counts <- BatchCorrectedCounts(counts_data,individual.batch.id);
+
+nclus_vec <- 2:5
+samp_metadata <- cbind.data.frame(individual_id, cell_phase_vector)
+colnames(samp_metadata) <- c("individual", "cell_phase")
+
+if(!dir.exists("../figures/ipsc_structure")) dir.create("../figures/ipsc_structure")
+
+if(file.exists("../../project/rdas/topic_fit_ipsc.rda")) {
+ipsc_topics_single <- get(load("../../project/rdas/topic_fit_ipsc.rda"));
+} else {
+StructureObj(counts_data ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_id, path_rda="../../project/rdas/topic_fit_ipsc.rda",path_struct = "../figures/ipsc_structure");
+  
+ipsc_topics_single <- get(load("../../project/rdas/topic_fit_ipsc.rda"));
 }
 
-col=c(rgb(seq(0,1,length=15),1,seq(0,1,length=15)),rgb(1,seq(1,0,length=15),seq(1,0,length=15)))
-library(gplots)
-
-par(mar=c(4,4,4,4))
-cor_batch <- cor(t(batch_removed_cpm));
-heatmap.2(cor_batch,scale="none",trace="none",labRow=cell_phase_vector,labCol=cell_phase_vector,breaks=c(seq(-1,0,0.07),seq(0,0.5,0.05),seq(0.6,1,0.1)),col=col,distfun=function(x) dist(x,method="euclidean"),hclustfun=function(x) hclust(x,method="average"));
-
-
-out <- kmeans(batch_removed_cpm,5);
-xtabs(~out$cluster+cell_phase_vector)
-```
-
-None of the hierarchical clustering heatmaps or the kmeans algorithm seem to show distinct clusters of the cell cycle effects. We take the exponent of the normalized terms, apply an admixture model to the remodeled normalized data.
-
-```{r echo=TRUE, eval=TRUE}
-exp_batch_removed_cpm_data <- round(100*exp(batch_removed_cpm));
-
-structure_cell_cycle_genes <- function(data,K, type_info)
+for(num in 1:length(nclus_vec))
 {
-Topic_clus <- topics(data, K=K, tol=0.001);
-docweights <- Topic_clus$omega;
-type_ordered <- type_info[order(type_info)];
-docweights_ordered <- docweights[order(type_info),];
-barplot(t(docweights_ordered),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=0.3,cex.main=1.4);
-labels = match(unique(type_ordered), type_ordered);
-abline(v=labels-1)
-
-labels_low=labels-1;
-labels_up=c(labels_low[2:length(labels_low)],dim(docweights_ordered)[1]);
-mid_point <- labels_low +0.5*(labels_up-labels_low);
-axis(1,at=mid_point, unique(type_ordered),las=2,cex.axis=0.3);
+obj <- StructureObj_omega(ipsc_topics_single[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_id,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/ipsc_structure',control=list(cex.axis=1));
 }
-
-sapply(2:5, function(k) structure_cell_cycle_genes(exp_batch_removed_cpm_data,k,cell_phase_vector))
-
 
 ```
 
+## Batch Uncorrected Structure Plot
 
+### Structure plot by individual
+
+<img src='../figures/ipsc_structure/clus_2/struct_clus_2_individual.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_3/struct_clus_3_individual.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_4/struct_clus_4_individual.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_5/struct_clus_5_individual.png' style="width:304px;height:228px;">
+
+### Structure plot by batch
+
+<img src='../figures/ipsc_structure/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
+
+### Structure plot by cell phase
+
+<img src='../figures/ipsc_structure/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+
+
+```{r }
+
+if(!dir.exists("../figures/ipsc_structure_batchcorrect")) dir.create("../figures/ipsc_structure_batchcorrect")
+
+if(file.exists("../../project/rdas/topic_fit_ipsc_batchcorrect.rda")) {
+ipsc_topics_single_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect.rda"));
+} else {
+StructureObj(batch_corrected_counts ,nclus_vec,samp_metadata = samp_metadata, tol=0.005, batch_lab = batch_id, path_rda="../../project/rdas/topic_fit_ipsc_batchcorrect.rda",path_struct = "../figures/ipsc_structure_batchcorrect");
+  
+ipsc_topics_single_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect.rda"));
+}
+
+for(num in 1:length(nclus_vec))
+{
+obj <- StructureObj_omega(ipsc_topics_single_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_id,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/ipsc_structure_batchcorrect',control=list(cex.axis=1));
+}
+
+```
+
+## Batch Corrected Structure Plot
+
+### Structure plot by individual
+
+<img src='../figures/ipsc_structure_batchcorrect/clus_2/struct_clus_2_individual.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_3/struct_clus_3_individual.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_4/struct_clus_4_individual.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_5/struct_clus_5_individual.png' style="width:304px;height:228px;">
+
+### Structure plot by batch
+
+<img src='../figures/ipsc_structure_batchcorrect/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
+
+### Structure plot by cell phase
+
+<img src='../figures/ipsc_structure_batchcorrect/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">

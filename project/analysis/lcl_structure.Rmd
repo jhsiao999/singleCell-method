@@ -29,6 +29,7 @@ library(gplots)
 ## Prepare data
 
 ```{r}
+#setwd('/Users/kushal/Documents/singleCell-method/project/analysis/')
 lcl_qc_data <- read_csv("../data/qc-lcl.csv")
 dim(lcl_qc_data)
 
@@ -58,6 +59,8 @@ Remove wells with no cells in them.
 ii_presentWell <- which(lcl_qc_data$cell.num > 0)
 
 lcl_molecules_refined <- lcl_molecules_refined[ii_presentWell, ]
+
+lcl_qc_data <- lcl_qc_data[ii_presentWell,];
 lcl_annotations_refined <- lcl_annotations_refined[ii_presentWell,]
 stopifnot(nrow(lcl_molecules_refined) == nrow(lcl_annotations_refined))
 
@@ -98,7 +101,7 @@ batch_lab <- factor(batch_lab, levels = c(1:4))
 ```
 
 
-## Admixture modelling
+## Batch Uncorrected Model (single + bulk)
 
 We install the package CountClust and then apply the Structure analysis 
 on the LCL cells taking into account the sample metadata owing to individual id, 
@@ -111,53 +114,39 @@ library(maptpx)
 # Remove rows with more than 1 missing values
 lcl_molecules_refined <- handleNA(lcl_molecules_refined)$data
 
-
-# Try fitting 2 to 5 clusters 
-nclust_vec <- 2:5
-if(file.exists("../rdas/lcl-structure.rda")) {
-    load("../rdas/lcl-structure.rda")
-} else {
-    topics_list <- lapply(nclust_vec, function(per_clust) {
-        topics( lcl_molecules_refined, K = per_clust, tol = 0.005)
-        })    
-    names(topics_list) <- paste0("clust", nclust_vec)
-    save(topics_list, 
-         file = "../rdas/lcl-structure.rda")
-}
 ```
-
-
-
 Structure plots
 
 ```{r}
-nclust <- length(topics_list)
-type_info <- batch_lab
+nclus_vec <- 2:5;
+samp_metadata <- cbind.data.frame(1:88);
+colnames(samp_metadata) = c("samples");
+batch_lab <- batch_lab
 
-for (per_clust in 1:nclust) {
-    topics_clust <- topics_list[[per_clust]]
-    clust <- topics_clust$K
-    docweights <- topics_clust$omega
-    type_ordered <- type_info[order(type_info)]
-    docweights_ordered <- docweights[order(type_info),]
-    barplot( t(docweights_ordered), 
-             col = 2:(clust+1), axisnames = F,
-             space = 0, border=NA,
-             main = paste("No. of clusters=", clust), las = 1,
-             ylim = c(0,1), cex.axis = 0.3, cex.main=1.4)
-    labels <- match(unique(type_ordered), type_ordered)
-    abline(v=labels-1)
-    labels_low <- labels-1
-    labels_up <- c(labels_low[2:length(labels_low)], dim(docweights_ordered)[1])
-    mid_point <- labels_low +0.5*(labels_up-labels_low)
-    axis(1, at = mid_point, unique(type_ordered), las = 2, cex.axis=0.3)
+if(!dir.exists("../figures/lcl_structure_bulk")) dir.create("../figures/lcl_structure_bulk")
+
+if(file.exists("../../project/rdas/topic_fit_lcl_bulk.rda")) {
+lcl_topics_bulk <- get(load("../../project/rdas/topic_fit_lcl_bulk.rda"));} else {
+StructureObj(lcl_molecules_refined,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_lcl_bulk.rda",partition=c('TRUE'),path_struct = "../figures/lcl_structure_bulk");
 }
+
+
+for(num in 1:length(nclus_vec))
+{
+obj <- StructureObj_omega(lcl_topics_bulk[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_lab,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/lcl_structure_bulk',control=list(cex.axis=1));
+}
+
 ```
+
+<img src='../figures/lcl_structure_bulk/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_bulk/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_bulk/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_bulk/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
 
 It seems from the above plots there is batch effect in the data and that is most clear for number of topics equal to 4 or 5. It also seems all the batches have very distinct patterns. Now we obtain batch corrected counts.
 
 
-### Batch Corrected Model (single + bulk)
+## Batch Corrected Model (single + bulk)
 
 ```{r batch_correct, echo=TRUE, eval=TRUE}
 
@@ -166,24 +155,25 @@ batch_corrected_lcl_molecules <- BatchCorrectedCounts(lcl_molecules_refined,batc
 
 Now we apply StructureObj on the batch corrected new counts data and see what patterns we get from the new data analysis, ideally we should not see the batch patterns that we saw in the previous run.
 
-```{r batch_corrected_structure, echo=TRUE, eval=TRUE}
-
+```{r batch_corrected_structure, echo=TRUE, eval=TRUE, cache=TRUE}
 nclus_vec <- 2:5;
-samp_metadata <- cbind.data.frame(1:96);
+samp_metadata <- cbind.data.frame(1:88);
 colnames(samp_metadata) = c("samples");
 batch_lab <- batch_lab
 
-if(!dir.exists("../../figures/lcl_structure_batchcorrect_bulk")) dir.create("../../figures/lcl_structure_batchcorrect_bulk")
+if(!dir.exists("../figures/lcl_structure_batchcorrect_bulk")) dir.create("../figures/lcl_structure_batchcorrect_bulk")
 
-#StructureObj(batch_corrected_lcl_molecules,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_batchcorrect_bulk.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_structure_batchcorrect_bulk");
-
-
-lcl_topics_batchcorrect <- get(load("../../../project/rdas/topic_fit_lcl_batchcorrect_bulk.rda"));
-
+if(file.exists("../../project/rdas/topic_fit_lcl_batchcorrect_bulk.rda")) {
+lcl_topics_batchcorrect <- get(load("../../project/rdas/topic_fit_lcl_batchcorrect_bulk.rda"));
+} else {
+StructureObj(batch_corrected_lcl_molecules,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_lcl_batchcorrect_bulk.rda",partition=c('TRUE'),path_struct = "../figures/lcl_structure_batchcorrect_bulk");
+  
+lcl_topics_batchcorrect <- get(load("../../project/rdas/topic_fit_lcl_batchcorrect_bulk.rda"));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj <- StructureObj_omega(lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_lab,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_structure_batchcorrect_bulk',control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_topics_batchcorrect[[num]]$omega, samp_metadata = samp_metadata, batch_lab = batch_lab,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/lcl_structure_batchcorrect_bulk',control=list(cex.axis=1));
 }
 
 ```
@@ -191,17 +181,17 @@ obj <- StructureObj_omega(lcl_topics_batchcorrect[[num]]$omega, samp_metadata = 
 
 The batch removed Structure plots are as follows 
 
-<img src='../../figures/lcl_structure_batchcorrect_bulk/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_batchcorrect_bulk/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_batchcorrect_bulk/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_batchcorrect_bulk/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_bulk/clus_2/struct_clus_2_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_bulk/clus_3/struct_clus_3_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_bulk/clus_4/struct_clus_4_batch.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_bulk/clus_5/struct_clus_5_batch.png' style="width:304px;height:228px;">
 
 We now assign cell phase to each of the 96 cells and try to see if any cell phase effects are seen in the Structure plot analysis or not. 
 
 We first extract the LCL single cells. 
 
 
-### Extracting LCL single cells 
+## Extracting LCL single cells 
 
 ```{r lcl_single_cells, echo=TRUE, eval=TRUE}
 
@@ -292,36 +282,45 @@ ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
 
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
+cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
+cell_phase_vector <- factor(cell_phase_vector, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 
 ```
 
+## Batch Uncorrected model (Single cells)
+
 We now use the cell-phase to rearrange the Structure plots both before and after the batch correction. First we do the before batch correction (organized by cell phase)
 
-```{r, echo=TRUE, eval=TRUE}
+```{r, echo=TRUE, eval=TRUE, cache=TRUE}
 
-samp_metadata <- cbind.data.frame(as.vector(as.matrix(assign_cell_phase)));
+samp_metadata <- cbind.data.frame(as.vector(as.matrix(cell_phase_vector)));
 colnames(samp_metadata) = c("cell_phase");
 
 nclus_vec <- 2:5;
 
-if(!dir.exists("../../figures/lcl_structure_single")) dir.create("../../figures/lcl_structure_single")
+if(!dir.exists("../figures/lcl_structure_single")) dir.create("../figures/lcl_structure_single")
 
-#StructureObj(lcl_single_cells ,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_single.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_structure_single");
-
-
-lcl_topics_single <- get(load("../../../project/rdas/topic_fit_lcl_single.rda"));
-
+if(file.exists("../../project/rdas/topic_fit_lcl_single.rda")) {
+lcl_topics_single <- get(load("../../project/rdas/topic_fit_lcl_single.rda"));
+} else {
+StructureObj(lcl_single_cells ,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_lcl_single.rda",partition=c('TRUE'),path_struct = "../figures/lcl_structure_single");
+  
+lcl_topics_single <- get(load("../../project/rdas/topic_fit_lcl_single.rda"));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj <- StructureObj_omega(lcl_topics_single[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_structure_single',control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_topics_single[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/lcl_structure_single',control=list(cex.axis=1));
 }
 ```
 
-<img src='../../figures/lcl_structure_single/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_single/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_single/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_single/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_single/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_single/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_single/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_single/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+
+## Batch Corrected model (Single cells)
 
 Now we perform the batch corrected counts.
 
@@ -336,28 +335,30 @@ Now we use the Structure model on the batch corrected counts.
 ```{r echo=TRUE, eval=TRUE}
 
 nclus_vec <- 2:5;
-samp_metadata <- cbind.data.frame(as.vector(as.matrix(assign_cell_phase)));
+samp_metadata <- cbind.data.frame(as.vector(as.matrix(cell_phase_vector)));
 colnames(samp_metadata) = c("cell_phase");
 
-if(!dir.exists("../../figures/lcl_structure_batchcorrect_single")) dir.create("../../figures/lcl_structure_batchcorrect_single")
+if(!dir.exists("../figures/lcl_structure_batchcorrect_single")) dir.create("../figures/lcl_structure_batchcorrect_single")
 
-#StructureObj(batch_corrected_lcl_single,nclus_vec,samp_metadata = samp_metadata, tol=0.001, batch_lab = NULL, path_rda="../../../project/rdas/topic_fit_lcl_batchcorrect_single.rda",partition=c('TRUE'),path_struct = "../../figures/lcl_structure_batchcorrect_single");
-
-
-lcl_topics_batchcorrect_single <- get(load("../../../project/rdas/topic_fit_lcl_batchcorrect_single.rda"));
-
+if(file.exists("../../project/rdas/topic_fit_lcl_batchcorrect_single.rda")) {
+lcl_topics_batchcorrect_single <- get(load("../../project/rdas/topic_fit_lcl_batchcorrect_single.rda"));
+} else {
+StructureObj(batch_corrected_lcl_single,nclus_vec,samp_metadata = samp_metadata, tol=0.1, batch_lab = NULL, path_rda="../../project/rdas/topic_fit_lcl_batchcorrect_single.rda",partition=c('TRUE'),path_struct = "../figures/lcl_structure_batchcorrect_single");
+  
+lcl_topics_batchcorrect_single <- get(load("../../project/rdas/topic_fit_lcl_batchcorrect_single.rda"));
+}
 
 for(num in 1:length(nclus_vec))
 {
-obj <- StructureObj_omega(lcl_topics_batchcorrect_single[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../../figures/lcl_structure_batchcorrect_single',control=list(cex.axis=1));
+obj <- StructureObj_omega(lcl_topics_batchcorrect_single[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct='../figures/lcl_structure_batchcorrect_single',control=list(cex.axis=1));
 }
 
 ```
 
-<img src='../../figures/lcl_structure_batchcorrect_single/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_batchcorrect_single/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_batchcorrect_single/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
-<img src='../../figures/lcl_structure_batchcorrect_single/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_single/clus_2/struct_clus_2_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_single/clus_3/struct_clus_3_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_single/clus_4/struct_clus_4_cell_phase.png' style="width:304px;height:228px;">
+<img src='../figures/lcl_structure_batchcorrect_single/clus_5/struct_clus_5_cell_phase.png' style="width:304px;height:228px;">
 
 ```{r}
 sessionInfo()
