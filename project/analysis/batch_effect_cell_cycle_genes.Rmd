@@ -306,18 +306,13 @@ write.table(rev(geneNames[word_order]),
 }
 ```
 
-List out hgnc symbol for the top 20 genes that distinguish the clusters.
+List out the top 20 genes that distinguish the clusters.
 
 ```{r}
-library(biomaRt)
+library(mygene)
 library(knitr)
-# define biomart object
-mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
-# query biomart
-results <- getBM(attributes = c("hgnc_symbol", "description"), 
-                 filters = "ensembl_gene_id", 
-                 values = rev(geneNames[word_order])[1:20],
-                 mart = mart)
+results <- queryMany(rev(geneNames[word_order])[1:20], scopes="ensembl.gene", 
+                 fields=c("name", "summary"), species="human")
 kable(as.data.frame(results))
 ```
 
@@ -357,18 +352,12 @@ write.table(rev(geneNames[order(diff_vec)]),
 
 
 
-List out hgnc symbol for the top 20 genes that distinguish the two clusters.
+List out the top 20 genes that distinguish the two clusters.
 
 ```{r}
-library(biomaRt)
-library(knitr)
-# define biomart object
-mart <- useMart(biomart = "ensembl", dataset = "hsapiens_gene_ensembl")
-# query biomart
-results <- getBM(attributes = c("hgnc_symbol", "description"), 
-                 filters = "ensembl_gene_id", 
-                 values = rev(geneNames[order(diff_vec)])[1:20],
-                 mart = mart)
+library(mygene)
+results <- queryMany(rev(geneNames[order(diff_vec)])[1:20], scopes="ensembl.gene", 
+                 fields=c("name", "summary"), species="human")
 kable(as.data.frame(results))
 ```
 
