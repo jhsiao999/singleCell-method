@@ -1,0 +1,82 @@
+---
+title: "Marioni gene annotations"
+author: "Kushal K Dey"
+date: "September 30, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+## Objective 
+
+This is a follow up script of the Structure fit on Marioni's data where we extract the cluster driving genes and annotate them to see if they are biologically meaningful. Note that the single cells may have been sequenced using the same plate. o, what we are seeing may be plate effect confounded with the biological effect.
+
+```{r echo=FALSE, eval=TRUE}
+rm(list=ls())
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(CountClust)
+suppressMessages(library(mygene))
+library(knitr)
+```
+
+## Extracting Cluster annotations of genes
+
+```{r echo=TRUE, eval=TRUE}
+#setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+
+marioni_topics <- get(load("../../project/rdas/marioni_pooled_topic_fit.rda"));
+
+theta <- marioni_topics[[2]]$theta;
+features <- ExtractTopFeatures(theta,top_features=50,method="poisson")
+
+features_vec <- unique(as.vector(features));
+
+class <- as.numeric(apply(theta[features_vec,], 1, which.max))
+
+imp_gene_names <- rownames(theta[features_vec,]);
+
+imp_genes_per_class <- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(class==x)]);
+
+```
+
+The colors of the designated cluster numbers as per the Structure plot are in the order given below. 
+
+```{r echo=TRUE, eval=TRUE}
+
+barplot(rep(1,dim(theta)[2]),col=(2:(dim(theta)[2]+1)))
+
+```
+
+## Gene Annotations - Top genes driving clusters
+
+### First class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[1]], scopes="ensembl.gene", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Second Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[2]], scopes="ensembl.gene", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Third Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[3]], scopes="ensembl.gene", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
