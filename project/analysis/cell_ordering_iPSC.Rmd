@@ -149,18 +149,15 @@ cell_phase_vector <- factor(cell_phase_vector,
 ### Define the pattern matrices
 
 ```{r patterns, echo=TRUE, eval=TRUE}
-patterns1 <- diag(1,5)
-patterns2 <- matrix(0,4,5);
-for(m in 1:(nrow(patterns2)))
+patterns <- matrix(0,9,5);
+for(m in 1:(nrow(patterns)))
 {
-  patterns2[m,m]=1;
-  patterns2[m,(m+1)]=1;
+  if(m%%2!=0) patterns[m,ceiling(m/2)]=1
+  else{
+  patterns[m,ceiling(m/2)]=1;
+  patterns[m,ceiling(m/2)+1]=1;
+  }
 }
-
-patterns3 <- rbind(rep(0,5),rep(1,5));
-
-patterns <- rbind(patterns1, patterns2);
-
 
 ```
 
@@ -204,8 +201,43 @@ cell_order_list <- unlist(lapply(1:length(indices_split), function(l)
                                                   }
                                                 }))
 
-
+cell_order_list <- cbind.data.frame(cell_order_list)
+colnames(cell_order_list) <- c("recovered_cell_order");
+#write.table(cell_order_list,"../data/ipsc_ordered_cells.txt");
 
 
 ```
 
+## Structure arranged by cell order (cellcycle/ batch effect corrected)
+
+```{r structure_ordered, echo=TRUE, eval=TRUE}
+
+nclus_vec <- 2:5
+ipsc_topics_single <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
+
+samp_metadata <- cbind.data.frame(1:dim(cell_order_list)[1]);
+colnames(samp_metadata) <- c("recovered_cell_order")
+
+cell_names <- rownames(ipsc_topics_single[[1]]$omega)
+
+
+for(num in 1:length(nclus_vec))
+{
+doc_ordered <- ipsc_topics_single[[num]]$omega[match(as.vector(cell_order_list[,1]),cell_names),];
+# barplot(t(doc_ordered),col=2:(nclus_vec[num]+1),axisnames=F,space=0,border=NA,
+#            main=paste("Structure arranged by",colnames(samp_metadata)[num],": topics=",nclus_vec[num]),
+#            las=las,ylim=c(0,1),ylab="admix prop", xlab=paste0(colnames(samp_metadata)[num]),
+ #           cex.axis=cex.axis,cex.main=cex.main);
+obj <- StructureObj_omega(doc_ordered, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("FALSE",dim(samp_metadata)[2]),path_struct='../figures/ipsc_structure_batchcorrect_cellcycle/',control=list(cex.axis=1));
+
+}
+
+
+```
+
+### Structure plot by cell recovered order
+
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_2/struct_clus_2_recovered_cell_order.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovered_cell_order.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered_cell_order.png' style="width:304px;height:228px;">
+<img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_5/struct_clus_5_recovered_cell_order.png' style="width:304px;height:228px;">
