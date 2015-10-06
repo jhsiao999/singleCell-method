@@ -1,0 +1,96 @@
+\documentclass[11pt]{article}
+\input{header.tex}
+\begin{document}
+
+\section{Background and Objectives}
+
+We assume there are S single cells in our dataset. We do not known which cell cycle phase they come from and have only recorded the gene expression of these cells. Not all of these genes bear cell cycle specific information, so we constrain our focus to only the cell cycle genes. Before we try to model the data we have, lets have a glimpse at what we have and what we want to achieve.
+
+\begin{itemize}
+
+\item  Objective: We have some cells, we do not know which phase they are in. We want to find out which phase they are in and the relative order 
+
+\item We know a set of genes are expressed in these phases. Is that the full set is not known. Lengths of the phases - not known. Also very likely not all of the genes in the list are actually expressive or oscillatory. Should we do some preprocessing to filter them (aka Macosko approach of correlation thresholding). May be look at qtlCurves plot to get a sense. 
+
+\item Researchers assume sinusoidal wave function for modeling the oscillatory genes. Is that a good model? What does qtlCurves say?
+Can we do Fourier or wavelet fitting instead (thats just because I am learning these :) ).
+
+\item We want a hierarchical ordering. First we want to group the single cells into the  higher level order of cell cycle phases, namely G1.S, S, G2.M, M and M.G1. But then once we have done that, we also want to reorder the cells inside each of these phases. That is a little extra than just  finding the ordering of the cells, because that does not tell us which phase it is from and does not fully draw from phase specific cell cycle genes.
+ 
+\end{itemize}
+
+
+\section{Model}
+
+Let the vector of time orders for the $S$ cells is given by $t_{S}$ and for gene $g$ and cell $s$, we can write down the model 
+
+$$ Y_{sg} = \alpha_g sin (t_s + \phi_g) + \epsilon_{sg}  \hspace{1 in}  \epsilon_{sg} \sim N(0, \sigma^2_{g}) $$
+
+Note that the frequency is $1$ because the reference frame is the cell cycle which is a circle and the period is thus assumed to be $2 \pi$. This model is assumed for all $g$ which are sinusoidal. Without loss of generality, we assume that all the genes are such. So, we can write down the model  for cell $s$ as 
+
+$$ \mathcal{L}_{s}  \propto \prod_{g=1}^{G} N ( \alpha_g sin (t_s + \phi_g), \sigma^2_{g} )  $$
+
+The full model over all the $S$ cells is given by 
+
+$$ \mathcal{L} \propto \prod_{s=1}^{S} \prod_{g=1}^{G} N ( \alpha_g sin (t_s + \phi_g), \sigma^2_{g} ) $$
+
+Here $t_s$ are the cell specific parameters and $\alpha_g$, $\phi_g$ and $\sigma^2_g$ are gene speciifc parameters. I do not think this model is identifiable. 
+
+Given the vector $t_s$, we can write 
+\begin{align*}
+Y_{sg}  & = \alpha_g  cos(\phi_g) sin (t_s) + \alpha_g sin (\phi_g) cos(t_s) + \epsilon_{sg}   \\
+\qquad & = \beta_{1g} sin(t_s) + \beta_{2g} cos(t_s) + \epsilon_{sg}  
+\end{align*}
+
+
+
+There is a bijective mapping from $(\alpha,\phi)$ to $(\beta_1, \beta_2)$ and so it is enough to find the ML estimates of $\beta_1$ and $\beta_2$ instead of $\alpha$ and $\phi$. The bijective map is given by 
+
+$$ \alpha_g = \sqrt{\beta^2_{1g} + \beta^2_{2g} }$$
+
+$$ \phi_g = tan^{-1}  \left (\frac{\beta_{2g}}{\beta_{1g}} \right ) $$
+
+We can thus write down the model in matrix notation as 
+
+$$ X^{g}_{S \times 1} = M^{s}_{S \times 2}  \beta^{g}_{2 \times 1} + \epsilon^{g}_{S \times 1} $$
+
+Assume flat prior for $\beta^g$
+
+$$ P(\beta^{g}) \propto 1 $$
+
+Then the posterior for $\beta^g$ is given by 
+
+$$ P(\beta^{g} | \sigma^2_g, t_S, X ) \propto N(\beta^{g} | \hat{\beta}^{g}, \sigma^2 (M^{T}M)^{-1}) $$ 
+
+We assume the prior for $\sigma^2_{g}$ to be 
+
+$$ P(\sigma^2_{g}) \propto \frac{1}{\sigma^2_{g}} $$
+
+Then the posterior is given by 
+
+\begin{align*}
+P(\sigma^2_{g} | \beta^{g}, t_{S}, X) & \propto  \frac{1}{\sigma^2_{g}} N( X_{g} | M \beta_{g}, \sigma^2_{g} I)  \\
+\qquad  &  \propto InvGamma \left ( \sigma^{2}_{g} | \frac{S}{2}, \frac{1}{2} (X^{g} - M^{s}\beta^{g})^{T} (X^{g} - M^{s}\beta^{g}) \right) \\
+\end{align*}
+
+Now the most important part is finding the posterior $$ P(t_S | \sigma^{2}_{g} , \beta^{g}, X) $$. One suggestion was to use $t_s$ for each $s$ as a discrete variable that takes values G1.S, S, G2.M, M and M.G1. However then how should we fix the relative order within each group? The hierarchy of the ordering is important as mentioned in previous section. So, just finding a posterior on  $t_S$  which is a $S$ dimensional vector and pretty big may not be the best idea as we are missing out on cell phase information.  
+
+Even if we want to find the latter posterior, then also we may have to resort to MCMC. 
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
