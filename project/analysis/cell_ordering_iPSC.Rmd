@@ -84,7 +84,23 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
 
 labs=unique(unlist(lapply(1:5, function(k) match(cell_cycle_genes_list[[k]],rownames(molecules_single)))));
 labs = labs[!is.na(labs)];
+cpm_data <- voom(t(molecules_single[labs,]))$E
+individual_id <- sapply(1:length(rownames(cpm_data)), function(x) 
+                        strsplit(rownames(cpm_data)[x],"[.]")[[1]][1])
+
+batch_id <- sapply(1:length(rownames(cpm_data)), function(x)
+                    strsplit(rownames(cpm_data)[x],"[.]")[[1]][2]);
+
+individual.batch.id <- paste0(individual_id, "_", batch_id);
+
+
+molecules_single <- t(BatchCorrectedCounts(t(molecules_single),individual.batch.id,use_parallel=TRUE));
+
+
+reads_single <- t(BatchCorrectedCounts(t(reads_single),individual.batch.id,use_parallel=TRUE));
+
 molecules_single_cell_cycle <- molecules_single[labs,];
+
 ans <-
 sapply(cell_cycle_genes_list,function(xx){
   #### create table of each phase
@@ -98,9 +114,9 @@ sapply(cell_cycle_genes_list,function(xx){
   #### restrict to correlation >= 0.3 
   reads_single_phase_restricted <- reads_single_phase[rownames(reads_single_phase) %in% names(cor_vector[cor_vector >= 0.3]),]
   #### apply normalization to reads
-  norm_factors_single <- calcNormFactors(reads_single_phase_restricted, method = "TMM")
+  norm_factors_single <- calcNormFactors(reads_single_phase_restricted, method = "RLE")
   reads_single_cpm <- cpm(reads_single_phase_restricted, log = TRUE,
-                            lib.size = colSums(reads_single) * norm_factors_single)
+                            lib.size = colSums(reads_single))
   #### output the phase specific scores (mean of normalized expression levels in the phase)
   apply(reads_single_cpm,2,mean)
 
@@ -241,3 +257,5 @@ obj <- StructureObj_omega(doc_ordered, samp_metadata = samp_metadata, batch_lab 
 <img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovered_cell_order.png' style="width:304px;height:228px;">
 <img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered_cell_order.png' style="width:304px;height:228px;">
 <img src='../figures/ipsc_structure_batchcorrect_cellcycle/clus_5/struct_clus_5_recovered_cell_order.png' style="width:304px;height:228px;">
+
+
