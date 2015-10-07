@@ -13,6 +13,7 @@ For more information on cell cycle definition, go to [github.com/singleCell-seq/
 
 
 ```{r packages, message = FALSE, warning = FALSE}
+setwd('/Users/kushal/Documents/singleCell-method/project/analysis/')
 library(data.table)
 library(maptpx)
 library(gplots)
@@ -20,6 +21,7 @@ library(philentropy) # github: HajkD/philentropy
 library(dplyr)
 library(edgeR)
 library(qtlcharts)
+library(CountClust)
 ```
 
 ## Prepare data
@@ -89,10 +91,40 @@ cell_cycle_genes_list <- lapply(1:5,function(x){
   temp <- as.character(cell_cycle_genes[,x])
   temp[temp!=""]
 })
+
+labs <- unique(unlist(lapply(1:5, function(k) 
+                            match(cell_cycle_genes_list[[k]],
+                            rownames(molecules_single)))) )
+labs <- labs[!is.na(labs)]
+molecules_single_cell_cycle <- molecules_single[labs,]
+```
+
+## Batch Corrected data 
+
+```{r batchcorrect, echo=TRUE, eval=TRUE}
+cpm_data <- voom(t(molecules_single[labs,]))$E
+individual_id <- sapply(1:length(rownames(cpm_data)), function(x) 
+                        strsplit(rownames(cpm_data)[x],"[.]")[[1]][1])
+
+batch_id <- sapply(1:length(rownames(cpm_data)), function(x)
+                    strsplit(rownames(cpm_data)[x],"[.]")[[1]][2]);
+
+individual.batch.id <- paste0(individual_id, "_", batch_id);
+
+
+molecules_single <- t(BatchCorrectedCounts(t(molecules_single),individual.batch.id,use_parallel=TRUE));
+
+
+reads_single <- t(BatchCorrectedCounts(t(reads_single),individual.batch.id,use_parallel=TRUE));
+
+molecules_single_cell_cycle <- molecules_single[labs,];
+
 ```
 
 
-## Gene count profile
+## Gene cpm profile
+
+### Cell cycle phase genes
 
 We explore these genes in greater detail. How do the **iplotCurves** look like for the single cells for the cell cylce genes. 
 
@@ -107,38 +139,69 @@ iplotCurves_cell_cycle <- function(data,genes_list)
 }
 ```
 
+Using the reordering technique of Macosko et al to order the cells as per their position in the cell cycle.
+
+```{r echo=TRUE, eval=TRUE}
+batch_removed_cpm <- voom(t(molecules_single_cell_cycle))$E;
+ordered_cells <- as.vector(as.matrix(read.table("../data/ipsc_ordered_cells.txt")));
+
+indices <- match(ordered_cells, colnames(molecules_single_cell_cycle));
+batch_removed_cpm <- batch_removed_cpm[indices,];
+```
 
 
 sample gene cell cycle genes corresponding to first phase.
 
 ```{r, echo=TRUE, eval=TRUE, cache=FALSE}
-iplotCurves_cell_cycle(molecules_single,cell_cycle_genes_list[[1]])
+iplotCurves_cell_cycle(t(batch_removed_cpm),cell_cycle_genes_list[[1]])
 ```
 
 The iplotCurves for cell cycle genes corresponding to second phase.
 
 ```{r, echo=TRUE, eval=TRUE, cache=FALSE}
-iplotCurves_cell_cycle(molecules_single,cell_cycle_genes_list[[2]])
+iplotCurves_cell_cycle(t(batch_removed_cpm),cell_cycle_genes_list[[2]])
 ```
 
 The iplotCurves for cell cycle genes corresponding to third phase.
 
 ```{r, echo=TRUE, eval=TRUE,cache=FALSE}
-iplotCurves_cell_cycle(molecules_single,cell_cycle_genes_list[[3]])
+iplotCurves_cell_cycle(t(batch_removed_cpm),cell_cycle_genes_list[[3]])
 ```
 
 The iplotCurves for cell cycle genes corresponding to fourth phase.
 
 ```{r, echo=TRUE, eval=TRUE, cache=FALSE}
-iplotCurves_cell_cycle(molecules_single,cell_cycle_genes_list[[4]])
+iplotCurves_cell_cycle(t(batch_removed_cpm),cell_cycle_genes_list[[4]])
 ```
 
 The iplotCurves for cell cycle genes corresponding to fifth phase.
 
 ```{r, echo=TRUE, eval=TRUE, cache=FALSE}
-iplotCurves_cell_cycle(molecules_single,cell_cycle_genes_list[[5]])
+iplotCurves_cell_cycle(t(batch_removed_cpm),cell_cycle_genes_list[[5]])
 ```
 
+Not all the cell cycle genes seem to be informative. So, we pick the cell cycle genes that get picked up by the admixture method to be cluster driving. We try to see the patterns of expression of these cluster driving genes and see if they are indeed sinusoidal. 
+
+### Admixture k=3 top cluster driving genes 
+
+```{r echo=TRUE, eval=TRUE}
+ipsc_topics_cellcycle_batchcorrect <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
+topics_clust <- ipsc_topics_cellcycle_batchcorrect[[2]]
+clust <- topics_clust$K
+theta <- topics_clust$theta
+features <- ExtractTopFeatures(theta,top_features=50,method="poisson")
+
+features_vec <- unique(as.vector(features));
+
+class <- as.numeric(apply(theta[features_vec,], 1, which.max))
+imp_gene_names <- colnames(batch_removed_cpm[,features_vec]);
+
+
+```
+
+```{r, echo=TRUE, eval=TRUE, cache=FALSE}
+iplotCurves_cell_cycle(t(batch_removed_cpm),imp_gene_names)
+```
 
 ## Cell-cycle scores
 
@@ -223,6 +286,9 @@ Assign the single cells to the cell phase
 ```{r echo=TRUE, eval=TRUE,cache=FALSE}
 cell_phase <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
 assign_cell_phase <- data.frame(cell_phase)
+cell_phase_vector <- as.vector(as.matrix(assign_cell_phase));
+cell_phase_vector <- factor(cell_phase_vector, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
 ```
 
 
