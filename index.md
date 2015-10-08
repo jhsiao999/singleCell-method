@@ -34,14 +34,14 @@ tagline:
 
 ###  Recovered cell order analysis
 
-* [Cell ordering of the iPSCs- Macosko method](cell_ordering_iPSC.html)
-* [Cell cycle genes scores - recovered cell order](cell_cycle_score_analysis.html)
+* [Cell ordering of the iPSCs- Macosko method](project/analysis/cell_ordering_iPSC.html)
+* [Cell cycle genes scores - recovered cell order](project/analysis/cell_cycle_score_analysis.html)
 
 ### Marioni single cell analysis
 
-* [Structure analysis for Marioni single cell data](marioni_structure_all_genes.html)
-* [Gene annotations for Marioni data](gene_annotations_marioni.html)
+* [Structure analysis for Marioni single cell data](project/analysis/marioni_structure_all_genes.html)
+* [Gene annotations for Marioni data](project/analysis/gene_annotations_marioni.html)
 
 ### Deng (Zygote to blastocyst) analysis
 
-* [Structure analysis of Deng data](deng_structure_all_genes.html)
+* [Structure analysis of Deng data](project/analysis/deng_structure_all_genes.html)
