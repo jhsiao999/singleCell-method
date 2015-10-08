@@ -1,0 +1,98 @@
+---
+title: "Deng single cell analysis"
+author: "Kushal K Dey"
+date: "October 8, 2015"
+output: html_document
+---
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+rm(list=ls())
+library(data.table)
+#install_github('kkdey/maptpx') otherwise shows error
+library(maptpx)
+library(CountClust)
+```
+
+```{r echo=TRUE, eval=FALSE}
+rm(list=ls())
+library(data.table)
+library(CountClust)
+setwd('/Users/kushal/Documents/singleCell-method/project/analysis/')
+
+files <- list.files("../data/Deng_data/");
+
+num <- 1
+temp_data <- data.frame(fread(paste0('../data/Deng_data/',files[num])));
+gene_names <- temp_data$X.Gene_symbol;
+
+reads_mat <- cbind.data.frame(gene_names);
+
+for(num in 1:length(files))
+{
+  temp_data <- data.frame(fread(paste0('../data/Deng_data/',files[num])));
+  reads_mat <- cbind.data.frame(reads_mat,temp_data$reads);
+}
+
+cell_meta <- unlist(lapply(files, function(x) strsplit(x,"_")[[1]][2]));
+colnames(reads_mat) <- c("gene_names",files);
+reads_no_dups <- reads_mat %>%
+                  group_by(gene_names) %>%
+                  summarise_each(funs(sum))
+
+reads_no_dups <- data.frame(reads_no_dups)
+
+gene_names_new <- reads_no_dups[,1]
+reads_no_dups <- reads_no_dups[,-1];
+rownames(reads_no_dups) <- gene_names_new;
+colnames(reads_no_dups) <- cell_meta;
+dim(reads_no_dups);
+
+
+write.table(reads_no_dups,"../data/Deng_cell_data.txt");
+```
+
+Now we load the data.
+
+```{r echo=TRUE, eval=TRUE}
+reads <- data.frame(fread('../data/Deng_cell_data.txt'),row.names=1);
+files <- list.files("../data/Deng_data/");
+cell_meta <- unlist(lapply(files, function(x) strsplit(x,"_")[[1]][2]));
+colnames(reads) <- cell_meta;
+```
+
+## Fitting the admixture model
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+samp_metadata <- cbind.data.frame(colnames(reads));
+counts <- t(reads);
+colnames(samp_metadata) <- c("cell_type");
+
+if(!dir.exists("../figures/deng_structure")) dir.create("../figures/deng_structure")
+
+nclus_vec <- 2:7;
+
+if(file.exists("../../project/rdas/deng_topic_fit.rda")) {
+deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
+} else {
+StructureObj(as.matrix(counts),nclus_vec,samp_metadata = samp_metadata, tol=10, batch_lab = NULL, path_rda="../../project/rdas/deng_topic_fit.rda",partition=c('TRUE'),path_struct = "../figures/deng_structure");
+deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
+}
+
+for(num in 1:length(nclus_vec))
+{
+obj <- StructureObj_omega(deng_topics[[num]]$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/deng_structure",control=list(cex.axis=1));
+}
+
+```
+
+The Structure plots clearly show cell phase effects
+
+<img src='../figures/deng_structure/clus_2/struct_clus_2_cell_type.png' style="width:350px;height:300px;">
+<img src='../figures/deng_structure/clus_3/struct_clus_3_cell_type.png' style="width:350px;height:300px;">
+<img src='../figures/deng_structure/clus_4/struct_clus_4_cell_type.png' style="width:350px;height:300px;">
+<img src='../figures/deng_structure/clus_5/struct_clus_5_cell_type.png' style="width:350px;height:300px;">
+<img src='../figures/deng_structure/clus_6/struct_clus_6_cell_type.png' style="width:350px;height:300px;">
+<img src='../figures/deng_structure/clus_7/struct_clus_7_cell_type.png' style="width:350px;height:300px;">
+
+```{r}
+sessionInfo()
