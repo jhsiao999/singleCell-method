@@ -45,3 +45,5 @@ tagline:
 ### Deng (Zygote to blastocyst) analysis
 
 * [Structure analysis of Deng data](project/analysis/deng_structure_all_genes.html)
+* [Gene annotations for Deng data K=7](project/analysis/gene_annotations_deng.html)
+
