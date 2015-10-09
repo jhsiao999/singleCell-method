@@ -2,7 +2,9 @@
 title: "Deng gene annotations"
 author: "Kushal K Dey"
 date: "October 8, 2015"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 ```{r echo=FALSE, eval=TRUE}

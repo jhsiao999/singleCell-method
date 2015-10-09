@@ -66,6 +66,23 @@ img {
 <h4 class="date"><em>October 8, 2015</em></h4>
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#objective">Objective</a></li>
+<li><a href="#extracting-top-genes">Extracting top genes</a><ul>
+<li><a href="#k7">K=7</a></li>
+</ul></li>
+<li><a href="#gene-annotations---top-genes-driving-clusters">Gene Annotations - Top genes driving clusters</a><ul>
+<li><a href="#first-class">First class</a></li>
+<li><a href="#second-class">Second Class</a></li>
+<li><a href="#third-class">Third Class</a></li>
+<li><a href="#fourth-class">Fourth Class</a></li>
+<li><a href="#fifth-class">Fifth Class</a></li>
+<li><a href="#sixth-class">Sixth Class</a></li>
+<li><a href="#seventh-class">Seventh Class</a></li>
+</ul></li>
+</ul>
+</div>
 
 <pre class="r"><code>library(CountClust)
 suppressMessages(library(mygene))
@@ -106,8 +123,8 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
-<th align="left">name</th>
 <th align="left">query</th>
+<th align="left">name</th>
 <th align="left">X_id</th>
 <th align="left">summary</th>
 <th align="left">notfound</th>
@@ -115,225 +132,225 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">uridine phosphorylase 1</td>
 <td align="left">Upp1</td>
+<td align="left">uridine phosphorylase 1</td>
 <td align="left">22271</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">teratocarcinoma-derived growth factor 1</td>
 <td align="left">Tdgf1</td>
+<td align="left">teratocarcinoma-derived growth factor 1</td>
 <td align="left">21667</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">fatty acid binding protein 5, epidermal</td>
 <td align="left">Fabp5</td>
+<td align="left">fatty acid binding protein 5, epidermal</td>
 <td align="left">16592</td>
 <td align="left">The protein encoded by this gene is part of the fatty acid binding protein family (FABP). FABPs are a family of small, highly conserved, cytoplasmic proteins that bind long-chain fatty acids and other hydrophobic ligands and participate in fatty acid uptake, transport, and metabolism. In humans this gene has been associated with psoriasis and type 2 diabetes. In mouse deficiency of this gene in combination with a deficiency in Fabp4 confers protection against atherosclerosis, diet-induced obesity, insulin resistance and experimental autoimmune encephalomyelitis (the mouse model for multiple sclerosis). Alternative splicing results in multiple transcript variants that encode different protein isoforms. The mouse genome contains many pseudogenes similar to this locus.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">peroxiredoxin 1</td>
 <td align="left">Prdx1</td>
+<td align="left">peroxiredoxin 1</td>
 <td align="left">18477</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">peptide YY</td>
 <td align="left">Pyy</td>
+<td align="left">peptide YY</td>
 <td align="left">217212</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">glutaredoxin</td>
 <td align="left">Glrx</td>
+<td align="left">glutaredoxin</td>
 <td align="left">93692</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Rho family GTPase 3</td>
 <td align="left">Rnd3</td>
+<td align="left">Rho family GTPase 3</td>
 <td align="left">74194</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">gap junction protein, alpha 1</td>
 <td align="left">Gja1</td>
+<td align="left">gap junction protein, alpha 1</td>
 <td align="left">14609</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">A kinase (PRKA) anchor protein (gravin) 12</td>
 <td align="left">Akap12</td>
+<td align="left">A kinase (PRKA) anchor protein (gravin) 12</td>
 <td align="left">83397</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">solute carrier family 13 (sodium-dependent citrate transporter), member 5</td>
 <td align="left">Slc13a5</td>
+<td align="left">solute carrier family 13 (sodium-dependent citrate transporter), member 5</td>
 <td align="left">237831</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">NA</td>
 <td align="left">4930583H14Rik</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="even">
-<td align="left">collagen, type IV, alpha 1</td>
 <td align="left">Col4a1</td>
+<td align="left">collagen, type IV, alpha 1</td>
 <td align="left">12826</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">myristoylated alanine rich protein kinase C substrate</td>
 <td align="left">Marcks</td>
+<td align="left">myristoylated alanine rich protein kinase C substrate</td>
 <td align="left">17118</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">transformation related protein 53</td>
 <td align="left">Trp53</td>
+<td align="left">transformation related protein 53</td>
 <td align="left">22059</td>
 <td align="left">This gene encodes tumor protein p53, which responds to diverse cellular stresses to regulate target genes that induce cell cycle arrest, apoptosis, senescence, DNA repair, or changes in metabolism. p53 protein is expressed at low level in normal cells and at a high level in a variety of transformed cell lines, where it’s believed to contribute to transformation and malignancy. p53 is a DNA-binding protein containing transcription activation, DNA-binding, and oligomerization domains. It is postulated to bind to a p53-binding site and activate expression of downstream genes that inhibit growth and/or invasion, and thus function as a tumor suppressor. Mice deficient for this gene are developmentally normal but are susceptible to spontaneous tumors. Evidence to date shows that this gene contains one promoter, in contrast to alternative promoters of the human gene, and transcribes a few of splice variants which encode different isoforms, although the biological validity or the full-length nature of some variants has not been determined.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">asparagine synthetase</td>
 <td align="left">Asns</td>
+<td align="left">asparagine synthetase</td>
 <td align="left">27053</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">fructose bisphosphatase 2</td>
 <td align="left">Fbp2</td>
+<td align="left">fructose bisphosphatase 2</td>
 <td align="left">14120</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">tet methylcytosine dioxygenase 1</td>
 <td align="left">Tet1</td>
+<td align="left">tet methylcytosine dioxygenase 1</td>
 <td align="left">52463</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">ring finger protein 130</td>
 <td align="left">Rnf130</td>
+<td align="left">ring finger protein 130</td>
 <td align="left">59044</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">solute carrier family 24, member 5</td>
 <td align="left">Slc24a5</td>
+<td align="left">solute carrier family 24, member 5</td>
 <td align="left">317750</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">RIKEN cDNA E130012A19 gene</td>
 <td align="left">E130012A19Rik</td>
+<td align="left">RIKEN cDNA E130012A19 gene</td>
 <td align="left">103551</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">aconitase 1</td>
 <td align="left">Aco1</td>
+<td align="left">aconitase 1</td>
 <td align="left">11428</td>
 <td align="left">This gene encodes a member of the aconitase/IPM isomerase protein family. The encoded protein has been identified as a moonlighting protein based on its ability to perform mechanistically distinct functions. Depending on iron levels in the cytosol, the encoded protein can function as either an aconitase enzyme or as an mRNA binding protein. When cellular iron levels are high, the encoded protein functions as an aconitase, an essential enzyme in the TCA cycle that catalyzes the conversion of citrate to isocitrate. When cellular iron levels are low, the encoded protein regulates iron uptake and utilization by binding to iron-responsive elements in the untranslated regions of mRNAs for genes involved in iron metabolism. Disruption of this gene is associated with pulmonary hypertension and polycythemia.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">SRY (sex determining region Y)-box 2</td>
 <td align="left">Sox2</td>
+<td align="left">SRY (sex determining region Y)-box 2</td>
 <td align="left">20674</td>
 <td align="left">This intronless gene encodes a member of the SRY-related HMG-box (SOX) family of transcription factors involved in the regulation of embryonic development and in the determination of cell fate. The product of this gene is required for stem-cell maintenance in the central nervous system, and also regulates gene expression in the stomach. Mutations in a similar gene in human have been associated with optic nerve hypoplasia and with syndromic microphthalmia, a severe form of structural eye malformation. This gene lies within an intron of another gene called SOX2 overlapping transcript (Sox2ot).</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">family with sequence similarity 25, member C</td>
 <td align="left">Fam25c</td>
+<td align="left">family with sequence similarity 25, member C</td>
 <td align="left">69134</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">phosphoglucomutase 1</td>
 <td align="left">Pgm1</td>
+<td align="left">phosphoglucomutase 1</td>
 <td align="left">66681</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">protein O-glucosyltransferase 1</td>
 <td align="left">Poglut1</td>
+<td align="left">protein O-glucosyltransferase 1</td>
 <td align="left">224143</td>
 <td align="left">This gene encodes a protein that can catalyze transfer of either UDP-glucose or UDP-xylose to epidermal growth factor (EGF) repeats, such as those found in Notch. Loss of this gene product results in embryonic lethality. Embryos have neural plate defects, heart defects, and truncations of their posterior axis. Alternate splicing results in multiple transcript variants.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">bone morphogenetic protein 4</td>
 <td align="left">Bmp4</td>
+<td align="left">bone morphogenetic protein 4</td>
 <td align="left">12159</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">expressed sequence C77370</td>
 <td align="left">C77370</td>
+<td align="left">expressed sequence C77370</td>
 <td align="left">245555</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">zinc finger CCCH type, antiviral 1</td>
 <td align="left">Zc3hav1</td>
+<td align="left">zinc finger CCCH type, antiviral 1</td>
 <td align="left">78781</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">junction adhesion molecule 2</td>
 <td align="left">Jam2</td>
+<td align="left">junction adhesion molecule 2</td>
 <td align="left">67374</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">angiotensin II, type I receptor-associated protein</td>
 <td align="left">Agtrap</td>
+<td align="left">angiotensin II, type I receptor-associated protein</td>
 <td align="left">11610</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">gap junction protein, beta 5</td>
 <td align="left">Gjb5</td>
+<td align="left">gap junction protein, beta 5</td>
 <td align="left">14622</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">carcinoembryonic antigen-related cell adhesion molecule 10</td>
 <td align="left">Ceacam10</td>
+<td align="left">carcinoembryonic antigen-related cell adhesion molecule 10</td>
 <td align="left">26366</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
@@ -350,8 +367,8 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
-<th align="left">X_id</th>
 <th align="left">query</th>
+<th align="left">X_id</th>
 <th align="left">name</th>
 <th align="left">summary</th>
 <th align="left">notfound</th>
@@ -359,379 +376,379 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">11461</td>
 <td align="left">Actb</td>
+<td align="left">11461</td>
 <td align="left">actin, beta</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">16668</td>
 <td align="left">Krt18</td>
+<td align="left">16668</td>
 <td align="left">keratin 18</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">14077</td>
 <td align="left">Fabp3</td>
+<td align="left">14077</td>
 <td align="left">fatty acid binding protein 3, muscle and heart</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">216350</td>
 <td align="left">Tspan8</td>
+<td align="left">216350</td>
 <td align="left">tetraspanin 8</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">14667</td>
 <td align="left">Gm2a</td>
+<td align="left">14667</td>
 <td align="left">GM2 ganglioside activator protein</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">14725</td>
 <td align="left">Lrp2</td>
+<td align="left">14725</td>
 <td align="left">low density lipoprotein receptor-related protein 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">14187</td>
 <td align="left">Akr1b8</td>
+<td align="left">14187</td>
 <td align="left">aldo-keto reductase family 1, member B8</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">15902</td>
 <td align="left">Id2</td>
+<td align="left">15902</td>
 <td align="left">inhibitor of DNA binding 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">218275</td>
 <td align="left">BC051665</td>
+<td align="left">218275</td>
 <td align="left">cDNA sequence BC051665</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">18826</td>
 <td align="left">Lcp1</td>
+<td align="left">18826</td>
 <td align="left">lymphocyte cytosolic protein 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">407814</td>
 <td align="left">BC053393</td>
+<td align="left">407814</td>
 <td align="left">cDNA sequence BC053393</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">347708</td>
 <td align="left">Dppa1</td>
+<td align="left">347708</td>
 <td align="left">developmental pluripotency associated 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">16691</td>
 <td align="left">Krt8</td>
+<td align="left">16691</td>
 <td align="left">keratin 8</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">13132</td>
 <td align="left">Dab2</td>
+<td align="left">13132</td>
 <td align="left">disabled 2, mitogen-responsive phosphoprotein</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">ENSMUSG00000086909</td>
 <td align="left">Gm4926</td>
+<td align="left">ENSMUSG00000086909</td>
 <td align="left">predicted gene 4926</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">237749</td>
 <td align="left">Gm4926</td>
+<td align="left">237749</td>
 <td align="left">T-cell immunoglobulin and mucin domain containing 2 pseudogene</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">50528</td>
 <td align="left">Tmprss2</td>
+<td align="left">50528</td>
 <td align="left">transmembrane protease, serine 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">108105</td>
 <td align="left">B3gnt5</td>
+<td align="left">108105</td>
 <td align="left">UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 5</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">67103</td>
 <td align="left">Ptgr1</td>
+<td align="left">67103</td>
 <td align="left">prostaglandin reductase 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">19156</td>
 <td align="left">Psap</td>
+<td align="left">19156</td>
 <td align="left">prosaposin</td>
 <td align="left">This gene encodes a multifunctional glycoprotein that plays a role in the intracellular metabolism of various sphingolipids or secreted into the plasma, milk or cerebrospinal fluid. The encoded protein undergoes proteolytic processing to generate four different polypeptides known as saposin A, B, C or D, that are required for the hydrolysis of certain sphingolipids by lysosomal hydrolases. Alternately, the encoded protein is secreted into body fluids where it exhibits neurotrophic and myelinotrophic activities. A complete lack of the encoded protein is fatal to mice either at the neonatal stage or within the first month due to severe leukodystrophy and sphingolipid accumulation. Alternative splicing results in multiple transcript variants encoding different isoforms that may undergo similar processing to generate the mature saposins.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">77579</td>
 <td align="left">Myh10</td>
+<td align="left">77579</td>
 <td align="left">myosin, heavy polypeptide 10, non-muscle</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">13710</td>
 <td align="left">Elf3</td>
+<td align="left">13710</td>
 <td align="left">E74-like factor 3</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">14462</td>
 <td align="left">Gata3</td>
+<td align="left">14462</td>
 <td align="left">GATA binding protein 3</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">67804</td>
 <td align="left">Snx2</td>
+<td align="left">67804</td>
 <td align="left">sorting nexin 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">21346</td>
 <td align="left">Tagln2</td>
+<td align="left">21346</td>
 <td align="left">transgelin 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">57738</td>
 <td align="left">Slc15a2</td>
+<td align="left">57738</td>
 <td align="left">solute carrier family 15 (H+/peptide transporter), member 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">17075</td>
 <td align="left">Epcam</td>
+<td align="left">17075</td>
 <td align="left">epithelial cell adhesion molecule</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">20527</td>
 <td align="left">Slc2a3</td>
+<td align="left">20527</td>
 <td align="left">solute carrier family 2 (facilitated glucose transporter), member 3</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">12740</td>
 <td align="left">Cldn4</td>
+<td align="left">12740</td>
 <td align="left">claudin 4</td>
 <td align="left">This gene encodes a member of the claudin family. Claudins are integral membrane proteins and components of tight junction strands. Tight junction strands serve as a physical barrier to prevent solutes and water from passing freely through the paracellular space between epithelial or endothelial cell sheets, and also play critical roles in maintaining cell polarity and signal transductions. The protein encoded by this gene is a high-affinity receptor for clostridium perfringens enterotoxin (CPE) produced by the bacterium Clostridium perfringens, and the interaction with CPE results in increased membrane permeability by forming small pores in plasma membrane. This protein augments alveolar epithelial barrier function and is induced in acute lung injury. It is highly expressed in pancreatic and ovarian cancers.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">NA</td>
 <td align="left">2610019F03Rik</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
-<td align="left">67938</td>
 <td align="left">Myl12b</td>
+<td align="left">67938</td>
 <td align="left">myosin, light chain 12B, regulatory</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">13809</td>
 <td align="left">Enpep</td>
+<td align="left">13809</td>
 <td align="left">glutamyl aminopeptidase</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">12313</td>
 <td align="left">Calm1</td>
+<td align="left">12313</td>
 <td align="left">calmodulin 1</td>
 <td align="left">This gene encodes a member of the EF-hand calcium-binding protein family. The encoded protein acts as a calcium sensor and is involved in relaying signals to calcium-sensitive proteins, enzymes and ion channels. The protein-calcium complex binds target proteins to regulate several cellular processes, including smooth muscle contraction, inflammation, apoptosis and the immune response. Mutations in the human gene are associated with catecholaminergic polymorphic ventricular tachycardia and long QT syndrome 14. Alternative splicing results in multiple transcript variants encoding different isoforms.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">NA</td>
 <td align="left">5730469M10Rik</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
-<td align="left">67771</td>
 <td align="left">Arpc5</td>
+<td align="left">67771</td>
 <td align="left">actin related protein 2/3 complex, subunit 5</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">11732</td>
 <td align="left">Ank</td>
+<td align="left">11732</td>
 <td align="left">progressive ankylosis</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">56753</td>
 <td align="left">Tacstd2</td>
+<td align="left">56753</td>
 <td align="left">tumor-associated calcium signal transducer 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">20971</td>
 <td align="left">Sdc4</td>
+<td align="left">20971</td>
 <td align="left">syndecan 4</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">11465</td>
 <td align="left">Actg1</td>
+<td align="left">11465</td>
 <td align="left">actin, gamma, cytoplasmic 1</td>
 <td align="left">Actins are highly conserved proteins that are involved in various types of cell motility and maintenance of the cytoskeleton. In vertebrates, three main groups of actin isoforms, alpha, beta, and gamma, have been identified. The alpha actins are found in muscle tissues and are a major constituent of the contractile apparatus. The beta and gamma actins co-exist in most cell types as components of the cytoskeleton, and as mediators of internal cell motility. Actin, gamma 1, encoded by this gene, is a cytoplasmic actin found in non-muscle cells. Alternative splicing results in multiple transcript variants.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">14702</td>
 <td align="left">Gng2</td>
+<td align="left">14702</td>
 <td align="left">guanine nucleotide binding protein (G protein), gamma 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">29875</td>
 <td align="left">Iqgap1</td>
+<td align="left">29875</td>
 <td align="left">IQ motif containing GTPase activating protein 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">73690</td>
 <td align="left">Glipr1</td>
+<td align="left">73690</td>
 <td align="left">GLI pathogenesis-related 1 (glioma)</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">13813</td>
 <td align="left">Eomes</td>
+<td align="left">13813</td>
 <td align="left">eomesodermin homolog (Xenopus laevis)</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">56431</td>
 <td align="left">Dstn</td>
+<td align="left">56431</td>
 <td align="left">destrin</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">13014</td>
 <td align="left">Cstb</td>
+<td align="left">13014</td>
 <td align="left">cystatin B</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">17988</td>
 <td align="left">Ndrg1</td>
+<td align="left">17988</td>
 <td align="left">N-myc downstream regulated gene 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">96957</td>
 <td align="left">Tmem62</td>
+<td align="left">96957</td>
 <td align="left">transmembrane protein 62</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">171283</td>
 <td align="left">Havcr1</td>
+<td align="left">171283</td>
 <td align="left">hepatitis A virus cellular receptor 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">12495</td>
 <td align="left">Entpd1</td>
+<td align="left">12495</td>
 <td align="left">ectonucleoside triphosphate diphosphohydrolase 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">17886</td>
 <td align="left">Myh9</td>
+<td align="left">17886</td>
 <td align="left">myosin, heavy polypeptide 9, non-muscle</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">14860</td>
 <td align="left">Gsta4</td>
+<td align="left">14860</td>
 <td align="left">glutathione S-transferase, alpha 4</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">67182</td>
 <td align="left">Pdzk1ip1</td>
+<td align="left">67182</td>
 <td align="left">PDZK1 interacting protein 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">67834</td>
 <td align="left">Idh3a</td>
+<td align="left">67834</td>
 <td align="left">isocitrate dehydrogenase 3 (NAD+) alpha</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">76709</td>
 <td align="left">Arpc2</td>
+<td align="left">76709</td>
 <td align="left">actin related protein 2/3 complex, subunit 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
@@ -747,293 +764,293 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
+<th align="left">X_id</th>
 <th align="left">query</th>
 <th align="left">name</th>
-<th align="left">X_id</th>
 <th align="left">summary</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">15516</td>
 <td align="left">Hsp90ab1</td>
 <td align="left">heat shock protein 90 alpha (cytosolic), class B member 1</td>
-<td align="left">15516</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">15519</td>
 <td align="left">Hsp90aa1</td>
 <td align="left">heat shock protein 90, alpha (cytosolic), class A member 1</td>
-<td align="left">15519</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">67923</td>
 <td align="left">Tceb1</td>
 <td align="left">transcription elongation factor B (SIII), polypeptide 1</td>
-<td align="left">67923</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">384077</td>
 <td align="left">Pramel5</td>
 <td align="left">preferentially expressed antigen in melanoma like 5</td>
-<td align="left">384077</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">18148</td>
 <td align="left">Npm1</td>
 <td align="left">nucleophosmin 1</td>
-<td align="left">18148</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">15502</td>
 <td align="left">Dnaja1</td>
 <td align="left">DnaJ (Hsp40) homolog, subfamily A, member 1</td>
-<td align="left">15502</td>
 <td align="left">The protein encoded by this gene is a member of the DnaJ family, whose members act as cochaperones of heat shock protein 70. Heat shock proteins facilitate protein folding, trafficking, prevention of aggregation, and proteolytic degradation. Members of this family are characterized by a highly conserved N-terminal J domain, a glycine/phenylalanine-rich region, four CxxCxGxG zinc finger repeats, and a C-terminal substrate-binding domain. The J domain mediates the interaction with heat shock protein 70 to recruit substrates and regulate ATP hydrolysis activity. Mice deficient for this gene display reduced levels of activation‐induced deaminase, an enzyme that deaminates deoxycytidine at the immunoglobulin genes during immune responses. In addition, mice lacking this gene exhibit severe defects in spermatogenesis. Several pseudogenes of this gene are found on other chromosomes. Alternative splicing results in multiple transcript variants.</td>
 </tr>
 <tr class="odd">
+<td align="left">15481</td>
 <td align="left">Hspa8</td>
 <td align="left">heat shock protein 8</td>
-<td align="left">15481</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">15191</td>
 <td align="left">Hdgf</td>
 <td align="left">hepatoma-derived growth factor</td>
-<td align="left">15191</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">73708</td>
 <td align="left">Dppa3</td>
 <td align="left">developmental pluripotency-associated 3</td>
-<td align="left">73708</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">12116</td>
 <td align="left">Bhmt</td>
 <td align="left">betaine-homocysteine methyltransferase</td>
-<td align="left">12116</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">19231</td>
 <td align="left">Ptma</td>
 <td align="left">prothymosin alpha</td>
-<td align="left">19231</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">27050</td>
 <td align="left">Rps3</td>
 <td align="left">ribosomal protein S3</td>
-<td align="left">27050</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">56086</td>
 <td align="left">Set</td>
 <td align="left">SET nuclear oncogene</td>
-<td align="left">56086</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">22121</td>
 <td align="left">Rpl13a</td>
 <td align="left">ribosomal protein L13A</td>
-<td align="left">22121</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">56351</td>
 <td align="left">Ptges3</td>
 <td align="left">prostaglandin E synthase 3 (cytosolic)</td>
-<td align="left">56351</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">26961</td>
 <td align="left">Rpl8</td>
 <td align="left">ribosomal protein L8</td>
-<td align="left">26961</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">11837</td>
 <td align="left">Rplp0</td>
 <td align="left">ribosomal protein, large, P0</td>
-<td align="left">11837</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">19823</td>
 <td align="left">Rnf7</td>
 <td align="left">ring finger protein 7</td>
-<td align="left">19823</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">110196</td>
 <td align="left">Fdps</td>
 <td align="left">farnesyl diphosphate synthetase</td>
-<td align="left">110196</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">71780</td>
 <td align="left">Isyna1</td>
 <td align="left">myo-inositol 1-phosphate synthase A1</td>
-<td align="left">71780</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">15452</td>
 <td align="left">Hprt</td>
 <td align="left">hypoxanthine guanine phosphoribosyl transferase</td>
-<td align="left">15452</td>
 <td align="left">The protein encoded by this gene is a transferase, which catalyzes conversion of hypoxanthine to inosine monophosphate and guanine to guanosine monophosphate via transfer of the 5-phosphoribosyl group from 5-phosphoribosyl 1-pyrophosphate. This enzyme plays a central role in the generation of purine nucleotides through the purine salvage pathway.</td>
 </tr>
 <tr class="even">
+<td align="left">18103</td>
 <td align="left">Nme2</td>
 <td align="left">NME/NM23 nucleoside diphosphate kinase 2</td>
-<td align="left">18103</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">27207</td>
 <td align="left">Rps11</td>
 <td align="left">ribosomal protein S11</td>
-<td align="left">27207</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">55948</td>
 <td align="left">Sfn</td>
 <td align="left">stratifin</td>
-<td align="left">55948</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">20867</td>
 <td align="left">Stip1</td>
 <td align="left">stress-induced phosphoprotein 1</td>
-<td align="left">20867</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">170930</td>
 <td align="left">Sumo2</td>
 <td align="left">small ubiquitin-like modifier 2</td>
-<td align="left">170930</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">19989</td>
 <td align="left">Rpl7</td>
 <td align="left">ribosomal protein L7</td>
-<td align="left">19989</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">68512</td>
 <td align="left">Tomm5</td>
 <td align="left">translocase of outer mitochondrial membrane 5 homolog (yeast)</td>
-<td align="left">68512</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">207214</td>
 <td align="left">Larp4</td>
 <td align="left">La ribonucleoprotein domain family, member 4</td>
-<td align="left">207214</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">54709</td>
 <td align="left">Eif3i</td>
 <td align="left">eukaryotic translation initiation factor 3, subunit I</td>
-<td align="left">54709</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">547109</td>
 <td align="left">Trim43a</td>
 <td align="left">tripartite motif-containing 43A</td>
-<td align="left">547109</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">14694</td>
 <td align="left">Gnb2l1</td>
 <td align="left">guanine nucleotide binding protein (G protein), beta polypeptide 2 like 1</td>
-<td align="left">14694</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">66446</td>
 <td align="left">Exosc7</td>
 <td align="left">exosome component 7</td>
-<td align="left">66446</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">67443</td>
 <td align="left">Map1lc3b</td>
 <td align="left">microtubule-associated protein 1 light chain 3 beta</td>
-<td align="left">67443</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">77337</td>
 <td align="left">Akr1c21</td>
 <td align="left">aldo-keto reductase family 1, member C21</td>
-<td align="left">77337</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">20054</td>
 <td align="left">Rps15</td>
 <td align="left">ribosomal protein S15</td>
-<td align="left">20054</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">276770</td>
 <td align="left">Eif5a</td>
 <td align="left">eukaryotic translation initiation factor 5A</td>
-<td align="left">276770</td>
 <td align="left">This gene encodes an elongation initiation factor, which participates in protein synthesis. The encoded protein also plays roles in mRNA metabolism, cell proliferation, and cell cycle control. This protein contains a modified lysine residue called hypusine, which appears to be necessary for its function. Alternatively spliced transcript variants have been described. Related pseudogenes exist on chromosomes 2, 5, and 19.</td>
 </tr>
 <tr class="even">
+<td align="left">56040</td>
 <td align="left">Rplp1</td>
 <td align="left">ribosomal protein, large, P1</td>
-<td align="left">56040</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">75717</td>
 <td align="left">Cul5</td>
 <td align="left">cullin 5</td>
-<td align="left">75717</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">20044</td>
 <td align="left">Rps14</td>
 <td align="left">ribosomal protein S14</td>
-<td align="left">20044</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">29858</td>
 <td align="left">Pmm1</td>
 <td align="left">phosphomannomutase 1</td>
-<td align="left">29858</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">20103</td>
 <td align="left">Rps5</td>
 <td align="left">ribosomal protein S5</td>
-<td align="left">20103</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">76815</td>
 <td align="left">Calcoco2</td>
 <td align="left">calcium binding and coiled-coil domain 2</td>
-<td align="left">76815</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">60532</td>
 <td align="left">Wtap</td>
 <td align="left">Wilms tumour 1-associating protein</td>
-<td align="left">60532</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">53600</td>
 <td align="left">Timm23</td>
 <td align="left">translocase of inner mitochondrial membrane 23</td>
-<td align="left">53600</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">65019</td>
 <td align="left">Rpl23</td>
 <td align="left">ribosomal protein L23</td>
-<td align="left">65019</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">76846</td>
 <td align="left">Rps9</td>
 <td align="left">ribosomal protein S9</td>
-<td align="left">76846</td>
 <td align="left">NA</td>
 </tr>
 </tbody>
@@ -1049,8 +1066,8 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <thead>
 <tr class="header">
 <th align="left">X_id</th>
-<th align="left">name</th>
 <th align="left">query</th>
+<th align="left">name</th>
 <th align="left">summary</th>
 <th align="left">notfound</th>
 </tr>
@@ -1058,337 +1075,337 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <tbody>
 <tr class="odd">
 <td align="left">11650</td>
-<td align="left">alkaline phosphatase, placental-like 2</td>
 <td align="left">Alppl2</td>
+<td align="left">alkaline phosphatase, placental-like 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">330064</td>
-<td align="left">solute carrier family 5 (sodium-dependent vitamin transporter), member 6</td>
 <td align="left">Slc5a6</td>
+<td align="left">solute carrier family 5 (sodium-dependent vitamin transporter), member 6</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">171284</td>
-<td align="left">T cell immunoglobulin and mucin domain containing 2</td>
 <td align="left">Timd2</td>
+<td align="left">T cell immunoglobulin and mucin domain containing 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">13032</td>
-<td align="left">cathepsin C</td>
 <td align="left">Ctsc</td>
+<td align="left">cathepsin C</td>
 <td align="left">This gene encodes a member of the peptidase C1 (papain) family of cysteine proteases. Alternative splicing results in multiple transcript variants, at least one of which encodes a preproprotein that is proteolytically processed to generate multiple protein products. These products include the dipeptidyl peptidase 1 light, heavy, and exclusion domain chains, which together comprise one subunit of the homotetrameric enzyme. This enzyme has amino dipeptidase activity and may play a role in the activation of granzymes during inflammation. Homozygous knockout mice for this gene exhibit impaired granzyme activation and enhanced survival in a sepsis model.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">230709</td>
-<td align="left">zinc metallopeptidase, STE24</td>
 <td align="left">Zmpste24</td>
+<td align="left">zinc metallopeptidase, STE24</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">13039</td>
-<td align="left">cathepsin L</td>
 <td align="left">Ctsl</td>
+<td align="left">cathepsin L</td>
 <td align="left">This gene encodes a member of the peptidase C1 (papain) family of cysteine proteases. The encoded preproprotein is proteolytically processed to generate multiple protein products. These products include the activation peptide and the cathepsin L1 heavy and light chains. The mature enzyme appears to be important in embryonic development through its processing of histone H3 and may play a role in disease progression in a model of kidney disease. Homozygous knockout mice for this gene exhibit hair loss, skin thickening, bone and heart defects, and enhanced susceptibility to bacterial infection. A pseudogene of this gene has been identified in the genome.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">12660</td>
-<td align="left">choline kinase alpha</td>
 <td align="left">Chka</td>
+<td align="left">choline kinase alpha</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">108705</td>
-<td align="left">pituitary tumor-transforming 1 interacting protein</td>
 <td align="left">Pttg1ip</td>
+<td align="left">pituitary tumor-transforming 1 interacting protein</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">19025</td>
-<td align="left">cathepsin A</td>
 <td align="left">Ctsa</td>
+<td align="left">cathepsin A</td>
 <td align="left">This gene encodes a glycoprotein with deamidase, esterase and carboxypeptidase activities. The encoded protein associates with and provides a protective function to the lysosomal enzymes beta-galactosidase and neuraminidase. Deficiency of the related gene in humans results in galactosialidosis. The proprotein is processed into two shorter chains. Alternatively spliced transcript variants encoding multiple isoforms have been observed for this gene.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">27388</td>
-<td align="left">phosphatidylserine synthase 2</td>
 <td align="left">Ptdss2</td>
+<td align="left">phosphatidylserine synthase 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">70701</td>
-<td align="left">NIPA-like domain containing 1</td>
 <td align="left">Nipal1</td>
+<td align="left">NIPA-like domain containing 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">16529</td>
-<td align="left">potassium channel, subfamily K, member 5</td>
 <td align="left">Kcnk5</td>
+<td align="left">potassium channel, subfamily K, member 5</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">100504715</td>
-<td align="left">transmembrane protein with metallophosphoesterase domain</td>
 <td align="left">Tmppe</td>
+<td align="left">transmembrane protein with metallophosphoesterase domain</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">270166</td>
-<td align="left">caseinolytic mitochondrial matrix peptidase chaperone subunit</td>
 <td align="left">Clpx</td>
+<td align="left">caseinolytic mitochondrial matrix peptidase chaperone subunit</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">66065</td>
-<td align="left">hydroxysteroid (17-beta) dehydrogenase 14</td>
 <td align="left">Hsd17b14</td>
+<td align="left">hydroxysteroid (17-beta) dehydrogenase 14</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">72027</td>
-<td align="left">solute carrier family 39 (zinc transporter), member 4</td>
 <td align="left">Slc39a4</td>
+<td align="left">solute carrier family 39 (zinc transporter), member 4</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">22384</td>
-<td align="left">eukaryotic translation initiation factor 4H</td>
 <td align="left">Eif4h</td>
+<td align="left">eukaryotic translation initiation factor 4H</td>
 <td align="left">This gene encodes eukaryotic translation initiation factor 4H (eIF4H) that plays a critical role in the process of protein synthesis. The encoded protein is an RNA-binding protein that, in concert with other translation initiation factors, helps unwind the 5’ cap-proximal region of mRNA to prepare it for ribosomal attachment. Mice lacking the encoded protein displayed growth retardation with a significant reduction of body weight, a smaller brain volume and altered brain morphology. Behaviorally, mice lacking the encoded protein exhibit severe impairments of fear-related associative learning and memory formation. Alternative splicing results in multiple transcript variants encoding different isoforms.</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">66857</td>
-<td align="left">phospholipase B domain containing 1</td>
 <td align="left">Plbd1</td>
+<td align="left">phospholipase B domain containing 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">26943</td>
-<td align="left">serine incorporator 3</td>
 <td align="left">Serinc3</td>
+<td align="left">serine incorporator 3</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">117198</td>
-<td align="left">influenza virus NS1A binding protein</td>
 <td align="left">Ivns1abp</td>
+<td align="left">influenza virus NS1A binding protein</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">70572</td>
-<td align="left">importin 5</td>
 <td align="left">Ipo5</td>
+<td align="left">importin 5</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">231510</td>
-<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 9</td>
 <td align="left">Agpat9</td>
+<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 9</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">22410</td>
-<td align="left">wingless-type MMTV integration site family, member 10B</td>
 <td align="left">Wnt10b</td>
+<td align="left">wingless-type MMTV integration site family, member 10B</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">666747</td>
-<td align="left">tripartite motif-containing 43B</td>
 <td align="left">Trim43b</td>
+<td align="left">tripartite motif-containing 43B</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">66734</td>
-<td align="left">microtubule-associated protein 1 light chain 3 alpha</td>
 <td align="left">Map1lc3a</td>
+<td align="left">microtubule-associated protein 1 light chain 3 alpha</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">333433</td>
-<td align="left">glycerol-3-phosphate dehydrogenase 1-like</td>
 <td align="left">Gpd1l</td>
+<td align="left">glycerol-3-phosphate dehydrogenase 1-like</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">252830</td>
-<td align="left">oocyte specific homeobox 6</td>
 <td align="left">Obox6</td>
+<td align="left">oocyte specific homeobox 6</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">107652</td>
-<td align="left">UDP-N-acetylglucosamine pyrophosphorylase 1</td>
 <td align="left">Uap1</td>
+<td align="left">UDP-N-acetylglucosamine pyrophosphorylase 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">20670</td>
-<td align="left">SRY (sex determining region Y)-box 15</td>
 <td align="left">Sox15</td>
+<td align="left">SRY (sex determining region Y)-box 15</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">20496</td>
-<td align="left">solute carrier family 12, member 2</td>
 <td align="left">Slc12a2</td>
+<td align="left">solute carrier family 12, member 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">75909</td>
-<td align="left">vacuole membrane protein 1</td>
 <td align="left">Vmp1</td>
+<td align="left">vacuole membrane protein 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">73658</td>
-<td align="left">spinster homolog 1</td>
 <td align="left">Spns1</td>
+<td align="left">spinster homolog 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">16004</td>
-<td align="left">insulin-like growth factor 2 receptor</td>
 <td align="left">Igf2r</td>
+<td align="left">insulin-like growth factor 2 receptor</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">78889</td>
-<td align="left">WD repeat and SOCS box-containing 1</td>
 <td align="left">Wsb1</td>
+<td align="left">WD repeat and SOCS box-containing 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">70769</td>
-<td align="left">nucleolar and coiled-body phosphoprotein 1</td>
 <td align="left">Nolc1</td>
+<td align="left">nucleolar and coiled-body phosphoprotein 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">223739</td>
-<td align="left">RIKEN cDNA 5031439G07 gene</td>
 <td align="left">5031439G07Rik</td>
+<td align="left">RIKEN cDNA 5031439G07 gene</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">71704</td>
-<td align="left">Rho guanine nucleotide exchange factor (GEF) 3</td>
 <td align="left">Arhgef3</td>
+<td align="left">Rho guanine nucleotide exchange factor (GEF) 3</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">77053</td>
-<td align="left">Sad1 and UNC84 domain containing 1</td>
 <td align="left">Sun1</td>
+<td align="left">Sad1 and UNC84 domain containing 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">77975</td>
-<td align="left">transmembrane protein 50B</td>
 <td align="left">Tmem50b</td>
+<td align="left">transmembrane protein 50B</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">245860</td>
-<td align="left">autophagy related 9A</td>
 <td align="left">Atg9a</td>
+<td align="left">autophagy related 9A</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">76809</td>
-<td align="left">Bri3 binding protein</td>
 <td align="left">Bri3bp</td>
+<td align="left">Bri3 binding protein</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">18432</td>
-<td align="left">MYB binding protein (P160) 1a</td>
 <td align="left">Mybbp1a</td>
+<td align="left">MYB binding protein (P160) 1a</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">56209</td>
-<td align="left">glycerophosphodiester phosphodiesterase 1</td>
 <td align="left">Gde1</td>
+<td align="left">glycerophosphodiester phosphodiesterase 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">NA</td>
-<td align="left">NA</td>
 <td align="left">9530008L14Rik</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">28114</td>
-<td align="left">NOL1/NOP2/Sun domain family member 2</td>
 <td align="left">Nsun2</td>
+<td align="left">NOL1/NOP2/Sun domain family member 2</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">66631</td>
-<td align="left">hippocampus abundant transcript-like 1</td>
 <td align="left">Hiatl1</td>
+<td align="left">hippocampus abundant transcript-like 1</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">217666</td>
-<td align="left">L-2-hydroxyglutarate dehydrogenase</td>
 <td align="left">L2hgdh</td>
+<td align="left">L-2-hydroxyglutarate dehydrogenase</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">52123</td>
-<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 5 (lysophosphatidic acid acyltransferase, epsilon)</td>
 <td align="left">Agpat5</td>
+<td align="left">1-acylglycerol-3-phosphate O-acyltransferase 5 (lysophosphatidic acid acyltransferase, epsilon)</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
@@ -1404,369 +1421,369 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
-<th align="left">query</th>
 <th align="left">notfound</th>
-<th align="left">X_id</th>
+<th align="left">query</th>
 <th align="left">name</th>
+<th align="left">X_id</th>
 <th align="left">summary</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">LOC100502936</td>
 <td align="left">TRUE</td>
+<td align="left">LOC100502936</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Bcl2l10</td>
 <td align="left">NA</td>
-<td align="left">12049</td>
+<td align="left">Bcl2l10</td>
 <td align="left">Bcl2-like 10</td>
+<td align="left">12049</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">E330034G19Rik</td>
 <td align="left">NA</td>
-<td align="left">105418</td>
+<td align="left">E330034G19Rik</td>
 <td align="left">RIKEN cDNA E330034G19 gene</td>
+<td align="left">105418</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Zbed3</td>
 <td align="left">NA</td>
-<td align="left">72114</td>
+<td align="left">Zbed3</td>
 <td align="left">zinc finger, BED type containing 3</td>
+<td align="left">72114</td>
 <td align="left">This gene encodes a member of the zinc finger protein superfamily. This protein may regulate the Wnt/beta-catenin signaling pathway. This protein may be involved in insulin resistance and type 2 diabetes in humans. Alternative splicing results in multiple transcript variants.</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Tcl1</td>
-<td align="left">NA</td>
-<td align="left">21432</td>
 <td align="left">T cell lymphoma breakpoint 1</td>
+<td align="left">21432</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Oas1d</td>
-<td align="left">NA</td>
-<td align="left">100535</td>
 <td align="left">2’-5’ oligoadenylate synthetase 1D</td>
+<td align="left">100535</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Spin1</td>
-<td align="left">NA</td>
-<td align="left">20729</td>
 <td align="left">spindlin 1</td>
+<td align="left">20729</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">AU022751</td>
-<td align="left">NA</td>
-<td align="left">102991</td>
 <td align="left">expressed sequence AU022751</td>
+<td align="left">102991</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Btg4</td>
-<td align="left">NA</td>
-<td align="left">56057</td>
 <td align="left">B cell translocation gene 4</td>
+<td align="left">56057</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Rfpl4</td>
-<td align="left">NA</td>
-<td align="left">192658</td>
 <td align="left">ret finger protein-like 4</td>
+<td align="left">192658</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Khdc1b</td>
-<td align="left">NA</td>
-<td align="left">98582</td>
 <td align="left">KH domain containing 1B</td>
+<td align="left">98582</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Oog3</td>
-<td align="left">NA</td>
-<td align="left">100012</td>
 <td align="left">oogenesin 3</td>
+<td align="left">100012</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">D6Ertd527e</td>
-<td align="left">NA</td>
-<td align="left">52372</td>
 <td align="left">DNA segment, Chr 6, ERATO Doi 527, expressed</td>
+<td align="left">52372</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Mphosph6</td>
-<td align="left">NA</td>
-<td align="left">68533</td>
 <td align="left">M phase phosphoprotein 6</td>
+<td align="left">68533</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">C86187</td>
-<td align="left">NA</td>
-<td align="left">97402</td>
 <td align="left">expressed sequence C86187</td>
+<td align="left">97402</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Pkd2l2</td>
-<td align="left">NA</td>
-<td align="left">53871</td>
 <td align="left">polycystic kidney disease 2-like 2</td>
+<td align="left">53871</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Accsl</td>
-<td align="left">NA</td>
-<td align="left">381411</td>
 <td align="left">1-aminocyclopropane-1-carboxylate synthase (non-functional)-like</td>
+<td align="left">381411</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Fbxw24</td>
-<td align="left">NA</td>
-<td align="left">382106</td>
 <td align="left">F-box and WD-40 domain protein 24</td>
+<td align="left">382106</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Oosp1</td>
 <td align="left">NA</td>
-<td align="left">170834</td>
+<td align="left">Oosp1</td>
 <td align="left">oocyte secreted protein 1</td>
+<td align="left">170834</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Eif4e1b</td>
 <td align="left">NA</td>
-<td align="left">218268</td>
+<td align="left">Eif4e1b</td>
 <td align="left">eukaryotic translation initiation factor 4E family member 1B</td>
+<td align="left">218268</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Ldhb</td>
 <td align="left">NA</td>
-<td align="left">16832</td>
+<td align="left">Ldhb</td>
 <td align="left">lactate dehydrogenase B</td>
+<td align="left">16832</td>
 <td align="left">This gene encodes a subunit of the lactate dehydrogenase enzyme, which catalyzes the reversible conversion of lactate to pyruvate in the glycolytic pathway. This protein is one of two lactate dehydrogenase subunits that combine to form five distinct isozymes with different kinetic parameters. Pseudogenes have been identified on chromosomes 1 and 19. Alternative splicing of this gene results in multiple transcript variants that encode multiple isoforms.</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Bmp15</td>
-<td align="left">NA</td>
-<td align="left">12155</td>
 <td align="left">bone morphogenetic protein 15</td>
+<td align="left">12155</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Obox2</td>
-<td align="left">NA</td>
-<td align="left">246792</td>
 <td align="left">oocyte specific homeobox 2</td>
+<td align="left">246792</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Trim61</td>
-<td align="left">NA</td>
-<td align="left">260296</td>
 <td align="left">tripartite motif-containing 61</td>
+<td align="left">260296</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">C87499</td>
-<td align="left">NA</td>
-<td align="left">381590</td>
 <td align="left">expressed sequence C87499</td>
+<td align="left">381590</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">4933427D06Rik</td>
-<td align="left">NA</td>
-<td align="left">232217</td>
 <td align="left">RIKEN cDNA 4933427D06 gene</td>
+<td align="left">232217</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Oas1e</td>
-<td align="left">NA</td>
-<td align="left">231699</td>
 <td align="left">2’-5’ oligoadenylate synthetase 1E</td>
+<td align="left">231699</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Tcl1b1</td>
-<td align="left">NA</td>
-<td align="left">27379</td>
 <td align="left">T cell leukemia/lymphoma 1B, 1</td>
+<td align="left">27379</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Obox1</td>
-<td align="left">NA</td>
-<td align="left">71468</td>
 <td align="left">oocyte specific homeobox 1</td>
+<td align="left">71468</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Rgs2</td>
-<td align="left">NA</td>
-<td align="left">19735</td>
 <td align="left">regulator of G-protein signaling 2</td>
+<td align="left">19735</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Nlrp4f</td>
-<td align="left">NA</td>
-<td align="left">97895</td>
 <td align="left">NLR family, pyrin domain containing 4F</td>
+<td align="left">97895</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Zfp57</td>
 <td align="left">NA</td>
-<td align="left">22715</td>
+<td align="left">Zfp57</td>
 <td align="left">zinc finger protein 57</td>
+<td align="left">22715</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">H1foo</td>
 <td align="left">NA</td>
-<td align="left">171506</td>
+<td align="left">H1foo</td>
 <td align="left">H1 histone family, member O, oocyte-specific</td>
+<td align="left">171506</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Dazl</td>
 <td align="left">NA</td>
-<td align="left">13164</td>
+<td align="left">Dazl</td>
 <td align="left">deleted in azoospermia-like</td>
+<td align="left">13164</td>
 <td align="left">This gene encodes a member of the depleted in azoospermia-like (DAZL) protein family. Members of this family contain an RNA recognition motif, interact with poly A binding proteins, and may be involved in the initiation of translation. The encoded protein is expressed in the cytoplasm of pluripotent stem cells, and in both male and female germ cells, where it is essential for gametogenesis. Disruption of this gene is associated with infertility. Alternative splicing results in multiple transcript variants.</td>
 </tr>
 <tr class="odd">
-<td align="left">Gm97</td>
 <td align="left">TRUE</td>
+<td align="left">Gm97</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Obox5</td>
-<td align="left">NA</td>
-<td align="left">252829</td>
 <td align="left">oocyte specific homeobox 5</td>
+<td align="left">252829</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Tgfb2</td>
-<td align="left">NA</td>
-<td align="left">21808</td>
 <td align="left">transforming growth factor, beta 2</td>
+<td align="left">21808</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">AA545190</td>
-<td align="left">NA</td>
-<td align="left">57866</td>
 <td align="left">EST AA545190</td>
+<td align="left">57866</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Meis2</td>
-<td align="left">NA</td>
-<td align="left">17536</td>
 <td align="left">Meis homeobox 2</td>
+<td align="left">17536</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Bpgm</td>
-<td align="left">NA</td>
-<td align="left">12183</td>
 <td align="left">2,3-bisphosphoglycerate mutase</td>
+<td align="left">12183</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Oas1c</td>
 <td align="left">NA</td>
-<td align="left">114643</td>
+<td align="left">Oas1c</td>
 <td align="left">2’-5’ oligoadenylate synthetase 1C</td>
+<td align="left">114643</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Ccdc69</td>
 <td align="left">NA</td>
-<td align="left">52570</td>
+<td align="left">Ccdc69</td>
 <td align="left">coiled-coil domain containing 69</td>
+<td align="left">52570</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Riok1</td>
 <td align="left">NA</td>
-<td align="left">71340</td>
+<td align="left">Riok1</td>
 <td align="left">RIO kinase 1 (yeast)</td>
+<td align="left">71340</td>
 <td align="left">This gene encodes a member of the RIO family of atypical serine protein kinases. A similar protein in humans is a component of the protein arginine methyltransferase 5 complex that specifically recruits the RNA-binding protein nucleolin as a methylation substrate.</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Tbc1d15</td>
-<td align="left">NA</td>
-<td align="left">66687</td>
 <td align="left">TBC1 domain family, member 15</td>
+<td align="left">66687</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Dcp1a</td>
-<td align="left">NA</td>
-<td align="left">75901</td>
 <td align="left">DCP1 decapping enzyme homolog A (S. cerevisiae)</td>
+<td align="left">75901</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Gdf9</td>
-<td align="left">NA</td>
-<td align="left">14566</td>
 <td align="left">growth differentiation factor 9</td>
+<td align="left">14566</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
+<td align="left">NA</td>
 <td align="left">Tcl1b2</td>
-<td align="left">NA</td>
-<td align="left">27381</td>
 <td align="left">T cell leukemia/lymphoma 1B, 2</td>
+<td align="left">27381</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
+<td align="left">NA</td>
 <td align="left">Gm13023</td>
-<td align="left">NA</td>
-<td align="left">194227</td>
 <td align="left">predicted gene 13023</td>
+<td align="left">194227</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Fbxw15</td>
 <td align="left">NA</td>
-<td align="left">382105</td>
+<td align="left">Fbxw15</td>
 <td align="left">F-box and WD-40 domain protein 15</td>
+<td align="left">382105</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">Wee2</td>
 <td align="left">NA</td>
-<td align="left">381759</td>
+<td align="left">Wee2</td>
 <td align="left">WEE1 homolog 2 (S. pombe)</td>
+<td align="left">381759</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">Oas1h</td>
 <td align="left">NA</td>
-<td align="left">246729</td>
+<td align="left">Oas1h</td>
 <td align="left">2’-5’ oligoadenylate synthetase 1H</td>
+<td align="left">246729</td>
 <td align="left">NA</td>
 </tr>
 </tbody>
@@ -1782,286 +1799,286 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <thead>
 <tr class="header">
 <th align="left">X_id</th>
-<th align="left">name</th>
 <th align="left">query</th>
+<th align="left">name</th>
 <th align="left">notfound</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">100038982</td>
-<td align="left">REX1, RNA exonuclease 1 homolog pseudogene</td>
 <td align="left">Gm1995</td>
+<td align="left">REX1, RNA exonuclease 1 homolog pseudogene</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">NA</td>
-<td align="left">NA</td>
 <td align="left">Dub1a</td>
+<td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">75753</td>
-<td align="left">Kruppel-like factor 17</td>
 <td align="left">Klf17</td>
+<td align="left">Kruppel-like factor 17</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">ENSMUSG00000094635</td>
-<td align="left">predicted gene 7104</td>
 <td align="left">Gm7104</td>
+<td align="left">predicted gene 7104</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">633093</td>
-<td align="left">REX1, RNA exonuclease 1 homolog pseudogene</td>
 <td align="left">Gm7104</td>
+<td align="left">REX1, RNA exonuclease 1 homolog pseudogene</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">246791</td>
-<td align="left">oocyte specific homeobox 3</td>
 <td align="left">Obox3</td>
+<td align="left">oocyte specific homeobox 3</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSMUSG00000100205</td>
-<td align="left">predicted pseudogene 4850</td>
 <td align="left">Gm4850</td>
+<td align="left">predicted pseudogene 4850</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">226957</td>
-<td align="left">THO complex 4 pseudogene</td>
 <td align="left">Gm4850</td>
+<td align="left">THO complex 4 pseudogene</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">432591</td>
-<td align="left">predicted gene 11544</td>
 <td align="left">Gm11544</td>
+<td align="left">predicted gene 11544</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">ENSMUSG00000081586</td>
-<td align="left">predicted gene 11544</td>
 <td align="left">Gm11544</td>
+<td align="left">predicted gene 11544</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">ENSMUSG00000074804</td>
-<td align="left">expressed sequence AU015228</td>
 <td align="left">AU015228</td>
+<td align="left">expressed sequence AU015228</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">99169</td>
-<td align="left">expressed sequence AU015228</td>
 <td align="left">AU015228</td>
+<td align="left">expressed sequence AU015228</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">277666</td>
-<td align="left">predicted gene 13078</td>
 <td align="left">Gm13078</td>
+<td align="left">predicted gene 13078</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">668359</td>
-<td align="left">predicted gene 9125</td>
 <td align="left">Gm9125</td>
+<td align="left">predicted gene 9125</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">54196</td>
-<td align="left">poly(A) binding protein, nuclear 1</td>
 <td align="left">Pabpn1</td>
+<td align="left">poly(A) binding protein, nuclear 1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">69020</td>
-<td align="left">zinc finger protein 707</td>
 <td align="left">Zfp707</td>
+<td align="left">zinc finger protein 707</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">170734</td>
-<td align="left">zinc finger and SCAN domain containing 5B</td>
 <td align="left">Zscan5b</td>
+<td align="left">zinc finger and SCAN domain containing 5B</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">ENSMUSG00000085114</td>
-<td align="left">RIKEN cDNA 1600025M17 gene</td>
 <td align="left">1600025M17Rik</td>
+<td align="left">RIKEN cDNA 1600025M17 gene</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">72030</td>
-<td align="left">RIKEN cDNA 1600025M17 gene</td>
 <td align="left">1600025M17Rik</td>
+<td align="left">RIKEN cDNA 1600025M17 gene</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">217194</td>
-<td align="left">kelch-like 11</td>
 <td align="left">Klhl11</td>
+<td align="left">kelch-like 11</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">66591</td>
-<td align="left">MAD2L1 binding protein</td>
 <td align="left">Mad2l1bp</td>
+<td align="left">MAD2L1 binding protein</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">19647</td>
-<td align="left">retinoblastoma binding protein 6</td>
 <td align="left">Rbbp6</td>
+<td align="left">retinoblastoma binding protein 6</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">236537</td>
-<td align="left">zinc finger protein 352</td>
 <td align="left">Zfp352</td>
+<td align="left">zinc finger protein 352</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">73274</td>
-<td align="left">GC-rich promoter binding protein 1</td>
 <td align="left">Gpbp1</td>
+<td align="left">GC-rich promoter binding protein 1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">382074</td>
-<td align="left">forkhead box R1</td>
 <td align="left">Foxr1</td>
+<td align="left">forkhead box R1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">215919</td>
-<td align="left">ret finger protein-like 4B</td>
 <td align="left">Rfpl4b</td>
+<td align="left">ret finger protein-like 4B</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">69769</td>
-<td align="left">tumor necrosis factor, alpha-induced protein 8-like 2</td>
 <td align="left">Tnfaip8l2</td>
+<td align="left">tumor necrosis factor, alpha-induced protein 8-like 2</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">435337</td>
-<td align="left">predicted gene 5662</td>
 <td align="left">Gm5662</td>
+<td align="left">predicted gene 5662</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">70611</td>
-<td align="left">F-box protein 33</td>
 <td align="left">Fbxo33</td>
+<td align="left">F-box protein 33</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">27224</td>
-<td align="left">transcription elongation factor B (SIII), polypeptide 3</td>
 <td align="left">Tceb3</td>
+<td align="left">transcription elongation factor B (SIII), polypeptide 3</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">70369</td>
-<td align="left">BCL2-associated athanogene 5</td>
 <td align="left">Bag5</td>
+<td align="left">BCL2-associated athanogene 5</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">15257</td>
-<td align="left">homeodomain interacting protein kinase 1</td>
 <td align="left">Hipk1</td>
+<td align="left">homeodomain interacting protein kinase 1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">26554</td>
-<td align="left">cullin 3</td>
 <td align="left">Cul3</td>
+<td align="left">cullin 3</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">666806</td>
-<td align="left">predicted gene 8300</td>
 <td align="left">Gm8300</td>
+<td align="left">predicted gene 8300</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">78887</td>
-<td align="left">Sfi1 homolog, spindle assembly associated (yeast)</td>
 <td align="left">Sfi1</td>
+<td align="left">Sfi1 homolog, spindle assembly associated (yeast)</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">106021</td>
-<td align="left">topoisomerase I binding, arginine/serine-rich</td>
 <td align="left">Topors</td>
+<td align="left">topoisomerase I binding, arginine/serine-rich</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">51869</td>
-<td align="left">Rap1 interacting factor 1 homolog (yeast)</td>
 <td align="left">Rif1</td>
+<td align="left">Rap1 interacting factor 1 homolog (yeast)</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">100039042</td>
-<td align="left">predicted gene 2016</td>
 <td align="left">Gm2016</td>
+<td align="left">predicted gene 2016</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">100073351</td>
-<td align="left">Yy2 transcription factor</td>
 <td align="left">Yy2</td>
+<td align="left">Yy2 transcription factor</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">NA</td>
-<td align="left">NA</td>
 <td align="left">Usp17l5</td>
+<td align="left">NA</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
 <td align="left">195434</td>
-<td align="left">UTP14, U3 small nucleolar ribonucleoprotein, homolog B (yeast)</td>
 <td align="left">Utp14b</td>
+<td align="left">UTP14, U3 small nucleolar ribonucleoprotein, homolog B (yeast)</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">75514</td>
-<td align="left">RIKEN cDNA 1700013H16 gene</td>
 <td align="left">1700013H16Rik</td>
+<td align="left">RIKEN cDNA 1700013H16 gene</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">ENSMUSG00000071217</td>
-<td align="left">predicted pseudogene 2022</td>
+<td align="left">100039052</td>
 <td align="left">Gm2022</td>
+<td align="left">predicted pseudogene 2022</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">100039052</td>
-<td align="left">predicted pseudogene 2022</td>
+<td align="left">ENSMUSG00000071217</td>
 <td align="left">Gm2022</td>
+<td align="left">predicted pseudogene 2022</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">108989</td>
-<td align="left">translocated promoter region, nuclear basket protein</td>
 <td align="left">Tpr</td>
+<td align="left">translocated promoter region, nuclear basket protein</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
 <td align="left">99681</td>
-<td align="left">trichohyalin</td>
 <td align="left">Tchh</td>
+<td align="left">trichohyalin</td>
 <td align="left">NA</td>
 </tr>
 </tbody>
@@ -2076,334 +2093,334 @@ imp_genes_per_class &lt;- lapply(1:dim(theta)[2], function(x) imp_gene_names[whi
 <table>
 <thead>
 <tr class="header">
-<th align="left">name</th>
 <th align="left">X_id</th>
+<th align="left">name</th>
 <th align="left">query</th>
 <th align="left">summary</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">albumin</td>
 <td align="left">11657</td>
+<td align="left">albumin</td>
 <td align="left">Alb</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">transferrin</td>
 <td align="left">22041</td>
+<td align="left">transferrin</td>
 <td align="left">Trf</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">fibrinogen beta chain</td>
 <td align="left">110135</td>
+<td align="left">fibrinogen beta chain</td>
 <td align="left">Fgb</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">thrombospondin 4</td>
 <td align="left">21828</td>
+<td align="left">thrombospondin 4</td>
 <td align="left">Thbs4</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">secreted phosphoprotein 1</td>
 <td align="left">20750</td>
+<td align="left">secreted phosphoprotein 1</td>
 <td align="left">Spp1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">lysyl oxidase</td>
 <td align="left">16948</td>
+<td align="left">lysyl oxidase</td>
 <td align="left">Lox</td>
 <td align="left">This gene encodes a precursor protein that belongs to the lysyl oxidase family of proteins. The secreted proprotein is proteolytically processed to an active mature peptide and a propeptide. This propeptide is thought to function in tumor suppression by inhibiting the Ras signaling pathway. The active enzyme plays a role in cross-linking of collagen and elastin and is essential for development of cardiovascular and respiratory systems, and development of skin and connective tissue. Alternative splicing results in multiple transcript variants.</td>
 </tr>
 <tr class="odd">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 3K</td>
 <td align="left">20714</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 3K</td>
 <td align="left">Serpina3k</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade H, member 1</td>
 <td align="left">12406</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade H, member 1</td>
 <td align="left">Serpinh1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1D</td>
 <td align="left">20703</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1D</td>
 <td align="left">Serpina1d</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">serine (or cysteine) preptidase inhibitor, clade A, member 1B</td>
 <td align="left">20701</td>
+<td align="left">serine (or cysteine) preptidase inhibitor, clade A, member 1B</td>
 <td align="left">Serpina1b</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">fatty acid binding protein 1, liver</td>
 <td align="left">14080</td>
+<td align="left">fatty acid binding protein 1, liver</td>
 <td align="left">Fabp1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">pentraxin related gene</td>
 <td align="left">19288</td>
+<td align="left">pentraxin related gene</td>
 <td align="left">Ptx3</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">fibronectin 1</td>
 <td align="left">14268</td>
+<td align="left">fibronectin 1</td>
 <td align="left">Fn1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">apolipoprotein A-II</td>
 <td align="left">11807</td>
+<td align="left">apolipoprotein A-II</td>
 <td align="left">Apoa2</td>
 <td align="left">This gene encodes a component of high density lipoproteins (HDL). Mice lacking the encoded protein have low HDL-cholesterol levels, smaller HDL particles, increased clearance of triglyceride-rich lipoproteins and insulin hypersensitivity. Transgenic mice overexpressing the encoded protein have elevated levels of HDL-cholesterol and show increased susceptibility to atherosclerosis. Alternative splicing of this gene results in multiple variants.</td>
 </tr>
 <tr class="odd">
-<td align="left">secreted acidic cysteine rich glycoprotein</td>
 <td align="left">20692</td>
+<td align="left">secreted acidic cysteine rich glycoprotein</td>
 <td align="left">Sparc</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1E</td>
 <td align="left">20704</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1E</td>
 <td align="left">Serpina1e</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">S100 calcium binding protein A4</td>
 <td align="left">20198</td>
+<td align="left">S100 calcium binding protein A4</td>
 <td align="left">S100a4</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">metastasis associated lung adenocarcinoma transcript 1 (non-coding RNA)</td>
 <td align="left">ENSMUSG00000092341</td>
+<td align="left">metastasis associated lung adenocarcinoma transcript 1 (non-coding RNA)</td>
 <td align="left">Malat1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">metastasis associated lung adenocarcinoma transcript 1 (non-coding RNA)</td>
 <td align="left">72289</td>
+<td align="left">metastasis associated lung adenocarcinoma transcript 1 (non-coding RNA)</td>
 <td align="left">Malat1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">alpha-2-HS-glycoprotein</td>
 <td align="left">11625</td>
+<td align="left">alpha-2-HS-glycoprotein</td>
 <td align="left">Ahsg</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">collagen, type I, alpha 1</td>
 <td align="left">12842</td>
+<td align="left">collagen, type I, alpha 1</td>
 <td align="left">Col1a1</td>
 <td align="left">This gene encodes the pro-alpha1 chains of type I collagen, whose triple helix comprises two alpha1 chains and one alpha2 chain. Type I is a fibril-forming collagen found in most connective tissues and is abundant in bone, cornea, dermis, and tendon.</td>
 </tr>
 <tr class="even">
-<td align="left">collagen, type I, alpha 2</td>
 <td align="left">12843</td>
+<td align="left">collagen, type I, alpha 2</td>
 <td align="left">Col1a2</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">chemokine (C-X-C motif) ligand 12</td>
 <td align="left">20315</td>
+<td align="left">chemokine (C-X-C motif) ligand 12</td>
 <td align="left">Cxcl12</td>
 <td align="left">This gene encodes a member of the alpha chemokine protein family. The encoded protein is secreted and functions as the ligand for the G-protein coupled receptor, chemokine (C-X-C motif) receptor 4. The encoded protein plays a role in many diverse cellular functions, including embryogenesis, immune surveillance, inflammation response, tissue homeostasis, and tumor growth and metastasis. Alternative splicing results in multiple transcript variants.</td>
 </tr>
 <tr class="even">
-<td align="left">apolipoprotein A-I</td>
 <td align="left">11806</td>
+<td align="left">apolipoprotein A-I</td>
 <td align="left">Apoa1</td>
 <td align="left">This gene encodes a preproprotein that is proteolytically cleaved to yield a signal peptide and a proproptein that is subsequently processed to generate the active mature peptide. The encoded protein is the major protein component of plasma high density lipoprotein (HDL). This protein facilitates the removal of cholesterol and other fats from tissues by transporting them to the liver for excretion. This protein is a cofactor for lecithin cholesterolacyltransferase, an enzyme that catalyzes the conversion of free cholesterol to cholesteryl esters. Mutations in this gene in humans causes familial HDL deficiency, Tangier disease and familial visceral amyloidosis. Similar clinical features are exhibited by mice with mutations in this gene. This gene is clustered with three other apolipoprotein genes on chromosome 9.</td>
 </tr>
 <tr class="odd">
-<td align="left">fibrinogen alpha chain</td>
 <td align="left">14161</td>
+<td align="left">fibrinogen alpha chain</td>
 <td align="left">Fga</td>
 <td align="left">This gene encodes a subunit of the coagulation factor fibrinogen, which is a component of the blood clot. The encoded protein is proteolytically processed by thrombin during the conversion of fibrinogen to fibrin. Mice lacking the encoded protein display bleeding in the peritoneal cavity, skin and soft tissues around joints immediately after birth, and are predisposed to spontaneous fatal abdominal hemorrhage as they grow. Pregnant mice lacking the encoded protein succumb to uterine bleeding during gestation. Alternative splicing results in multiple transcript variants encoding different isoforms.</td>
 </tr>
 <tr class="even">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade F, member 1</td>
 <td align="left">20317</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade F, member 1</td>
 <td align="left">Serpinf1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">secretory leukocyte peptidase inhibitor</td>
 <td align="left">20568</td>
+<td align="left">secretory leukocyte peptidase inhibitor</td>
 <td align="left">Slpi</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">cytochrome P450, family 2, subfamily e, polypeptide 1</td>
 <td align="left">13106</td>
+<td align="left">cytochrome P450, family 2, subfamily e, polypeptide 1</td>
 <td align="left">Cyp2e1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">biglycan</td>
 <td align="left">12111</td>
+<td align="left">biglycan</td>
 <td align="left">Bgn</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">fibrinogen gamma chain</td>
 <td align="left">99571</td>
+<td align="left">fibrinogen gamma chain</td>
 <td align="left">Fgg</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">collagen, type III, alpha 1</td>
 <td align="left">12825</td>
+<td align="left">collagen, type III, alpha 1</td>
 <td align="left">Col3a1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">transthyretin</td>
 <td align="left">22139</td>
+<td align="left">transthyretin</td>
 <td align="left">Ttr</td>
 <td align="left">This gene encodes a carrier protein responsible for the transport of thyroid hormones and retinol. The protein consists of a tetramer of identical subunits. Due to increased stability of the tetramer form of this encoded protein in mouse, compared to the human protein, this gene product has a reduced tendency to form amyloid fibrils. In humans, this protein binds beta-amyloid preventing its aggregation and providing a neuroprotective role in Alzheimer’s disease.</td>
 </tr>
 <tr class="odd">
-<td align="left">actin, alpha 2, smooth muscle, aorta</td>
 <td align="left">11475</td>
+<td align="left">actin, alpha 2, smooth muscle, aorta</td>
 <td align="left">Acta2</td>
 <td align="left">The protein encoded by this gene belongs to the actin family of proteins, which are highly conserved proteins that play a role in cell motility, structure and integrity. Alpha, beta and gamma actin isoforms have been identified, with alpha actins being a major constituent of the contractile apparatus, while beta and gamma actins are involved in the regulation of cell motility. This actin is an alpha actin that is found in skeletal muscle.</td>
 </tr>
 <tr class="even">
-<td align="left">chemokine (C-C motif) ligand 7</td>
 <td align="left">20306</td>
+<td align="left">chemokine (C-C motif) ligand 7</td>
 <td align="left">Ccl7</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">aldolase B, fructose-bisphosphate</td>
 <td align="left">230163</td>
+<td align="left">aldolase B, fructose-bisphosphate</td>
 <td align="left">Aldob</td>
 <td align="left">This gene encodes a subunit of the homotetrameric enzyme aldolase B, an isozyme of the class I fructose 1,6-bisphosphate aldolase enzyme. This enzyme catalyzes the conversion of fructose 1,6-bisphosphate to dihydroxyacetone phosphate and glyceraldehyde 3-phosphate. Homozygous knockout mice for this gene exhibit liver damage and death following fructose ingestion. A pseudogene of this gene has been identified in the genome.</td>
 </tr>
 <tr class="even">
-<td align="left">microsomal glutathione S-transferase 1</td>
 <td align="left">56615</td>
+<td align="left">microsomal glutathione S-transferase 1</td>
 <td align="left">Mgst1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">matrix Gla protein</td>
 <td align="left">17313</td>
+<td align="left">matrix Gla protein</td>
 <td align="left">Mgp</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">major urinary protein 3</td>
 <td align="left">17842</td>
+<td align="left">major urinary protein 3</td>
 <td align="left">Mup3</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1A</td>
 <td align="left">20700</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1A</td>
 <td align="left">Serpina1a</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">complement component 3</td>
 <td align="left">12266</td>
+<td align="left">complement component 3</td>
 <td align="left">C3</td>
 <td align="left">This gene encodes complement protein C3 which plays a central role in the classical, alternative and lectin activation pathways of the complement system. The encoded preproprotein undergoes a multi-step processing to generate various functional peptides. Mice deficient in the encoded protein fail to clear bacteria from the blood stream upon infection, display diminished airway hyperresponsiveness and lung eosinophilia upon allergen-induced pulmonary allergy, and develop severe lung injury after deposition of IgG immune complexes. Deficiency of the homolog of the encoded protein in humans was found to be associated with increased susceptibility to infections, age-related macular degeneration, and atypical hemolytic uremic syndrome.</td>
 </tr>
 <tr class="odd">
-<td align="left">matrix metallopeptidase 3</td>
 <td align="left">17392</td>
+<td align="left">matrix metallopeptidase 3</td>
 <td align="left">Mmp3</td>
 <td align="left">This gene encodes a member of the matrix metalloproteinase family of extracellular matrix-degrading enzymes that is involved in tissue remodeling, wound repair, progression of atherosclerosis and tumor invasion. The encoded protein is activated by the removal of an N-temrinal activation peptide to generate a zinc-dependent endopeptidase with a broad range of substrates such as proteoglycans, laminin, fibronectin, elastin, and collagens. This gene is located in a cluster of other matrix metalloproteinase genes on chromosome 9.</td>
 </tr>
 <tr class="even">
-<td align="left">selenoprotein P, plasma, 1</td>
 <td align="left">20363</td>
+<td align="left">selenoprotein P, plasma, 1</td>
 <td align="left">Sepp1</td>
 <td align="left">This gene encodes a selenoprotein containing multiple selenocysteine (Sec) residues encoded by the UGA codon that normally signals translation termination. The 3’ UTR of selenoprotein genes have a common stem-loop structure, the sec insertion sequence (SECIS), that is necessary for the recognition of UGA as a Sec codon rather than as a stop signal. This selenoprotein is a secreted protein, and is unusual in that it contains 10 selenocysteine residues per polypeptide, constituting most of the selenium in plasma. It has been implicated as an extracellular antioxidant and in the transport of selenium. Several transcript variants differing in the 5’ UTR, but encoding the same protein, have been found for this gene.</td>
 </tr>
 <tr class="odd">
-<td align="left">growth arrest specific 6</td>
 <td align="left">14456</td>
+<td align="left">growth arrest specific 6</td>
 <td align="left">Gas6</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">insulin-like growth factor binding protein 4</td>
 <td align="left">16010</td>
+<td align="left">insulin-like growth factor binding protein 4</td>
 <td align="left">Igfbp4</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">group specific component</td>
 <td align="left">14473</td>
+<td align="left">group specific component</td>
 <td align="left">Gc</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1C</td>
 <td align="left">20702</td>
+<td align="left">serine (or cysteine) peptidase inhibitor, clade A, member 1C</td>
 <td align="left">Serpina1c</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">cytochrome P450, family 3, subfamily a, polypeptide 11</td>
 <td align="left">13112</td>
+<td align="left">cytochrome P450, family 3, subfamily a, polypeptide 11</td>
 <td align="left">Cyp3a11</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">urate oxidase</td>
 <td align="left">22262</td>
+<td align="left">urate oxidase</td>
 <td align="left">Uox</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">procollagen C-endopeptidase enhancer protein</td>
 <td align="left">18542</td>
+<td align="left">procollagen C-endopeptidase enhancer protein</td>
 <td align="left">Pcolce</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">lumican</td>
 <td align="left">17022</td>
+<td align="left">lumican</td>
 <td align="left">Lum</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">ferritin heavy chain 1</td>
 <td align="left">14319</td>
+<td align="left">ferritin heavy chain 1</td>
 <td align="left">Fth1</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">vimentin</td>
 <td align="left">22352</td>
+<td align="left">vimentin</td>
 <td align="left">Vim</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="left">serum amyloid A 3</td>
 <td align="left">20210</td>
+<td align="left">serum amyloid A 3</td>
 <td align="left">Saa3</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="left">cytochrome P450, family 3, subfamily a, polypeptide 25</td>
 <td align="left">56388</td>
+<td align="left">cytochrome P450, family 3, subfamily a, polypeptide 25</td>
 <td align="left">Cyp3a25</td>
 <td align="left">NA</td>
 </tr>

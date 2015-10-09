@@ -2,8 +2,15 @@
 title: "Deng single cell analysis"
 author: "Kushal K Dey"
 date: "October 8, 2015"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
+
+## Objective
+
+The Deng dataset has single cells sequenced starting from zygote through the 2 cell, 4 cell all the way up to blastocyst. We want to cluster the development phase and try to see which genes are actually driving the clusters in the development phase. These would be the genes that would also play a significant part in differentiating the various stages of the development.
+
 
 ```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
 rm(list=ls())
@@ -12,6 +19,9 @@ library(data.table)
 library(maptpx)
 library(CountClust)
 ```
+
+
+## Prepare the Data
 
 ```{r echo=TRUE, eval=FALSE}
 rm(list=ls())
@@ -136,6 +146,9 @@ dev.off()
 
 ```
 
+
+### Structur based on cell type
+
 The Structure plots clearly show cell phase effects
 
 <img src='../figures/deng_structure/clus_2/struct_clus_2_cell_type.png' style="width:350px;height:300px;">
@@ -144,6 +157,11 @@ The Structure plots clearly show cell phase effects
 <img src='../figures/deng_structure/clus_5/struct_clus_5_cell_type.png' style="width:350px;height:300px;">
 <img src='../figures/deng_structure/clus_6/struct_clus_6_cell_type.png' style="width:350px;height:300px;">
 <img src='../figures/deng_structure/clus_7/struct_clus_7_cell_type.png' style="width:350px;height:300px;">
+
+## Observation from Structure
+
+Admixture indeed picks up the different developing phases. Zygote and early 2 cells fall in same cluster, but difference creeps in from mid 2 cell. There is a continuous pattern on admixture as one moves from 2 cell to 4 cell and even further from 8 cell to 16 cell. Blastocysts however form a separate cluster as is expected and the variation across the different stages of blastocyst, for instance, early, mid or late blastocysts show more or less similar patterns (late blastocyst is slightly different from the other two). In the dataset, we also had BxC liver cells and fibroblasts which separate out from the other single cells.
+
 
 ```{r}
 sessionInfo()
