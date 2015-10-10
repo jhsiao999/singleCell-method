@@ -77,6 +77,36 @@ Now the most important part is finding the posterior $$ P(t_S | \sigma^{2}_{g} ,
 
 Even if we want to find the latter posterior, then also we may have to resort to MCMC. 
 
+
+\section{Fourier or sum of sinusoids modeling}
+
+One suggestion we were discussing recently in the context that the gene expression curved did not look very sinusoidal was to use  a sum of sinusoids (which is basically Fourier) or a mixture of sinusoids (which I think will be analogous to sum of sinusoids as we will not be able to separate out the mixing proportions and the amplitudes of the individual components due to lack of identifiability). I think this will not really make a difference because in that case, we shall assume 
+
+$$ Y_{sg} = \sum_{l=1}^{L} \alpha_{lg} sin (t_s + \phi_{lg})  +\epsilon_{sg}, \hspace{1 in}  \epsilon_{sg} \sim N(0, \sigma^2_j)  $$
+
+Note that we keep the frequency of each sinusoid 1, because firstly, I guess we want them to have period $2 \pi$ as we are looking at the state space which is a circle for the cell cycle. The other reason is computational. If we have a frequency for each sinusoid, say $\omega_{lg}$, then we have serious lack of identifiability. We can write $\omega^{'}_{lg} = \omega_{lg} \times 100$ for all $l$ and $g$ and $t^{'}_s = t_s/100$ for all $s$ and the model remains the same. I do not know of any good prior that can handle such a scenario.
+
+In that case, we can write the total loglikelihood as 
+
+$$ \mathcal{L} \sim  \propto \prod_{s=1}^{S} \prod_{g=1}^{G} N ( \sum_{l=1}^{L}  \alpha_{lg} sin (t_s + \phi_{lg}), \sigma^2_{g} ) $$
+
+or we can write 
+
+\begin{align*}
+Y_{sg}  & =  \sum_{l=1}^{L}  \alpha_{lg} sin (t_s + \phi_{lg}) + \epsilon_{sg}  \\
+	    & = sin(t_s) \sum_{l=1}^{L} \alpha_{lg} cos(\phi_{lg}) + cos(t_s) \sum_{l=1}^{L} \alpha_{lg} sin(\phi_{lg}) + \epsilon_{sg}\\
+	    & = \beta_{1g} sin(t_s) + \beta_{2g} cos(t_s)  + \epsilon_{sg}\\
+	    & =  \lambda_g sin (t_s + \nu_g)  + \epsilon_{sg}\\
+\end{align*}
+
+where 
+
+$$ \lambda_{g} = \sqrt{\beta^2_{1g} +  \beta^2_{2g}} $$
+
+$$ \nu_g = tan^{-1}  \left (\frac{\beta_{2g}}{\beta_{1g}} \right ) $$   
+
+So basically with the frequencies across the sinusoids remaining the same, we are ultimately getting a sinusoid only it seems (if my calculations are correct). That is taking us back to the previous assumption we had. 
+
 \end{document}
 
 
