@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  9 OCT 2015 20:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  13 OCT 2015 11:56
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -303,29 +303,101 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1{/usr/local/texlive/2014/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 ] [2] [3]
-(./cell_reorder.aux) ) 
+<../figures/cell_order_R_figs/amp_compare.png, id=20, 324.21124pt x 488.82625pt
+>
+File: ../figures/cell_order_R_figs/amp_compare.png Graphic file (type png)
+ <use ../figures/cell_order_R_figs/amp_compare.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/amp_compare.png used on i
+nput line 113.
+(pdftex.def)             Requested size: 143.8011pt x 216.81pt.
+
+<../figures/cell_order_R_figs/phi_compare.png, id=22, 324.21124pt x 488.82625pt
+>
+File: ../figures/cell_order_R_figs/phi_compare.png Graphic file (type png)
+ <use ../figures/cell_order_R_figs/phi_compare.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/phi_compare.png used on i
+nput line 119.
+(pdftex.def)             Requested size: 143.8011pt x 216.81pt.
+
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 111--121
+ [][]  [] 
+ []
+
+
+<../figures/cell_order_R_figs/sigma_compare.png, id=23, 324.21124pt x 488.82625
+pt>
+File: ../figures/cell_order_R_figs/sigma_compare.png Graphic file (type png)
+ <use ../figures/cell_order_R_figs/sigma_compare.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/sigma_compare.png used on
+ input line 125.
+(pdftex.def)             Requested size: 143.8011pt x 216.81pt.
+
+<../figures/cell_order_R_figs/original_cell_order.png, id=24, 324.21124pt x 488
+.82625pt>
+File: ../figures/cell_order_R_figs/original_cell_order.png Graphic file (type p
+ng)
+ <use ../figures/cell_order_R_figs/original_cell_order.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/original_cell_order.png u
+sed on input line 137.
+(pdftex.def)             Requested size: 143.8011pt x 216.81pt.
+
+<../figures/cell_order_R_figs/estd_cell_order_100_classes.png, id=25, 324.21124
+pt x 488.82625pt>
+File: ../figures/cell_order_R_figs/estd_cell_order_100_classes.png Graphic file
+ (type png)
+
+<use ../figures/cell_order_R_figs/estd_cell_order_100_classes.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/estd_cell_order_100_class
+es.png used on input line 143.
+(pdftex.def)             Requested size: 143.8011pt x 216.81pt.
+
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 135--145
+ [][]  [] 
+ []
+
+
+<../figures/cell_order_R_figs/estd_cell_order_phase_adjusted.png, id=26, 377.41
+pt x 488.82625pt>
+File: ../figures/cell_order_R_figs/estd_cell_order_phase_adjusted.png Graphic f
+ile (type png)
+
+<use ../figures/cell_order_R_figs/estd_cell_order_phase_adjusted.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/estd_cell_order_phase_adj
+usted.png used on input line 149.
+(pdftex.def)             Requested size: 167.39694pt x 216.81pt.
+
+
+LaTeX Warning: Float too large for page by 5.51216pt on input line 154.
+
+[4] [5] [6] [7 <../figures/cell_order_R_figs/amp_compare.png> <../figures/cell_
+order_R_figs/phi_compare.png> <../figures/cell_order_R_figs/sigma_compare.png>]
+[8 <../figures/cell_order_R_figs/original_cell_order.png> <../figures/cell_orde
+r_R_figs/estd_cell_order_100_classes.png> <../figures/cell_order_R_figs/estd_ce
+ll_order_phase_adjusted.png>] (./cell_reorder.aux) ) 
 Here is how much of TeX's memory you used:
- 3863 strings out of 493117
- 56898 string characters out of 6135433
- 120640 words of memory out of 5000000
- 7262 multiletter control sequences out of 15000+600000
- 9246 words of font info for 35 fonts, out of 8000000 for 9000
+ 3914 strings out of 493117
+ 58711 string characters out of 6135433
+ 123656 words of memory out of 5000000
+ 7303 multiletter control sequences out of 15000+600000
+ 10813 words of font info for 40 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 38i,9n,38p,557b,149s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2014/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmbx12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmex10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmmi10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfo
-nts/cm/cmmi8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfont
-s/cm/cmr10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/c
-msy6.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cms
-y8.pfb>
-Output written on cell_reorder.pdf (3 pages, 101982 bytes).
+ 38i,9n,38p,1647b,482s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2014/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2014/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2014/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2014/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2014/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2014/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2014/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2014/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2014/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmti10.pfb>
+Output written on cell_reorder.pdf (8 pages, 310086 bytes).
 PDF statistics:
- 50 PDF objects out of 1000 (max. 8388607)
- 35 compressed objects within 1 object stream
+ 88 PDF objects out of 1000 (max. 8388607)
+ 54 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
