@@ -22,7 +22,7 @@ Can we do Fourier or wavelet fitting instead.
 
 \section{Model}
 
-Let the vector of time orders for the $S$ cells is given by $t_{S}$. Usually $S$ could be a pretty big number and that could lead to lots of parameters to estimate. So, we trim down the time points into time class $\mathcal{T}$ which is a set of uniformly spaced time points on $(0, 2 \pi)$. We can choose the time spacings depending on our computational resources and how much fine tuning we want on the ordering. We follow an iterative scheme, where for each cell $s$, we pick a time class $t^{(0)}_{s}$ randomly from the $ | \mathcal{T} |$ time classes. For any $n$, starting from $0$, we fit the following model for gene $g$ and cell $s$.
+Let the vector of time orders for the $S$ cells is given by $t_{S}$. Usually $S$ could be a pretty big number and that could lead to lots of parameters to estimate. So, we trim down the time points into time classes $\mathcal{T}$ which is a set of uniformly spaced time points on $(0, 2 \pi)$. We can choose the time spacings depending on our computational resources and how much fine tuning we want on the ordering. We follow an iterative scheme, where for each cell $s$, we pick a time class $t^{(0)}_{s}$ randomly from the $ | \mathcal{T} |$ time classes. For any $n$, starting from $0$, we fit the following model for gene $g$ and cell $s$.
 
 $$ Y_{sg} = \alpha_g sin (t^{(n)}_s + \phi_g) + \epsilon_{sg}  \hspace{1 in}  \epsilon_{sg} \sim N(0, \sigma^2_{g}) $$
 
@@ -89,11 +89,33 @@ p_s (c | Y_s, \theta^{(n)})  & \stackrel{def}{=} P \left (t_s = c |  Y_s, \sigma
 				        & \propto  \prod_{g=1}^{G} N \left ( \alpha^{(n)}_g sin (c + \phi^{(n)}_g), \sigma^{(n)}_{g} \right ) \\
 \end{align*}
 
+where $\theta^{(n)} = \left (\sigma^{(n)}, \alpha^{(n)}, \phi^{(n)} \right )$. \\[2 pt]
+
 We calculate this for each $c$ and then generate a sample from the multinomial distribution $ Mult \left (1, p_s (. | Y_s, \theta^{(n)}) \right)$ and assign the cell $s$ to that time class. We repeat this procedure for all the single cells $s$. Note there that the finer the set of time classes $\mathcal{T}$, the higher would be the resolution of the order, but the greater would be the computational expense as well. So, there is a trade-off in how refined we want $\mathcal{T}$ to be.  
 
 \subsection{A continuous time order}
 
-There may be multiple cells that get assigned to the same time class using the method above. One may seek a more continuous time order pattern, more so if $ | \mathcal{T} | is not so large. 
+There may be multiple cells that get assigned to the same time class using the method above. One may seek a more continuous time order pattern, more so if $ | \mathcal{T} |$ is not so large. We tend to follow a similar approach to Macosko 2012 paper, but in a slightly different way. Our algorithm to find the total cell re-order is as follows. Suppose at the end of the above algorithm, once we have observed convergence, $t_s = c^{\star}$ with the parameters $\theta^{\star}$. . Define 
+
+\begin{align*}
+c_{pre}  & =  | \mathcal{T} |  &   \hspace{-2 in} c^{\star}=1 \\
+	     & = c^{\star} -1 &  \hspace{-2 in} c^{\star} \neq 1 \\
+\end{align*}
+
+\begin{align*}
+c_{post}  & =  1  &  \hspace{-2 in} c^{\star}=| \mathcal{T} | \\
+	     & = c^{\star}  + 1  &  \hspace{-2 in} c^{\star} \neq | \mathcal{T} | \\
+\end{align*}
+     
+Then we define
+
+$$ r_{s} =\frac{ \frac{p_s \left (c_{pre} | Y, \theta^{\star} \right )}{p_s \left (c^{\star} | Y, \theta^{\star} \right )}}{ \frac{p_s \left (c_{pre} | Y, \theta^{\star} \right )}{p_s \left (c^{\star} | Y, \theta^{\star} \right )} +  \frac{p_s \left (c_{post} | Y, \theta^{\star} \right )}{p_s \left (c^{\star} | Y, \theta^{\star} \right )}} $$
+
+Then the fully recovered time order $T_s$ is given by 
+
+$$ T_s = c_{pre} + r_s \times  \frac{4 \pi}{(| \mathcal{T} | -1 )} $$
+
+We repeat the above mechanism for all $s$ and we will get a more continuous ordering. This is more like a piecewise linear statistical interpolation scheme applied on the $p_s \left (. | Y, \theta^{\star} \right )$ data. 
 
 
 \section{Simulation Results}
@@ -201,6 +223,22 @@ $$ t^{'}_s = t_{s} + \epsilon \hspace{1 in} \forall s $$
 $$ \phi^{'}_{g} = \phi_{g} - \epsilon \hspace{1 in} \forall g $$
 
 As a result of this, we may get estimated phases and estimated cell times that are shifted. If we do not have prior information about relative order of the phases or the relative order of the cell times, then it will be difficult to extract the correct estimates of $t$ and $\phi$ and what we would end up estimating is a rotation of the actual time points. To solve this problem, again we may need to use the phase specific genes expression to drive the knowledge of a broad order among the cells, which can give us the suitable anti-rotation to get the back estimates of the original times.
+
+\subsection{Road ahead}
+
+\begin{itemize}
+
+\item To fix the identifiability issue in a meaningful way, possibly pooling in information from phase specific cell cycle genes. Would probably be worthwhile to think about  whether we can fix this without relying on cell cycle genes so much, as the identification of these phase specific genes may not be foolproof.
+
+\item To implement the Bayesian version, which should not be very difficult. We may think about what priors we want to set though. I am more interested in having a meaningful prior for phases that takes into account the cell cycle gene information, thereby fixing identifiability. 
+
+\item  To implement the method (both classical and Bayesian versions) on Yoav's single cell data and figure out a way to compare our results with Macosko's results and measures to check which method is doing better. The big question: How much relevant would be the assumption of all genes being sinusoidal. More importantly, do we want a filtering scheme to filter out the sinusoidal genes. That would be a difficult task as there is a lot of noise, seems like signal to noise ratio (SNR)  will not be very high.
+
+\item Whether we should move to wavelets from sinusoidal. I do not think there is much gain to be had in doing so probably, but personally, my knowledge of wavelets is pretty limited right now. Will be able to give a better call on this after 1 month. 
+
+\end{itemize}
+
+
 
 
 
