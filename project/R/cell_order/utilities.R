@@ -122,7 +122,7 @@ cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter)
   
   cell_times_iter <- cell_times_init;
   
-  for(iter in 1:20)
+  for(iter in 1:num_iter)
   {
     fun <- cell_reordering_iter(cycle_data, cell_times_iter);
     cell_times_iter <- fun$cell_times_iter;
@@ -133,8 +133,8 @@ cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter)
     cat("The loglikelihood after iter", iter, "is:", loglik_iter,"\n")
   }
   
-  
   out <- list("cell_times"=cell_times_iter, "amp"=amp_iter,"phi"=phi_iter, "sigma"=sigma_iter, "loglik"=loglik_iter)
+  #save(out,file="../rdas/cell_order_ipsc_2.rda");
   return(out)
 }
 
@@ -185,6 +185,31 @@ cell_reordering_full <- function(cycle_data, celltime_levels, cell_times, amp, p
   return(cell_order_full)
 }
 
+load_data <- get(load(file="../rdas/cell_order_ipsc.rda"));
+cell_times <- load_data$cell_times;
+
+phase_matching <- function(cell_times, cell_phase_vector)
+{
+  ## cell_times are the recovered times of the single cells from the single cell experiment
+  ## cell_phase_vector is the vector of cell phases (G1, S, G2, M) etc for the cells
+    # this can be obtained using the phase specific genes
+  min_g1.s <- min(cell_times[which(cell_phase_vector=='G1.S')])
+  cell_times_mod <- cell_times - min_g1.s;
+  plot(cell_phase_vector, cell_times_mod)
+  cos_cell_times <- tapply(cos(cell_times_mod), factor(cell_phase_vector), mean);
+  sin_cell_times <- tapply(sin(cell_times_mod), factor(cell_phase_vector), mean);
+  mean_angles <- array(0, length(sin_cell_times));
+  for(l in 1:length(mean_angles)){
+    mean_angles[l] <- atan3(sin_cell_times[l], cos_cell_times[l]);
+  }
+  plot(cell_phase_vector,cos(cell_times))
+  plot(cell_phase_vector,sin(cell_times))
+  plot(cell_phase_vector, cell_times)
+  samp_recovered_order <- cbind.data.frame(rownames(cycle_data)[order(cell_times)])
+  colnames(samp_recovered_order) = "recovered_order";
+}
+
+
 
 plot(amp_genes, amp_iter, col="red",xlab="true amplitudes", ylab="est amplitudes", main="amplitudes est, comparison")
 plot(sigma_genes, sigma_iter, col="red",xlab="true sigma", ylab="est sigma", main="sigma(variation) est, comparison")
@@ -197,3 +222,4 @@ radial.plot(lengths=1:length(cell_times),radial.pos=cell_times,
             line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times)), lwd=2)
 radial.plot(lengths=1:length(sort(cell_order_full)),radial.pos=sort(cell_order_full), 
             line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_order_full)), lwd=2)
+
