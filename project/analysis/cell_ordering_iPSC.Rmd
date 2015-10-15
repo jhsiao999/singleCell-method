@@ -231,20 +231,24 @@ colnames(cell_order_list) <- c("recovered_cell_order");
 nclus_vec <- 2:5
 ipsc_topics_single <- get(load("../../project/rdas/topic_fit_ipsc_batchcorrect_cellcycle.rda"));
 
-samp_metadata <- cbind.data.frame(1:dim(cell_order_list)[1]);
-colnames(samp_metadata) <- c("recovered_cell_order")
+#samp_metadata <- cbind.data.frame(1:dim(cell_order_list)[1]);
+#colnames(samp_metadata) <- c("recovered_cell_order")
 
+samp_metadata <- read.table("../data/recovered_cell_order_signal_method.txt");
 cell_names <- rownames(ipsc_topics_single[[1]]$omega)
+
+samp_metadata1 <- cbind.data.frame(1:dim(samp_metadata)[1]);
+colnames(samp_metadata1) <- "recovered_order";
 
 
 for(num in 1:length(nclus_vec))
 {
-doc_ordered <- ipsc_topics_single[[num]]$omega[match(as.vector(cell_order_list[,1]),cell_names),];
+doc_ordered <- ipsc_topics_single[[num]]$omega[match(as.vector(samp_metadata[,1]),cell_names),];
 # barplot(t(doc_ordered),col=2:(nclus_vec[num]+1),axisnames=F,space=0,border=NA,
 #            main=paste("Structure arranged by",colnames(samp_metadata)[num],": topics=",nclus_vec[num]),
 #            las=las,ylim=c(0,1),ylab="admix prop", xlab=paste0(colnames(samp_metadata)[num]),
  #           cex.axis=cex.axis,cex.main=cex.main);
-obj <- StructureObj_omega(doc_ordered, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("FALSE",dim(samp_metadata)[2]),path_struct='../figures/ipsc_structure_batchcorrect_cellcycle/',control=list(cex.axis=1));
+obj <- StructureObj_omega(doc_ordered, samp_metadata = samp_metadata1, batch_lab = NULL,partition = rep("FALSE",dim(samp_metadata)[2]),path_struct='../figures/ipsc_structure_batchcorrect_cellcycle/',control=list(cex.axis=1));
 
 }
 
