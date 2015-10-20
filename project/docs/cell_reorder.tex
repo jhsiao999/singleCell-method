@@ -118,7 +118,7 @@ $$ T_s = c_{pre} + r_s \times  \frac{4 \pi}{(| \mathcal{T} | -1 )} $$
 We repeat the above mechanism for all $s$ and we will get a more continuous ordering. This is more like a piecewise linear statistical interpolation scheme applied on the $p_s \left (. | Y, \theta^{\star} \right )$ data. 
 
 
-\section{Simulation Results}
+\section{Results}
 
 I coded up the above mechanism and then used a simulation model to check whether the code is giving back the true ordering of the cells or not. For this simulation, I did not use any phase specific information of any of the genes or any of the cells. I started with $400$ single cells and $500$ genes (in the Yoav data, there were $578$ single cells and $543$ cell cycle genes- so pretty close) and then generated the signal from the model discussed above with 
 
@@ -128,8 +128,17 @@ I coded up the above mechanism and then used a simulation model to check whether
  \phi^{true}_{g}  & \sim \mathcal{U}(0, 2 \pi)   \\
  \end{align*}
  
+ \subsection{Simulation model 1}
 
 The cell cycle times were generated for the $400$ cells at uniform spacing from $0$ to $2 \pi$. Then we fitted the classical model mentioned above with number of time classes $\mathcal{T} =100$ and grouped the cells in these time classes. We ran around $30$ iterations (a total time of around $15$ minutes) and although the convergence tolerance was not met, the log posterior increase was of the order of $0.4-0.5$ when we stopped (we started from log posterior increase of the order of 1000s) . The estimates we observed were compared with the true values of the simulation. The plots are presented in Fig \ref{fig:fig1}. Next, we observed the patterns of estimated cell cycle time classes and the true cell cycle times and observed there indeed seems to be a rotation of the circle and when we adjust for this rotation, the two plots indeed look pretty same which kind of suggests that the model is working modulo identifiability (Fig \ref{fig:fig2}).
+
+\subsection{Simulation model 2}
+
+In simulation model 2, we take a random permutation of the cell times $0, 1 \times \frac{2 \pi}{400}, 2 \times \frac{2 \pi}{400}, \cdots $. This is very similar to the first model except that unlike the first model, the cell times in this model are not ordered. This simulation model was taken just to show that the order of the cells in the input does not affect the inference and that our method is successfully able to retrieve the cell order nevertheless. Fig \ref{fig:fig3} presents the radial plots, for the true simulated cell orders and the estimated cell orders (which are not exact to the actual simulated true cell order due to rotational non-identifiability).
+
+\subsection{Real data- iPSC data (Gilad lab)}
+
+We next applied our model on the iPSC data collected in Gilad lab. We did not have the information from which phase in the cell cycle the cell comes from. The gene list was taken from previous studies which identified cell cycle genes for normal cells (I suppose). The idea was to see how informative are these genes for the iPSC data obtained by Yoav's lab. There were $543$ cell cycle genes in the list and $578$ single cells (iPSCs).  We did not know about the phases of the genes, but we did know which genes corresponding to which of the $5$ phases (G1.S, S, G2.M, M, M.G1).  We fitted the cycle reordering algorithm of ours and without any phase adjustment, we present the plots of the amplitudes, phase, sigma and the SNR values of the genes (Fig \ref{fig:fig4}). Next, we observed how the admixture plot looks like under the Macosko method of ordering and our method of ordering for the iPSC data (Fig \ref{fig:fig5}). 
 
 
  \begin{figure*}[ht]
@@ -179,6 +188,115 @@ The cell cycle times were generated for the $400$ cells at uniform spacing from 
  \label{fig:fig2}
  \end{figure*}
 
+\begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/original_cell_order_exp_2_unsorted.png}
+        \caption{True radial plot- unsorted}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/original_cell_order_exp_2_sorted.png}
+        \caption{True radial plot - sorted}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/estd_cell_order_100_classes_exp_2.png}
+        \caption{Est radial plot- time}
+    \end{subfigure}
+    \caption{We present the true and the estimated radial plots, where we put the angles in radians on the circle and then colored them in a continuous pattern from light blue  to deep blue based on the order of the observations. To make it more interpretable, we also considered the length of the angle to be proportional to the position of the cell in the full list of $400$ cells considered for simulation. The first plot (\textit{top,left}) shows the true cell cycle times of the cells without sorting. The second plot (\textit{top,right}) shows the true cell cycle times in the sorted order. The third plot (\textit{bottom}) shows the estimated cell cycle order ordered as per the simulated cell cycle order. Note that the third plot almost perfectly preserves the true cell cycle order barring the rotation.}
+ \label{fig:fig3}
+ \end{figure*}
+
+
+ \begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/amp_plot_genes_ipsc.png}
+        \caption{amplitude}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/phase_plot_genes_ipsc.png}
+        \caption{phase}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/snr_plot_genes_ipsc.png}
+        \caption{SNR}
+    \end{subfigure}
+    \caption{The plots of the amplitudes, phases and SNR (signal to noise ratio) of the phase specific genes for each of the $5$ phases. The amplitudes and the SNR values do not show any notable difference, however the estimated phase distribution seems interesting. The prior belief was that it would be increasing with each phase. But it does not show such patterns. However, M and G2.M seem to be higher in phases compared to the other three phases.}
+ \label{fig:fig4}
+ \end{figure*}
+    
+ \begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovered_cell_order.png}
+        \caption{K=3, Macosko}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovered_order.png}
+        \caption{K=3, our method}
+    \end{subfigure}\\
+
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered_cell_order.png}
+        \caption{K=4, Macosko}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered_order.png}
+        \caption{K=4, our method}
+    \end{subfigure}\\
+  \caption{The admixture plots for (top) K=3 and (bottom) K=4 for the cell cycle re-ordering using Macosko method (left) and our method (right). In Macosko method, the ordering assumes that there is a montonicity in the phases from G1.S to M.G1. But, our method is more general, and it does not separate out the 5 phases, rather it seems it only separates out the M and S phases (as is true for ES cells).}
+ \label{fig:fig5}
+ \end{figure*}   
+
+\subsection{Observations}
+
+\begin{itemize}
+\item The model seems to be working on the simulated models, and give us the correct ordering (as is evident from Fig \ref{fig:fig2} and Fig \ref{fig:fig3}), modulo rotation, which should be easy to fix since we have the cell phase information.
+
+\item The application of the method on Yoav's data gives interesting results. Originally the intuition was that it would separate out the phases clearly and will explicitly show all the 5 phases G1.S, S, G2.M, M and M.G1 in the admixture plot in Fig \ref{fig:fig5}. However, this did not happen. The phases of the supposedly phase specific genes did not show the increasing order modulo $2 \pi$, which we had hoped for. One of the reasons I can think of is that since ES cells only show S and M phases, probably that is what we are seeing here only. Our method is just separating out the S and the M phases. Admixture plot in Fig \ref{fig:fig5} clearly shows two distinct patterns which mostly correlates to (M,G2.M) and (G1.S,S and M.G1) phases or more specifically, mitosis and non mitosis phases. 
+
+\item From the admixture plots in Fig \ref{fig:fig5}., it indeed seems that our method does a better job at pooling all the mitosis phase cells together in a more homogeneous compared to Macosko's method (the proportion of green cluster is more homogeneous in our case than in Macosko's case). 
+
+\item I repeated the experiment taking only high SNR (SNR $>$ 10) genes so that I can keep the noisy genes away and ensuring that they do not screw up the analysis. This gave us $277$ genes satisfying the above SNR condition (which is pretty high actually). When we observed the patterns on these genes only, I got a very similar looking admixture plot in Fig \ref{fig:fig5} (that is why did not present it here but I have it saved in my laptop). This indeed suggests that the genes which only account for noise are not really effecting the analysis as much.
+
+\item I am not sure but it may happen that the phase specific genes were obtained from non iPSC cells, where the phases were clearly visible and which has arrest phases and longer phases. So, may be that is one reason why the genes are not really showing the 5 phases for our case?
+
+\end{itemize}
+
+
+\subsection{Road Ahead}
+
+\begin{itemize}
+
+\item Make sense of the observations.....what is the story here?
+
+%\item To fix the identifiability issue in a meaningful way, possibly pooling in information from phase specific cell cycle genes. Would probably be worthwhile to think about  whether we can fix this without relying on cell cycle genes so much, as the identification of these phase specific genes may not be foolproof.
+
+%\item To implement the Bayesian version, which should not be very difficult. We may think about what priors we want to set though. I am more interested in having a meaningful prior for phases that takes into account the cell cycle gene information, thereby fixing identifiability. 
+
+\item To see if we can build a classifier from the phase distribution of the genes in the different phases (which was actually found to be different in different phases and may be a good yardstick for classification).
+
+\item To speed up the code : currently the $578$ samples and $543$ genes case takes around $20$ minutes to run and converge (at tolerance 0.1) of the log-likelihood which happens pretty quickly around $30-40$ iterations. Need to speak with Raman about one part of the code which seems to be the only time expensive component.
+\end{itemize}
+
+
+
 
 \section{Discussion}
 
@@ -223,21 +341,6 @@ $$ t^{'}_s = t_{s} + \epsilon \hspace{1 in} \forall s $$
 $$ \phi^{'}_{g} = \phi_{g} - \epsilon \hspace{1 in} \forall g $$
 
 As a result of this, we may get estimated phases and estimated cell times that are shifted. If we do not have prior information about relative order of the phases or the relative order of the cell times, then it will be difficult to extract the correct estimates of $t$ and $\phi$ and what we would end up estimating is a rotation of the actual time points. To solve this problem, again we may need to use the phase specific genes expression to drive the knowledge of a broad order among the cells, which can give us the suitable anti-rotation to get the back estimates of the original times.
-
-\subsection{Road ahead}
-
-\begin{itemize}
-
-\item To fix the identifiability issue in a meaningful way, possibly pooling in information from phase specific cell cycle genes. Would probably be worthwhile to think about  whether we can fix this without relying on cell cycle genes so much, as the identification of these phase specific genes may not be foolproof.
-
-\item To implement the Bayesian version, which should not be very difficult. We may think about what priors we want to set though. I am more interested in having a meaningful prior for phases that takes into account the cell cycle gene information, thereby fixing identifiability. 
-
-\item  To implement the method (both classical and Bayesian versions) on Yoav's single cell data and figure out a way to compare our results with Macosko's results and measures to check which method is doing better. The big question: How much relevant would be the assumption of all genes being sinusoidal. More importantly, do we want a filtering scheme to filter out the sinusoidal genes. That would be a difficult task as there is a lot of noise, seems like signal to noise ratio (SNR)  will not be very high.
-
-\item Whether we should move to wavelets from sinusoidal. I do not think there is much gain to be had in doing so probably, but personally, my knowledge of wavelets is pretty limited right now. Will be able to give a better call on this after 1 month. 
-
-\end{itemize}
-
 
 
 
