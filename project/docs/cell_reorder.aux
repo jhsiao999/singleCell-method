@@ -6,14 +6,24 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Bayesian model}{2}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Updating the time classes}{3}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}A continuous time order}{3}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Simulation Results}{4}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Why sinusoidal and not Fourier}{5}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Cell phase length}{6}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Problem of identifiability}{6}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Road ahead}{6}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces  The plots to compare the estimated amplitudes, phase and error variance of the genes with the true values. Ideally we would want to match the estimated values with the true values. While that seems to be fairly the case for the amplitudes and the sigma (the gene variance), it seems the results for the phase are not matching up, and looking at the linear trend in which the estimated phases are associated with the true phases, it seems the identifiability issue is making its presence felt.\relax }}{8}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Simulation model 1}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Simulation model 2}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Real data- iPSC data (Gilad lab)}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Observations}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Road Ahead}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Why sinusoidal and not Fourier}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Cell phase length}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Problem of identifiability}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces  The plots to compare the estimated amplitudes, phase and error variance of the genes with the true values. Ideally we would want to match the estimated values with the true values. While that seems to be fairly the case for the amplitudes and the sigma (the gene variance), it seems the results for the phase are not matching up, and looking at the linear trend in which the estimated phases are associated with the true phases, it seems the identifiability issue is making its presence felt.\relax }}{9}}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:fig1}{{1}{8}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces We present the true and the estimated radial plots, where we put the angles in radians on the circle and then colored them in a continuous pattern from light blue to deep blue based on the order of the observations. To make it more interpretable, we also considered the length of the angle to be proportional to the position of the cell in the full list of $400$ cells considered for simulation. The first plot (\textit  {top,left}) shows the true cell cycle times of the cells. The second plot (\textit  {top,right}) shows the estimated time classes with $\mathcal  {T}=100$ for the cells and one can see easily that this looks more like a rotation of the first plot. The third plot (\textit  {bottom}) shows the phase adjusted fully recovered estimated cell cycle times of the cells, which looks pretty similar to the true cell cycle time plot.\relax }}{9}}
-\newlabel{fig:fig2}{{2}{9}}
+\newlabel{fig:fig1}{{1}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces We present the true and the estimated radial plots, where we put the angles in radians on the circle and then colored them in a continuous pattern from light blue to deep blue based on the order of the observations. To make it more interpretable, we also considered the length of the angle to be proportional to the position of the cell in the full list of $400$ cells considered for simulation. The first plot (\textit  {top,left}) shows the true cell cycle times of the cells. The second plot (\textit  {top,right}) shows the estimated time classes with $\mathcal  {T}=100$ for the cells and one can see easily that this looks more like a rotation of the first plot. The third plot (\textit  {bottom}) shows the phase adjusted fully recovered estimated cell cycle times of the cells, which looks pretty similar to the true cell cycle time plot.\relax }}{10}}
+\newlabel{fig:fig2}{{2}{10}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces We present the true and the estimated radial plots, where we put the angles in radians on the circle and then colored them in a continuous pattern from light blue to deep blue based on the order of the observations. To make it more interpretable, we also considered the length of the angle to be proportional to the position of the cell in the full list of $400$ cells considered for simulation. The first plot (\textit  {top,left}) shows the true cell cycle times of the cells without sorting. The second plot (\textit  {top,right}) shows the true cell cycle times in the sorted order. The third plot (\textit  {bottom}) shows the estimated cell cycle order ordered as per the simulated cell cycle order. Note that the third plot almost perfectly preserves the true cell cycle order barring the rotation.\relax }}{11}}
+\newlabel{fig:fig3}{{3}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces The plots of the amplitudes, phases and SNR (signal to noise ratio) of the phase specific genes for each of the $5$ phases. The amplitudes and the SNR values do not show any notable difference, however the estimated phase distribution seems interesting. The prior belief was that it would be increasing with each phase. But it does not show such patterns. However, M and G2.M seem to be higher in phases compared to the other three phases.\relax }}{12}}
+\newlabel{fig:fig4}{{4}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces The admixture plots for (top) K=3 and (bottom) K=4 for the cell cycle re-ordering using Macosko method (left) and our method (right). In Macosko method, the ordering assumes that there is a montonicity in the phases from G1.S to M.G1. But, our method is more general, and it does not separate out the 5 phases, rather it seems it only separates out the M and S phases (as is true for ES cells).\relax }}{13}}
+\newlabel{fig:fig5}{{5}{13}}
