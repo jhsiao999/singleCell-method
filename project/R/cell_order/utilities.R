@@ -47,17 +47,35 @@ cell_reordering_iter <- function(cycle_data, cell_times_iter)
   cell_times_class <- seq(0, 2*pi, 2*pi/(celltime_levels-1));
   num_celltime_class <- length(cell_times_class);
   
+  sin_class_times <- sin(cell_times_class);
+  cos_class_times <- cos(cell_times_class);
+  sin_phi_genes <- sin(phi);
+  cos_phi_genes <- cos(phi);
+  sinu_signal <- cbind(sin_class_times, cos_class_times) %*% rbind(amp*cos_phi_genes, amp*sin_phi_genes);
+  options(digits=12)
   signal_intensity_per_class <- matrix(0, numcells, num_celltime_class)
   
   signal_intensity_per_class <- do.call(rbind,mclapply(1:numcells, function(cell) 
                         {
-                            out <- array(0,length(cell_times_class));
-                            for(times in 1:length(cell_times_class))
-                            {
-                                out[times] <- sum(mapply(dnorm, cycle_data[cell,], amp * sin(cell_times_class[times] + phi), sigma,log=TRUE));
-                            }
-                            return(out)
+                           res_error <- sweep(sinu_signal,2,cycle_data[cell,]);
+                           res_error_adjusted <- -(res_error^2);
+                           res_error_adjusted <- sweep(res_error_adjusted, 2, 2*sigma^2, '/');
+                           out <- rowSums(sweep(res_error_adjusted,2,log(sigma)) - 0.5*log(2*pi));
+                           return(out)
                         }, mc.cores=detectCores()));
+  
+#  signal_intensity_per_class_2 <- matrix(0, numcells, num_celltime_class)
+  
+#  signal_intensity_per_class_2 <- do.call(rbind,mclapply(1:numcells, function(cell) 
+#  {
+#    out <- array(0,length(cell_times_class));
+#    for(times in 1:length(cell_times_class))
+#    {
+#      out[times] <- sum(mapply(dnorm, cycle_data[cell,], amp * sin(cell_times_class[times] + phi), sigma,log=TRUE));
+#    }
+#    return(out)
+#  }, mc.cores=detectCores()));
+  
   
   
   signal_intensity_class_exp <- do.call(rbind,lapply(1:dim(signal_intensity_per_class)[1], function(x) 
@@ -107,7 +125,7 @@ loglik_cell_cycle <- function(cycle_data, cell_times, amp, phi, sigma)
 ## main workhorse function that takes in data and number of discrete levels 
 ## of cell times along with the number of iterations
 
-cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter)
+cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter, save_path=NULL)
 {
   # cycle_data: a N \times G matrix, where N is number of cells, G number of genes
   # celltime_levels: number of discrete cell times used for estimation
@@ -134,7 +152,11 @@ cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter)
   }
   
   out <- list("cell_times"=cell_times_iter, "amp"=amp_iter,"phi"=phi_iter, "sigma"=sigma_iter, "loglik"=loglik_iter)
-  #save(out,file="../rdas/cell_order_ipsc_2.rda");
+  
+  if(!is.null(save_path)){
+   save(out,file=save_path);
+  }
+  
   return(out)
 }
 
@@ -184,42 +206,4 @@ cell_reordering_full <- function(cycle_data, celltime_levels, cell_times, amp, p
   
   return(cell_order_full)
 }
-
-load_data <- get(load(file="../rdas/cell_order_ipsc.rda"));
-cell_times <- load_data$cell_times;
-
-phase_matching <- function(cell_times, cell_phase_vector)
-{
-  ## cell_times are the recovered times of the single cells from the single cell experiment
-  ## cell_phase_vector is the vector of cell phases (G1, S, G2, M) etc for the cells
-    # this can be obtained using the phase specific genes
-  min_g1.s <- min(cell_times[which(cell_phase_vector=='G1.S')])
-  cell_times_mod <- cell_times - min_g1.s;
-  plot(cell_phase_vector, cell_times_mod)
-  cos_cell_times <- tapply(cos(cell_times_mod), factor(cell_phase_vector), mean);
-  sin_cell_times <- tapply(sin(cell_times_mod), factor(cell_phase_vector), mean);
-  mean_angles <- array(0, length(sin_cell_times));
-  for(l in 1:length(mean_angles)){
-    mean_angles[l] <- atan3(sin_cell_times[l], cos_cell_times[l]);
-  }
-  plot(cell_phase_vector,cos(cell_times))
-  plot(cell_phase_vector,sin(cell_times))
-  plot(cell_phase_vector, cell_times)
-  samp_recovered_order <- cbind.data.frame(rownames(cycle_data)[order(cell_times)])
-  colnames(samp_recovered_order) = "recovered_order";
-}
-
-
-
-plot(amp_genes, amp_iter, col="red",xlab="true amplitudes", ylab="est amplitudes", main="amplitudes est, comparison")
-plot(sigma_genes, sigma_iter, col="red",xlab="true sigma", ylab="est sigma", main="sigma(variation) est, comparison")
-plot(phi_genes, phi_iter, col="red",xlab="true phi", ylab="est phi", main="phase est, comparison");
-
-library(plotrix)
-radial.plot(lengths=1:length(cell_times_iter),radial.pos=cell_times_iter, 
-            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times_iter)), lwd=2)
-radial.plot(lengths=1:length(cell_times),radial.pos=cell_times, 
-            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times)), lwd=2)
-radial.plot(lengths=1:length(sort(cell_order_full)),radial.pos=sort(cell_order_full), 
-            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_order_full)), lwd=2)
 
