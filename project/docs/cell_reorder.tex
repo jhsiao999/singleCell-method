@@ -138,7 +138,7 @@ In simulation model 2, we take a random permutation of the cell times $0, 1 \tim
 
 \subsection{Real data- iPSC data (Gilad lab)}
 
-We next applied our model on the iPSC data collected in Gilad lab. We did not have the information from which phase in the cell cycle the cell comes from. The gene list was taken from previous studies which identified cell cycle genes for normal cells (I suppose). The idea was to see how informative are these genes for the iPSC data obtained by Yoav's lab. There were $543$ cell cycle genes in the list and $578$ single cells (iPSCs).  We did not know about the phases of the genes, but we did know which genes corresponding to which of the $5$ phases (G1.S, S, G2.M, M, M.G1).  We fitted the cycle reordering algorithm of ours and without any phase adjustment, we present the plots of the amplitudes, phase, sigma and the SNR values of the genes (Fig \ref{fig:fig4}). Next, we observed how the admixture plot looks like under the Macosko method of ordering and our method of ordering for the iPSC data (Fig \ref{fig:fig5}).  It seemed to us that the cell ordering may not be very informative for this data and essentially may only be explaining as much as PCA would do. So, we carried out PCA and compared the PCA ordering with cell ordering and found that it is indeed true (Fig \ref{fig:fig6}).
+We next applied our model on the iPSC data collected in Gilad lab. We did not have the information from which phase in the cell cycle the cell comes from. The gene list was taken from previous studies which identified cell cycle genes for normal cells (I suppose). The idea was to see how informative are these genes for the iPSC data obtained by Yoav's lab. There were $543$ cell cycle genes in the list and $578$ single cells (iPSCs).  We did not know about the phases of the genes, but we did know which genes corresponding to which of the $5$ phases (G1.S, S, G2.M, M, M.G1).  We fitted the cycle reordering algorithm of ours and without any phase adjustment, we present the plots of the amplitudes, phase, sigma and the SNR values of the genes (Fig \ref{fig:fig4}). Next, we observed how the admixture plot looks like under the Macosko method of ordering and our method of ordering for the iPSC data (Fig \ref{fig:fig5}).  It seemed to us that the cell ordering may not be very informative for this data and essentially may only be explaining as much as PCA would do. So, we carried out PCA and compared the PCA ordering with cell ordering and found that it is indeed true (Fig \ref{fig:fig6}). We also checked the same assuming the cell phases to be fixed for the different phases using the general cell phase length information for the normal cells. The results of the exploration are given in Fig \ref{fig:fig7}.
 
 
  \begin{figure*}[ht]
@@ -230,10 +230,19 @@ We next applied our model on the iPSC data collected in Gilad lab. We did not ha
         \centering
         \includegraphics[height=3in]{../figures/cell_order_R_figs/snr_plot_genes_ipsc.png}
         \caption{SNR}
-    \end{subfigure}
-    \caption{The plots of the amplitudes, phases and SNR (signal to noise ratio) of the phase specific genes for each of the $5$ phases. The amplitudes and the SNR values do not show any notable difference, however the estimated phase distribution seems interesting. The prior belief was that it would be increasing with each phase. But it does not show such patterns. However, M and G2.M seem to be higher in phases compared to the other three phases.}
+    \end{subfigure}%
+    ~
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/cell_times_plot.png}
+        \caption{cell times}
+    \end{subfigure}\\
+    
+    \caption{(a), (b), (c) The plots of the amplitudes, phases and SNR (signal to noise ratio) of the phase specific genes for each of the $5$ phases. The amplitudes and the SNR values do not show any notable difference, however the estimated phase distribution seems interesting. The prior belief was that it would be increasing with each phase. But it does not show such patterns. However, M and G2.M seem to be higher in phases compared to the other three phases. (d) Violin plot of estimated cell times grouped by the cell phases assigned using Macosko algorithm.}
  \label{fig:fig4}
  \end{figure*}
+ 
+ 
     
  \begin{figure*}[ht]
     \centering    
@@ -263,7 +272,7 @@ We next applied our model on the iPSC data collected in Gilad lab. We did not ha
   \caption{The admixture plots for (top) K=3 and (bottom) K=4 for the cell cycle re-ordering using Macosko method (left) and our method (right). In Macosko method, the ordering assumes that there is a montonicity in the phases from G1.S to M.G1. But, our method is more general, and it does not separate out the 5 phases, rather it seems it only separates out the M and S phases (as is true for ES cells).}
  \label{fig:fig5}
  \end{figure*}   
-
+ 
 
  \begin{figure*}[ht]
     \centering    
@@ -294,6 +303,44 @@ We next applied our model on the iPSC data collected in Gilad lab. We did not ha
   (c) PC2 vs PC3 comparison, (d) Comparing the ranks of the cells obtained from the cell ordering with respect to the ranks obtained by projecting the data onto the first PC.}
  \label{fig:fig6}
  \end{figure*}   
+ 
+ 
+  \begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/amplitude_plot_phase_fixed.png}
+        \caption{amplitude}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/phase_plot_phase_fixed.png}
+        \caption{phase}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/snr_plot_phase_fixed.png}
+        \caption{SNR}
+    \end{subfigure}%
+    ~
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/cell_times_phase_fixed.png}
+        \caption{estd. cell times }
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=3in]{../figures/cell_order_R_figs/pca_cellorder_rank_phase_fixed.png}
+        \caption{PCA cell-order compare}
+    \end{subfigure}\\
+    
+    \caption{Results of the analysis from the model fit on Yoav's data keeping the phases of the genes fixed using information about the normal cell cycle lengths. (a), (b), (c) The plots of the amplitudes, phases and SNR (signal to noise ratio) of the phase specific genes for each of the $5$ phases. (d) The violin plot of the estimated cell times under the new model. (e) The comparison of the ranks of the single cells from the cell ordering method and the projection on to the first (or the strongest) PC.}
+ \label{fig:fig7}
+ \end{figure*}
+
 
 \subsection{Observations}
 
