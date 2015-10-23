@@ -10,10 +10,32 @@ cycle_counts_data <- cycle_counts_data[, which(colSums(cycle_counts_data)!=0)];
 cycle_voom_data <- voom(cycle_counts_data)$E;
 cycle_data <- apply(cycle_voom_data,2, function(x) x-mean(x));
 
+cell_phase_vector <- as.vector(as.matrix(read.table("../data/cell_phase_vector_yoav.txt")));
+
+cycle.pca <- princomp(cycle_data, scale.=TRUE, center=TRUE);
+plot(cycle.pca, type="l", col="red", main="scree plot for cycle data")
+library(rgl)
+plot(cycle.pca$scores[,1],cycle.pca$scores[,2], col=as.factor(cell_phase_vector), 
+     lwd=3, lty=1, pch=20, xlab="PC1", ylab="PC2", main="PC plot")
+legend("topleft", legend=levels(as.factor(cell_phase_vector)), col=1:length(as.factor(cell_phase_vector)),
+       pch=20)
+plot(cycle.pca$scores[,2],cycle.pca$scores[,3], col=as.factor(cell_phase_vector), 
+     lwd=3, lty=1, pch=20, xlab="PC2", ylab="PC3", main="PC plot")
+legend("topleft", legend=levels(as.factor(cell_phase_vector)), col=1:length(as.factor(cell_phase_vector)),
+       pch=20)
 source('/Users/kushal/Documents/singleCell-method/project/R/cell_order/utilities.R')
 out <- cell_reordering_phase(cycle_data, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_ipsc_2.rda")
 
+rank_pca <- rank(cycle.pca$scores[,1]);
+
 load_data <- get(load(file="../rdas/cell_order_ipsc.rda"));
+
+cell_times <- load_data$cell_times;
+
+rank_celltimes <- rank(cell_times);
+
+plot(rank_celltimes, rank_pca, xlab="Rank (ordering)",
+     ylab="Rank (PCA)", col="red")
 amp_genes <- load_data$amp;
 sd_genes <- load_data$sigma;
 phi_genes <- load_data$phi;
