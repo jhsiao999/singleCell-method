@@ -12,3 +12,5 @@ project/.DS_Store
 project/analysis/lcl_structure_cache/
 project/analysis/gene_annotations_ipsc_lcl_cache/
 project/analysis/gene_annotations_ipsc_lcl_files/
+project/data/macosko-2015-dropseq/
+project/data/.DS_Store
