@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  22 OCT 2015 20:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  19 OCT 2015 21:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -308,10 +308,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 92--93
  []
 
 [3] [4]
-
-LaTeX Warning: Reference `fig:fig6' on page 5 undefined on input line 141.
-
-
 <../figures/cell_order_R_figs/amp_compare.png, id=24, 324.21124pt x 488.82625pt
 >
 File: ../figures/cell_order_R_figs/amp_compare.png Graphic file (type png)
@@ -532,47 +528,6 @@ Overfull \hbox (4.86667pt too wide) in paragraph at lines 252--262
  [][]  [] 
  []
 
-
-<../figures/cell_order_R_figs/scree_plot.png, id=41, 669.50125pt x 488.82625pt>
-File: ../figures/cell_order_R_figs/scree_plot.png Graphic file (type png)
-<use ../figures/cell_order_R_figs/scree_plot.png>
-Package pdftex.def Info: ../figures/cell_order_R_figs/scree_plot.png used on in
-put line 272.
-(pdftex.def)             Requested size: 197.96086pt x 144.54pt.
-
-<../figures/cell_order_R_figs/PC_plot_12.png, id=42, 669.50125pt x 488.82625pt>
-File: ../figures/cell_order_R_figs/PC_plot_12.png Graphic file (type png)
-<use ../figures/cell_order_R_figs/PC_plot_12.png>
-Package pdftex.def Info: ../figures/cell_order_R_figs/PC_plot_12.png used on in
-put line 278.
-(pdftex.def)             Requested size: 197.96086pt x 144.54pt.
-
-Overfull \hbox (4.86667pt too wide) in paragraph at lines 270--280
- [][]  [] 
- []
-
-
-<../figures/cell_order_R_figs/PC_plot_23.png, id=43, 669.50125pt x 488.82625pt>
-File: ../figures/cell_order_R_figs/PC_plot_23.png Graphic file (type png)
-<use ../figures/cell_order_R_figs/PC_plot_23.png>
-Package pdftex.def Info: ../figures/cell_order_R_figs/PC_plot_23.png used on in
-put line 284.
-(pdftex.def)             Requested size: 197.96086pt x 144.54pt.
-
-<../figures/cell_order_R_figs/pca_cellorder_rank_compare.png, id=44, 669.50125p
-t x 488.82625pt>
-File: ../figures/cell_order_R_figs/pca_cellorder_rank_compare.png Graphic file 
-(type png)
-
-<use ../figures/cell_order_R_figs/pca_cellorder_rank_compare.png>
-Package pdftex.def Info: ../figures/cell_order_R_figs/pca_cellorder_rank_compar
-e.png used on input line 290.
-(pdftex.def)             Requested size: 197.96086pt x 144.54pt.
-
-Overfull \hbox (4.86667pt too wide) in paragraph at lines 282--292
- [][]  [] 
- []
-
 [5] [6] [7] [8] [9 <../figures/cell_order_R_figs/amp_compare.png> <../figures/c
 ell_order_R_figs/phi_compare.png> <../figures/cell_order_R_figs/sigma_compare.p
 ng>] [10 <../figures/cell_order_R_figs/original_cell_order.png> <../figures/cel
@@ -587,41 +542,32 @@ clus_3/struct_clus_3_recovered_cell_order.png> <../figures/ipsc_structure_batch
 correct_cellcycle/clus_3/struct_clus_3_recovered_order.png> <../figures/ipsc_st
 ructure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered_cell_order.png> <
 ../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered
-_order.png>] [14 <../figures/cell_order_R_figs/scree_plot.png> <../figures/cell
-_order_R_figs/PC_plot_12.png> <../figures/cell_order_R_figs/PC_plot_23.png> <..
-/figures/cell_order_R_figs/pca_cellorder_rank_compare.png>] (./cell_reorder.aux
-)
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+_order.png>] (./cell_reorder.aux) ) 
 Here is how much of TeX's memory you used:
- 3990 strings out of 493117
- 63165 string characters out of 6135433
- 130684 words of memory out of 5000000
- 7363 multiletter control sequences out of 15000+600000
+ 3969 strings out of 493117
+ 62255 string characters out of 6135433
+ 128684 words of memory out of 5000000
+ 7346 multiletter control sequences out of 15000+600000
  10813 words of font info for 40 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,9n,38p,1647b,483s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
-></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
-</usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
-/usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
-usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></us
-r/local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/
-local/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/lo
-cal/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local
-/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/
-texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/te
-xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texl
-ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on cell_reorder.pdf (14 pages, 941980 bytes).
+</usr/local/texlive/2014/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2014/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2014/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/pu
+blic/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/publ
+ic/amsfonts/cm/cmr10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmr8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmsy10.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmsy6.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfo
+nts/cm/cmsy8.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmti10.pfb>
+Output written on cell_reorder.pdf (13 pages, 777914 bytes).
 PDF statistics:
- 139 PDF objects out of 1000 (max. 8388607)
- 70 compressed objects within 1 object stream
+ 128 PDF objects out of 1000 (max. 8388607)
+ 68 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 81 words of extra memory for PDF output out of 10000 (max. 10000000)
 
