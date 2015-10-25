@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  22 OCT 2015 20:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2014.5.25)  23 OCT 2015 12:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -307,12 +307,31 @@ Underfull \hbox (badness 10000) in paragraph at lines 92--93
 
  []
 
-[3] [4]
+[3]
+
+LaTeX Warning: Reference `fig:fig1' on page 4 undefined on input line 133.
+
+
+LaTeX Warning: Reference `fig:fig2' on page 4 undefined on input line 133.
+
+
+LaTeX Warning: Reference `fig:fig3' on page 4 undefined on input line 137.
+
+[4]
+
+LaTeX Warning: Reference `fig:fig4' on page 5 undefined on input line 141.
+
+
+LaTeX Warning: Reference `fig:fig5' on page 5 undefined on input line 141.
+
 
 LaTeX Warning: Reference `fig:fig6' on page 5 undefined on input line 141.
 
 
-<../figures/cell_order_R_figs/amp_compare.png, id=24, 324.21124pt x 488.82625pt
+LaTeX Warning: Reference `fig:fig7' on page 5 undefined on input line 141.
+
+
+<../figures/cell_order_R_figs/amp_compare.png, id=25, 324.21124pt x 488.82625pt
 >
 File: ../figures/cell_order_R_figs/amp_compare.png Graphic file (type png)
  <use ../figures/cell_order_R_figs/amp_compare.png>
@@ -320,7 +339,7 @@ Package pdftex.def Info: ../figures/cell_order_R_figs/amp_compare.png used on i
 nput line 148.
 (pdftex.def)             Requested size: 143.8011pt x 216.81pt.
 
-<../figures/cell_order_R_figs/phi_compare.png, id=26, 324.21124pt x 488.82625pt
+<../figures/cell_order_R_figs/phi_compare.png, id=27, 324.21124pt x 488.82625pt
 >
 File: ../figures/cell_order_R_figs/phi_compare.png Graphic file (type png)
  <use ../figures/cell_order_R_figs/phi_compare.png>
@@ -333,7 +352,7 @@ Overfull \hbox (4.86667pt too wide) in paragraph at lines 146--156
  []
 
 
-<../figures/cell_order_R_figs/sigma_compare.png, id=27, 324.21124pt x 488.82625
+<../figures/cell_order_R_figs/sigma_compare.png, id=28, 324.21124pt x 488.82625
 pt>
 File: ../figures/cell_order_R_figs/sigma_compare.png Graphic file (type png)
  <use ../figures/cell_order_R_figs/sigma_compare.png>
@@ -341,7 +360,7 @@ Package pdftex.def Info: ../figures/cell_order_R_figs/sigma_compare.png used on
  input line 160.
 (pdftex.def)             Requested size: 143.8011pt x 216.81pt.
 
-<../figures/cell_order_R_figs/original_cell_order.png, id=28, 324.21124pt x 488
+<../figures/cell_order_R_figs/original_cell_order.png, id=29, 324.21124pt x 488
 .82625pt>
 File: ../figures/cell_order_R_figs/original_cell_order.png Graphic file (type p
 ng)
@@ -350,7 +369,7 @@ Package pdftex.def Info: ../figures/cell_order_R_figs/original_cell_order.png u
 sed on input line 172.
 (pdftex.def)             Requested size: 143.8011pt x 216.81pt.
 
-<../figures/cell_order_R_figs/estd_cell_order_100_classes.png, id=29, 324.21124
+<../figures/cell_order_R_figs/estd_cell_order_100_classes.png, id=30, 324.21124
 pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/estd_cell_order_100_classes.png Graphic file
  (type png)
@@ -365,7 +384,7 @@ Overfull \hbox (4.86667pt too wide) in paragraph at lines 170--180
  []
 
 
-<../figures/cell_order_R_figs/estd_cell_order_phase_adjusted.png, id=30, 377.41
+<../figures/cell_order_R_figs/estd_cell_order_phase_adjusted.png, id=31, 377.41
 pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/estd_cell_order_phase_adjusted.png Graphic f
 ile (type png)
@@ -379,7 +398,7 @@ usted.png used on input line 184.
 LaTeX Warning: Float too large for page by 5.51216pt on input line 189.
 
 
-<../figures/cell_order_R_figs/original_cell_order_exp_2_unsorted.png, id=31, 61
+<../figures/cell_order_R_figs/original_cell_order_exp_2_unsorted.png, id=32, 61
 5.29875pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/original_cell_order_exp_2_unsorted.png Graph
 ic file (type png)
@@ -394,7 +413,7 @@ Overfull \hbox (45.28842pt too wide) in paragraph at lines 195--196
  []
 
 
-<../figures/cell_order_R_figs/original_cell_order_exp_2_sorted.png, id=32, 615.
+<../figures/cell_order_R_figs/original_cell_order_exp_2_sorted.png, id=33, 615.
 29875pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/original_cell_order_exp_2_sorted.png Graphic
  file (type png)
@@ -414,7 +433,7 @@ Overfull \hbox (4.86667pt too wide) in paragraph at lines 193--203
  []
 
 
-<../figures/cell_order_R_figs/estd_cell_order_100_classes_exp_2.png, id=33, 615
+<../figures/cell_order_R_figs/estd_cell_order_100_classes_exp_2.png, id=34, 615
 .29875pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/estd_cell_order_100_classes_exp_2.png Graphi
 c file (type png)
@@ -432,7 +451,7 @@ Overfull \hbox (45.28842pt too wide) in paragraph at lines 207--208
 LaTeX Warning: Float too large for page by 5.51216pt on input line 212.
 
 
-<../figures/cell_order_R_figs/amp_plot_genes_ipsc.png, id=34, 615.29875pt x 488
+<../figures/cell_order_R_figs/amp_plot_genes_ipsc.png, id=35, 615.29875pt x 488
 .82625pt>
 File: ../figures/cell_order_R_figs/amp_plot_genes_ipsc.png Graphic file (type p
 ng)
@@ -446,7 +465,7 @@ Overfull \hbox (45.28842pt too wide) in paragraph at lines 219--220
  []
 
 
-<../figures/cell_order_R_figs/phase_plot_genes_ipsc.png, id=35, 615.29875pt x 4
+<../figures/cell_order_R_figs/phase_plot_genes_ipsc.png, id=36, 615.29875pt x 4
 88.82625pt>
 File: ../figures/cell_order_R_figs/phase_plot_genes_ipsc.png Graphic file (type
  png)
@@ -465,7 +484,7 @@ Overfull \hbox (4.86667pt too wide) in paragraph at lines 217--227
  []
 
 
-<../figures/cell_order_R_figs/snr_plot_genes_ipsc.png, id=36, 615.29875pt x 488
+<../figures/cell_order_R_figs/snr_plot_genes_ipsc.png, id=37, 615.29875pt x 488
 .82625pt>
 File: ../figures/cell_order_R_figs/snr_plot_genes_ipsc.png Graphic file (type p
 ng)
@@ -479,118 +498,220 @@ Overfull \hbox (45.28842pt too wide) in paragraph at lines 231--232
  []
 
 
-<../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovere
-d_cell_order.png, id=37, 602.25pt x 401.5pt>
-File: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_rec
-overed_cell_order.png Graphic file (type png)
+<../figures/cell_order_R_figs/cell_times_plot.png, id=38, 669.50125pt x 488.826
+25pt>
+File: ../figures/cell_order_R_figs/cell_times_plot.png Graphic file (type png)
+ <use ../figures/cell_order_R_figs/cell_times_plot.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/cell_times_plot.png used 
+on input line 237.
+(pdftex.def)             Requested size: 296.9515pt x 216.81pt.
 
-<use ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_reco
-vered_cell_order.png>
-Package pdftex.def Info: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_
-3/struct_clus_3_recovered_cell_order.png used on input line 242.
-(pdftex.def)             Requested size: 216.80983pt x 144.54pt.
+Overfull \hbox (69.32947pt too wide) in paragraph at lines 237--238
+ [][] 
+ []
 
-<../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovere
-d_order.png, id=38, 602.25pt x 401.5pt>
-File: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_rec
-overed_order.png Graphic file (type png)
 
-<use ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_reco
-vered_order.png>
-Package pdftex.def Info: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_
-3/struct_clus_3_recovered_order.png used on input line 248.
-(pdftex.def)             Requested size: 216.80983pt x 144.54pt.
-
-Overfull \hbox (4.86667pt too wide) in paragraph at lines 240--250
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 229--239
  [][]  [] 
  []
 
 
-<../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovere
+<../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovere
 d_cell_order.png, id=39, 602.25pt x 401.5pt>
+File: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_rec
+overed_cell_order.png Graphic file (type png)
+
+<use ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_reco
+vered_cell_order.png>
+Package pdftex.def Info: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_
+3/struct_clus_3_recovered_cell_order.png used on input line 251.
+(pdftex.def)             Requested size: 216.80983pt x 144.54pt.
+
+<../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovere
+d_order.png, id=40, 602.25pt x 401.5pt>
+File: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_rec
+overed_order.png Graphic file (type png)
+
+<use ../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_reco
+vered_order.png>
+Package pdftex.def Info: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_
+3/struct_clus_3_recovered_order.png used on input line 257.
+(pdftex.def)             Requested size: 216.80983pt x 144.54pt.
+
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 249--259
+ [][]  [] 
+ []
+
+
+<../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovere
+d_cell_order.png, id=41, 602.25pt x 401.5pt>
 File: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_rec
 overed_cell_order.png Graphic file (type png)
 
 <use ../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_reco
 vered_cell_order.png>
 Package pdftex.def Info: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_
-4/struct_clus_4_recovered_cell_order.png used on input line 254.
+4/struct_clus_4_recovered_cell_order.png used on input line 263.
 (pdftex.def)             Requested size: 216.80983pt x 144.54pt.
 
 <../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovere
-d_order.png, id=40, 602.25pt x 401.5pt>
+d_order.png, id=42, 602.25pt x 401.5pt>
 File: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_rec
 overed_order.png Graphic file (type png)
 
 <use ../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_reco
 vered_order.png>
 Package pdftex.def Info: ../figures/ipsc_structure_batchcorrect_cellcycle/clus_
-4/struct_clus_4_recovered_order.png used on input line 260.
+4/struct_clus_4_recovered_order.png used on input line 269.
 (pdftex.def)             Requested size: 216.80983pt x 144.54pt.
 
-Overfull \hbox (4.86667pt too wide) in paragraph at lines 252--262
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 261--271
  [][]  [] 
  []
 
 
-<../figures/cell_order_R_figs/scree_plot.png, id=41, 669.50125pt x 488.82625pt>
+<../figures/cell_order_R_figs/scree_plot.png, id=43, 669.50125pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/scree_plot.png Graphic file (type png)
 <use ../figures/cell_order_R_figs/scree_plot.png>
 Package pdftex.def Info: ../figures/cell_order_R_figs/scree_plot.png used on in
-put line 272.
+put line 281.
 (pdftex.def)             Requested size: 197.96086pt x 144.54pt.
 
-<../figures/cell_order_R_figs/PC_plot_12.png, id=42, 669.50125pt x 488.82625pt>
+<../figures/cell_order_R_figs/PC_plot_12.png, id=44, 669.50125pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/PC_plot_12.png Graphic file (type png)
 <use ../figures/cell_order_R_figs/PC_plot_12.png>
 Package pdftex.def Info: ../figures/cell_order_R_figs/PC_plot_12.png used on in
-put line 278.
+put line 287.
 (pdftex.def)             Requested size: 197.96086pt x 144.54pt.
 
-Overfull \hbox (4.86667pt too wide) in paragraph at lines 270--280
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 279--289
  [][]  [] 
  []
 
 
-<../figures/cell_order_R_figs/PC_plot_23.png, id=43, 669.50125pt x 488.82625pt>
+<../figures/cell_order_R_figs/PC_plot_23.png, id=45, 669.50125pt x 488.82625pt>
 File: ../figures/cell_order_R_figs/PC_plot_23.png Graphic file (type png)
 <use ../figures/cell_order_R_figs/PC_plot_23.png>
 Package pdftex.def Info: ../figures/cell_order_R_figs/PC_plot_23.png used on in
-put line 284.
+put line 293.
 (pdftex.def)             Requested size: 197.96086pt x 144.54pt.
 
-<../figures/cell_order_R_figs/pca_cellorder_rank_compare.png, id=44, 669.50125p
+<../figures/cell_order_R_figs/pca_cellorder_rank_compare.png, id=46, 669.50125p
 t x 488.82625pt>
 File: ../figures/cell_order_R_figs/pca_cellorder_rank_compare.png Graphic file 
 (type png)
 
 <use ../figures/cell_order_R_figs/pca_cellorder_rank_compare.png>
 Package pdftex.def Info: ../figures/cell_order_R_figs/pca_cellorder_rank_compar
-e.png used on input line 290.
+e.png used on input line 299.
 (pdftex.def)             Requested size: 197.96086pt x 144.54pt.
 
-Overfull \hbox (4.86667pt too wide) in paragraph at lines 282--292
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 291--301
  [][]  [] 
  []
 
-[5] [6] [7] [8] [9 <../figures/cell_order_R_figs/amp_compare.png> <../figures/c
-ell_order_R_figs/phi_compare.png> <../figures/cell_order_R_figs/sigma_compare.p
-ng>] [10 <../figures/cell_order_R_figs/original_cell_order.png> <../figures/cel
-l_order_R_figs/estd_cell_order_100_classes.png> <../figures/cell_order_R_figs/e
-std_cell_order_phase_adjusted.png>] [11 <../figures/cell_order_R_figs/original_
-cell_order_exp_2_unsorted.png> <../figures/cell_order_R_figs/original_cell_orde
-r_exp_2_sorted.png> <../figures/cell_order_R_figs/estd_cell_order_100_classes_e
-xp_2.png>] [12 <../figures/cell_order_R_figs/amp_plot_genes_ipsc.png> <../figur
-es/cell_order_R_figs/phase_plot_genes_ipsc.png> <../figures/cell_order_R_figs/s
-nr_plot_genes_ipsc.png>] [13 <../figures/ipsc_structure_batchcorrect_cellcycle/
-clus_3/struct_clus_3_recovered_cell_order.png> <../figures/ipsc_structure_batch
-correct_cellcycle/clus_3/struct_clus_3_recovered_order.png> <../figures/ipsc_st
-ructure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered_cell_order.png> <
-../figures/ipsc_structure_batchcorrect_cellcycle/clus_4/struct_clus_4_recovered
-_order.png>] [14 <../figures/cell_order_R_figs/scree_plot.png> <../figures/cell
-_order_R_figs/PC_plot_12.png> <../figures/cell_order_R_figs/PC_plot_23.png> <..
-/figures/cell_order_R_figs/pca_cellorder_rank_compare.png>] (./cell_reorder.aux
-)
+
+<../figures/cell_order_R_figs/amplitude_plot_phase_fixed.png, id=47, 453.695pt 
+x 488.82625pt>
+File: ../figures/cell_order_R_figs/amplitude_plot_phase_fixed.png Graphic file 
+(type png)
+
+<use ../figures/cell_order_R_figs/amplitude_plot_phase_fixed.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/amplitude_plot_phase_fixe
+d.png used on input line 312.
+(pdftex.def)             Requested size: 201.23251pt x 216.81pt.
+
+<../figures/cell_order_R_figs/phase_plot_phase_fixed.png, id=48, 453.695pt x 48
+8.82625pt>
+File: ../figures/cell_order_R_figs/phase_plot_phase_fixed.png Graphic file (typ
+e png)
+ <use ../figures/cell_order_R_figs/phase_plot_phase_fixed.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/phase_plot_phase_fixed.pn
+g used on input line 318.
+(pdftex.def)             Requested size: 201.23251pt x 216.81pt.
+
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 310--320
+ [][]  [] 
+ []
+
+
+<../figures/cell_order_R_figs/snr_plot_phase_fixed.png, id=49, 453.695pt x 488.
+82625pt>
+File: ../figures/cell_order_R_figs/snr_plot_phase_fixed.png Graphic file (type 
+png)
+ <use ../figures/cell_order_R_figs/snr_plot_phase_fixed.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/snr_plot_phase_fixed.png 
+used on input line 324.
+(pdftex.def)             Requested size: 201.23251pt x 216.81pt.
+
+<../figures/cell_order_R_figs/cell_times_phase_fixed.png, id=50, 453.695pt x 48
+8.82625pt>
+File: ../figures/cell_order_R_figs/cell_times_phase_fixed.png Graphic file (typ
+e png)
+ <use ../figures/cell_order_R_figs/cell_times_phase_fixed.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/cell_times_phase_fixed.pn
+g used on input line 330.
+(pdftex.def)             Requested size: 201.23251pt x 216.81pt.
+
+Overfull \hbox (4.86667pt too wide) in paragraph at lines 322--332
+ [][]  [] 
+ []
+
+
+<../figures/cell_order_R_figs/pca_cellorder_rank_phase_fixed.png, id=51, 453.69
+5pt x 488.82625pt>
+File: ../figures/cell_order_R_figs/pca_cellorder_rank_phase_fixed.png Graphic f
+ile (type png)
+
+<use ../figures/cell_order_R_figs/pca_cellorder_rank_phase_fixed.png>
+Package pdftex.def Info: ../figures/cell_order_R_figs/pca_cellorder_rank_phase_
+fixed.png used on input line 336.
+(pdftex.def)             Requested size: 201.23251pt x 216.81pt.
+
+
+LaTeX Warning: Float too large for page by 200.52214pt on input line 342.
+
+
+LaTeX Warning: Reference `fig:fig2' on page 5 undefined on input line 348.
+
+
+LaTeX Warning: Reference `fig:fig3' on page 5 undefined on input line 348.
+
+
+LaTeX Warning: Reference `fig:fig5' on page 5 undefined on input line 350.
+
+
+LaTeX Warning: Reference `fig:fig5' on page 5 undefined on input line 350.
+
+
+LaTeX Warning: Reference `fig:fig5' on page 5 undefined on input line 352.
+
+[5]
+
+LaTeX Warning: Reference `fig:fig5' on page 6 undefined on input line 354.
+
+[6] [7] [8] [9 <../figures/cell_order_R_figs/amp_compare.png> <../figures/cell_
+order_R_figs/phi_compare.png> <../figures/cell_order_R_figs/sigma_compare.png>]
+[10 <../figures/cell_order_R_figs/original_cell_order.png> <../figures/cell_ord
+er_R_figs/estd_cell_order_100_classes.png> <../figures/cell_order_R_figs/estd_c
+ell_order_phase_adjusted.png>] [11 <../figures/cell_order_R_figs/original_cell_
+order_exp_2_unsorted.png> <../figures/cell_order_R_figs/original_cell_order_exp
+_2_sorted.png> <../figures/cell_order_R_figs/estd_cell_order_100_classes_exp_2.
+png>] [12 <../figures/cell_order_R_figs/amp_plot_genes_ipsc.png> <../figures/ce
+ll_order_R_figs/phase_plot_genes_ipsc.png> <../figures/cell_order_R_figs/snr_pl
+ot_genes_ipsc.png> <../figures/cell_order_R_figs/cell_times_plot.png>] [13 <../
+figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_clus_3_recovered_ce
+ll_order.png> <../figures/ipsc_structure_batchcorrect_cellcycle/clus_3/struct_c
+lus_3_recovered_order.png> <../figures/ipsc_structure_batchcorrect_cellcycle/cl
+us_4/struct_clus_4_recovered_cell_order.png> <../figures/ipsc_structure_batchco
+rrect_cellcycle/clus_4/struct_clus_4_recovered_order.png>] [14 <../figures/cell
+_order_R_figs/scree_plot.png> <../figures/cell_order_R_figs/PC_plot_12.png> <..
+/figures/cell_order_R_figs/PC_plot_23.png> <../figures/cell_order_R_figs/pca_ce
+llorder_rank_compare.png>] [15 <../figures/cell_order_R_figs/amplitude_plot_pha
+se_fixed.png> <../figures/cell_order_R_figs/phase_plot_phase_fixed.png> <../fig
+ures/cell_order_R_figs/snr_plot_phase_fixed.png> <../figures/cell_order_R_figs/
+cell_times_phase_fixed.png> <../figures/cell_order_R_figs/pca_cellorder_rank_ph
+ase_fixed.png>] (./cell_reorder.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -599,10 +720,10 @@ LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 3990 strings out of 493117
- 63165 string characters out of 6135433
- 130684 words of memory out of 5000000
- 7363 multiletter control sequences out of 15000+600000
+ 4021 strings out of 493117
+ 64780 string characters out of 6135433
+ 133640 words of memory out of 5000000
+ 7388 multiletter control sequences out of 15000+600000
  10813 words of font info for 40 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,9n,38p,1647b,483s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -618,10 +739,10 @@ cal/texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local
 texlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/te
 xlive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texl
 ive/2014/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on cell_reorder.pdf (14 pages, 941980 bytes).
+Output written on cell_reorder.pdf (15 pages, 1115924 bytes).
 PDF statistics:
- 139 PDF objects out of 1000 (max. 8388607)
- 70 compressed objects within 1 object stream
+ 154 PDF objects out of 1000 (max. 8388607)
+ 72 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 101 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 131 words of extra memory for PDF output out of 10000 (max. 10000000)
 
