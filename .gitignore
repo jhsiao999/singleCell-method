@@ -9,6 +9,7 @@ project/iPSC+LCL/src/tsne_omega_files/
 project/analysis/batch_correction_check_cache/
 project/analysis/batch_correction_check_files/
 project/.DS_Store
+project/data/.DS_Store
 project/analysis/lcl_structure_cache/
 project/analysis/gene_annotations_ipsc_lcl_cache/
 project/analysis/gene_annotations_ipsc_lcl_files/
