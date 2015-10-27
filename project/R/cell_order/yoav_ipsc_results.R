@@ -3,14 +3,20 @@
 
 ## compare the SNR for Yoav's cell cycle data
 
-molecules_single_cell_cycle <- read.table("../data/molecules_ipsc_single_cell_cycle.txt");
+molecules_single_cell_cycle <- read.table("../../data/molecules_ipsc_single_cell_cycle.txt");
 cycle_counts_data <- t(molecules_single_cell_cycle);
 cycle_counts_data <- cycle_counts_data[, which(colSums(cycle_counts_data)!=0)];
 
 cycle_voom_data <- voom(cycle_counts_data)$E;
-cycle_data <- apply(cycle_voom_data,2, function(x) x-mean(x));
+library(scales)
+cycle_data <- apply(cycle_voom_data,2, function(x) rescale(x, to=c(-1,1)));
+#cycle_data <- apply(cycle_voom_data,1, function(x) x-mean(x));
 
-cell_phase_vector <- as.vector(as.matrix(read.table("../data/cell_phase_vector_yoav.txt")));
+
+out <- cell_reordering_phase(cycle_data, celltime_levels = 100, num_iter=100, 
+                             save_path="../../rdas/cell_order_ipsc.rda")
+
+cell_phase_vector <- as.vector(as.matrix(read.table("../../data/cell_phase_vector_yoav.txt")));
 
 cycle.pca <- princomp(cycle_data, scale.=TRUE, center=TRUE);
 plot(cycle.pca, type="l", col="red", main="scree plot for cycle data")
@@ -24,11 +30,11 @@ plot(cycle.pca$scores[,2],cycle.pca$scores[,3], col=as.factor(cell_phase_vector)
 legend("topleft", legend=levels(as.factor(cell_phase_vector)), col=1:length(as.factor(cell_phase_vector)),
        pch=20)
 source('/Users/kushal/Documents/singleCell-method/project/R/cell_order/utilities.R')
-out <- cell_reordering_phase(cycle_data, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_ipsc_2.rda")
+out <- cell_reordering_phase(cycle_data, celltime_levels = 100, num_iter=100, save_path="../../rdas/cell_order_ipsc_2.rda")
 
 rank_pca <- rank(cycle.pca$scores[,1]);
 
-load_data <- get(load(file="../rdas/cell_order_ipsc.rda"));
+load_data <- get(load(file="../../rdas/cell_order_ipsc_2.rda"));
 
 cell_times <- load_data$cell_times;
 
@@ -62,7 +68,7 @@ SNR <- ESS/RSS;
 plot(SNR, xlab="genes", ylab="SNR", main="Plot of SNR across all genes")
 
 
-cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
+cell_cycle_genes <- read.table("../../data/cellcyclegenes.txt", header = TRUE, sep="\t")
 
 ## create 5 lists of 5 phases (de-level and then remove "")
 cell_cycle_genes_list <- lapply(1:5,function(x){
@@ -92,11 +98,15 @@ phi_genes_yoav <- c(rep((11/(2*24))*2*pi, length(order1)), rep((11/24 + (19-11)/
 phi_genes_yoav <- phi_genes_yoav[match(order_unique, order)];
 
 out <- cell_reordering_phase(cycle_data, celltime_levels = 100, num_iter=100, 
-                             save_path="../rdas/cell_order_ipsc_phase_fixed.rda",
-                             fix.phase = TRUE, phi_fixed = phi_genes_yoav)
+                             save_path="../../rdas/cell_order_ipsc_phase_fixed.rda",
+                             fix.phase = TRUE, phase_in = phi_genes_yoav)
 
 
-
+load_data <- get(load(file="../rdas/cell_order_ipsc_phase_fixed.rda"));
+amp_genes <- load_data$amp;
+sd_genes <- load_data$sigma;
+phi_genes <- load_data$phi;
+cell_times <- load_data$cell_times
   
 phi_vec <- array(0, 0);
 factor_level <- array(0,0);
@@ -112,6 +122,7 @@ for(l in 1:5){
 }
 
 phi_vec1 <- unique(phi_vec);
+phi_vec1 <- c(phi_vec1, phi_vec1[4])
 factor_vec <- factor_level[match(phi_vec1,phi_vec)]
 par(mar=c(4,1,1,1))
 plot(ordered(factor_vec, c("G1.S", "S", "G2.M", "M", "M.G1")), phi_vec1,
@@ -138,11 +149,14 @@ amp_vec1 <- unique(amp_vec);
 factor_vec <- factor_level[match(amp_vec1,amp_vec)]
 
 par(mar=c(4,1,1,1))
-plot(ordered(factor_vec, c("G1.S", "S", "G2.M", "M", "M.G1")), amp_vec1/1000,
+plot(ordered(factor_vec, c("G1.S", "S", "G2.M", "M", "M.G1")), amp_vec1,
      xlab="factor_levels", ylab="amplitudes", 
      main="Amplitude plot across cell phases", col="red")
 
 ## SNR of genes across the cell phases
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
 
 snr_vec <- array(0,0)
 factor_level <- array(0,0)
@@ -163,8 +177,6 @@ plot(ordered(factor_vec, c("G1.S", "S", "G2.M", "M", "M.G1")), snr_vec1,
      main="SNR plot across cell phases", col="red")
 
 
-load_data <- get(load(file="../rdas/cell_order_ipsc.rda"));
-cell_times <- load_data$cell_times;
 
 phase_matching <- function(cell_times, cell_phase_vector)
 {
