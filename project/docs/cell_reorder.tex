@@ -136,9 +136,35 @@ The cell cycle times were generated for the $400$ cells at uniform spacing from 
 
 In simulation model 2, we take a random permutation of the cell times $0, 1 \times \frac{2 \pi}{400}, 2 \times \frac{2 \pi}{400}, \cdots $. This is very similar to the first model except that unlike the first model, the cell times in this model are not ordered. This simulation model was taken just to show that the order of the cells in the input does not affect the inference and that our method is successfully able to retrieve the cell order nevertheless. Fig \ref{fig:fig3} presents the radial plots, for the true simulated cell orders and the estimated cell orders (which are not exact to the actual simulated true cell order due to rotational non-identifiability).
 
+\subsection{Simulation model 3}
+
+For the simulation model 3, we do not generate cell times from all across the cell, but rather we try to recreate the G1, S and G2M phases as we understand.  I generated a $600$ cell data, with $200$ cells coming from the G1 phase, which I am taking to be generated at uniform spacing from $\frac{\pi}{3}$ to $2 \frac{\pi}{3}$, $200$ cells coming from the S phase, which I am taking to be uniformly spaced between $3 \frac{\pi}{3}$ and  $4\frac{\pi}{3}$ and $200$ cells coming from the G2M phase, taken uniformly from $5 \frac{\pi}{3}$ to $2 \pi$. For the genes, we simulate the data taking all genes with amplitude $10$ and the gene phases chosen such that the first $1/3$rd genes have phase uniformly distributed from $\frac{\pi}{3}$ to $2 \frac{\pi}{3}$ (may be called G1 phase specific genes), next $1/3$ rd genes uniformly distributed from $3 \frac{\pi}{3}$ to $4 \frac{\pi}{3}$ (may be called S phase specific genes) and the last $1/3$ rd genes uniformly distributed from $5 {\pi}{3}$ to $2 \pi$ (may be termed as G2M specific genes). Fig \ref{fig:fig8} presents the radial plots under phase fixing and phase not fixing both of which seem to be working pretty well. 
+We also test for the robustness of the method under phase fixing method by taking different combinations of fixed phase. The different choices of fixed phase considered are the following.
+
+\begin{itemize}
+
+\item \textbf{Choice 1} :  the phase is fixed at the true phases (this should give the best result)
+\item \textbf{Choice 2} :  the phase is fixed at $\frac{\pi}{2}$ for G1 data, $\pi$ for S data and $3 \frac{\pi}{2}$ for the G2M data.
+\item \textbf{Choice 3} :  Half of the genes are coming from Uniform distribution from $\frac{\pi}{4}$ to $3 \frac{\pi}{4}$. The other half of genes are coming from $5 \frac{\pi}{4}$ to $7 \frac{\pi}{4}$. 
+\item \textbf{Choice 4} : The phases are generated uniformly from $0$ to $2 \pi$. 
+
+\end{itemize}
+
+Fig \ref{fig:fig9} presents the radial plots for each of these scenarios. Note that the original true plot of cell times is Fig \ref{fig:fig8} (a).  
+
+
+
 \subsection{Real data- iPSC data (Gilad lab)}
 
 We next applied our model on the iPSC data collected in Gilad lab. We did not have the information from which phase in the cell cycle the cell comes from. The gene list was taken from previous studies which identified cell cycle genes for normal cells (I suppose). The idea was to see how informative are these genes for the iPSC data obtained by Yoav's lab. There were $543$ cell cycle genes in the list and $578$ single cells (iPSCs).  We did not know about the phases of the genes, but we did know which genes corresponding to which of the $5$ phases (G1.S, S, G2.M, M, M.G1).  We fitted the cycle reordering algorithm of ours and without any phase adjustment, we present the plots of the amplitudes, phase, sigma and the SNR values of the genes (Fig \ref{fig:fig4}). Next, we observed how the admixture plot looks like under the Macosko method of ordering and our method of ordering for the iPSC data (Fig \ref{fig:fig5}).  It seemed to us that the cell ordering may not be very informative for this data and essentially may only be explaining as much as PCA would do. So, we carried out PCA and compared the PCA ordering with cell ordering and found that it is indeed true (Fig \ref{fig:fig6}). We also checked the same assuming the cell phases to be fixed for the different phases using the general cell phase length information for the normal cells. The results of the exploration are given in Fig \ref{fig:fig7}.
+
+\subsection{Real data - Marioni single cell mouse data}
+
+We applied our model to the mouse single cell data collected by Marioni's lab. For this dataset, there were $96$ cells each of three phases - G1, S and G2M. The cells were classified into these cell cycle phases by FACS sorting. There were overall 891 cell cycle genes reported out of which $5$ did not express at all in any of the cells, so we filtered them out and ended up with $886$ cell cycle genes. We applied the cell ordering once on the log CPM values of the counts data and one on the rescaled data where the counts data is rescaled from $-1$ to $1$. We fitted the model once with phase not fixed and another time, the phases being fixed, where the phases are taken to be equal in length. 
+
+Fig \ref{fig:fig10} presents the violin plots of the cell times for the different phases and the corresponding phase density for original/ rescaled counts data and phase fixed or not fixed. 
+
+
 
 
  \begin{figure*}[ht]
@@ -339,6 +365,127 @@ We next applied our model on the iPSC data collected in Gilad lab. We did not ha
     
     \caption{Results of the analysis from the model fit on Yoav's data keeping the phases of the genes fixed using information about the normal cell cycle lengths. (a), (b), (c) The plots of the amplitudes, phases and SNR (signal to noise ratio) of the phase specific genes for each of the $5$ phases. (d) The violin plot of the estimated cell times under the new model. (e) The comparison of the ranks of the single cells from the cell ordering method and the projection on to the first (or the strongest) PC.}
  \label{fig:fig7}
+ \end{figure*}
+ 
+ 
+  \begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{../figures/cell_order_R_figs/true_cell_order_sim3.png}
+        \caption{true cell order}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{../figures/cell_order_R_figs/est_cell_order_sim3.png}
+        \caption{est. cell order}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/cell_order_R_figs/amp_compare_sim3.png}
+        \caption{amplitude}
+    \end{subfigure}%
+    ~
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/cell_order_R_figs/sigma_compare_sim3.png}
+        \caption{sigma}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/cell_order_R_figs/phase_compare_sim3.png}
+        \caption{phase}
+    \end{subfigure}\\
+    
+    \caption{Results of the analysis of the Simulation 3 model without phase fixing. We provide the true and the estimated cell order plots and we observe that the estimated cell order plot seems to be pretty close to the true order modulo rotation. Also the estimated amplitudes, phase and the sigma plot comparison with the true parameters also match pretty well.}
+ \label{fig:fig8}
+ \end{figure*}
+
+
+ \begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{../figures/cell_order_R_figs/et_cell_order_sim3_choice1.png}
+        \caption{choice 1}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.5in]{../figures/cell_order_R_figs/et_cell_order_sim3_choice2.png}
+        \caption{choice 2}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/cell_order_R_figs/et_cell_order_sim3_choice3.png}
+        \caption{choice 3}
+    \end{subfigure}%
+    ~
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2in]{../figures/cell_order_R_figs/et_cell_order_sim3_choice4.png}
+        \caption{choice 4}
+    \end{subfigure}\\
+  \caption{Results of the analysis of the Simulation 3 model with different choices of the fixed phases. We present the radial plots for 4 choices of fixed phases as given in the text. (Check simulation model 3). Apart from choice 4, where the phases of the genes were assumed to be completely uniformly distributed over $0$ to $2 \pi$, the other methods did pretty well. Obviously the likelihood was the best for the choice 1 model as it has the true phases of the genes. But the cell order seems to be pretty robust overall.}
+ \label{fig:fig9}
+ \end{figure*}
+
+  \begin{figure*}[ht]
+    \centering    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_celltimes.png}
+        \caption{celltimes: original}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_phase_density.png}
+        \caption{phase density: original}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_norm_celltimes.png}
+        \caption{celtimes: rescaled}
+    \end{subfigure}%
+    ~
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_phase_density_norm.png}
+        \caption{phase density: rescaled}
+    \end{subfigure}\\
+   
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_phase_fixed_celltimes.png}
+        \caption{celltimes: phase fixed}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_phase_density_phase_in.png}
+        \caption{phase density: phase fixed}
+    \end{subfigure}\\
+    
+     \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_phase_fixed_norm_celltimes.png}
+        \caption{celltimes: rescale, phase fixed}
+    \end{subfigure}%
+    ~
+       \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=1.5in]{../figures/cell_order_R_figs/marioni_phase_density_phase_in_norm.png}
+        \caption{phase density: rescale, phase fixed}
+    \end{subfigure}\\
+
+    \caption{Results of the analysis of the Marioni data with and without phase fixing and assuming sinusoidal expression either for the log CPM data ((a),(e)) or rescaled expression from $-1$ to $1$ ((c), (g)).}
+ \label{fig:fig10}
  \end{figure*}
 
 

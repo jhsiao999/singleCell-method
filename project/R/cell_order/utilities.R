@@ -1,4 +1,6 @@
 
+library(parallel)
+
 ## Bayesian cell re-ordering mechanism
 
 ## One iteration of cell reordering that takes the data as input and some
@@ -19,11 +21,18 @@ atan3 <- function(beta2, beta1)
     v <- - (pi/2);
   if (v < 0)
     v <- v + 2*pi;
+   # print(v)
+   #  print(beta1)
+   #  print(beta2)
   return(v)
 }
 
-cell_reordering_iter <- function(cycle_data, cell_times_iter)
+cell_reordering_iter <- function(cycle_data, celltime_levels, cell_times_iter, fix.phase=FALSE, phase_in=NULL)
 {
+  if(fix.phase==TRUE & is.null(phase_in))
+    stop("fix.phase=TRUE and phase not provided")
+  if(fix.phase==FALSE & !is.null(phase_in))
+    stop("fix.phase=FALSE and phase provided")
   if(length(unique(cell_times_iter))==1)
     stop("All the points have converged at same point on cycle");
   
@@ -34,15 +43,31 @@ cell_reordering_iter <- function(cycle_data, cell_times_iter)
   sigma <- array(0,G);
   amp <- array(0,G); phi <- array(0,G);
   
+  if(!fix.phase){
   for(g in 1:G)
   {
     fit <- lm(cycle_data[,g]  ~ sin(cell_times_iter) + cos(cell_times_iter) -1);
     sigma[g] <- sd(fit$residuals);
     beta1 <- fit$coefficients[1];
     beta2 <- fit$coefficients[2];
+    if(beta1==0 & beta2==0){
+      stop(paste0("You have a gene with all 0 counts at gene",g));
+    }
     amp[g] <- sqrt(beta1^2 + beta2^2);
     phi[g] <- atan3(as.numeric(beta2), as.numeric(beta1));
   }
+  }
+  
+  if(fix.phase){
+    phi <- phase_in;
+    for(g in 1:G)
+    {
+      fit <- lm(cycle_data[,g]  ~ sin(cell_times_iter+phi[g]) -1);
+      sigma[g] <- sd(fit$residuals);
+      amp[g] <- abs(fit$coefficients[1]);
+    }
+  }
+  
   
   cell_times_class <- seq(0, 2*pi, 2*pi/(celltime_levels-1));
   num_celltime_class <- length(cell_times_class);
@@ -125,7 +150,8 @@ loglik_cell_cycle <- function(cycle_data, cell_times, amp, phi, sigma)
 ## main workhorse function that takes in data and number of discrete levels 
 ## of cell times along with the number of iterations
 
-cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter, save_path=NULL)
+cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter, save_path=NULL,
+                                  fix.phase=FALSE, phase_in=NULL)
 {
   # cycle_data: a N \times G matrix, where N is number of cells, G number of genes
   # celltime_levels: number of discrete cell times used for estimation
@@ -142,7 +168,7 @@ cell_reordering_phase <- function(cycle_data, celltime_levels, num_iter, save_pa
   
   for(iter in 1:num_iter)
   {
-    fun <- cell_reordering_iter(cycle_data, cell_times_iter);
+    fun <- cell_reordering_iter(cycle_data, celltime_levels, cell_times_iter, fix.phase, phase_in);
     cell_times_iter <- fun$cell_times_iter;
     amp_iter <- fun$amp_iter;
     phi_iter <- fun$phi_iter;
@@ -177,6 +203,7 @@ cell_reordering_full <- function(cycle_data, celltime_levels, cell_times, amp, p
     }
     return(out)
   }, mc.cores=detectCores()));
+  
   
   
   signal_intensity <- signal_intensity[,order_class];
