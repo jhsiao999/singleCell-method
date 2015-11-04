@@ -76,7 +76,7 @@ We ran the method above once already (took around 30 minutes) and now we just lo
 
 ```{r echo=TRUE, eval=TRUE}
 out <- get(load(file="../rdas/Botstein_cell_cycle.rdata"));
-cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data)[2])
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
 ```
 
 We look at the plots of the amplitudes, phases and the non signal variation of the genes.
@@ -153,7 +153,7 @@ We reload the output
 
 ```{r echo=TRUE, eval=TRUE}
 out2 <- get(load(file="../rdas/Botstein_cell_cycle_sinusoidal.rdata"));
-cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data)[2])
+cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
 ```
 
 We plot the same features as above and check for the robustness. We needed to shift the cell order so as to compare with previous plot on all genes as the method is non-identifiable upto a rotation. 

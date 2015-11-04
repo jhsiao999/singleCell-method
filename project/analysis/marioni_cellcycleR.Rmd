@@ -1,0 +1,211 @@
+---
+title: "Marioni data: cell ordering"
+author: "Kushal K Dey"
+date: "November 4, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+```
+
+## Background
+
+In this script, we perform the cellcycleR method on the single cell data collected by John Marioni's group (see the data [here](http://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-2805/).  For the paper with the analysis of this data, see [Buttner et al 2015](http://www.nature.com/nbt/journal/v33/n2/full/nbt.3102.html). The experimental description as provided by the authors is given below 
+
+## Experimental Description (by Marioni's group)
+
+* Gene expression pattern of single mES cells during cell cycle stages
+Experiment Description	In this study, we aimed to study the gene expression patterns at single cell level across the different cell cycle stages in mESC. We performed single cell RNA-Seq experiment on mESC that were stained with Hoechst 33342 and Flow cytometry sorted for G1, S and G2M stages of cell cycle. Single cell RNA-Seq was performed using Fluidigm C1 system and libraries were generated using Nextera XT (Illumina) kit.*
+
+## Data Description
+
+We first load the data and then explore the data
+
+```{r echo=TRUE, eval=TRUE}
+setwd('/Users/kushal/Documents/singleCell-method/project/R/cell_order')
+G1_single <- data.frame(fread('../../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
+G2M_single <- data.frame(fread('../../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
+S_single <- data.frame(fread('../../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
+
+cell_phases <- c(rep("G1", 96), rep("S", 96), rep("G2M", 96))
+
+```
+
+We filter out the ERCC spike-in controls
+
+```{r echo=TRUE, eval=TRUE}
+ercc_start <- grep("ERCC", rownames(G1_single))[1]
+
+G1_single <- G1_single[-(ercc_start:dim(G1_single)[1]),-(1:3)];
+
+dim(G1_single)
+
+G2M_single <- G2M_single[-(ercc_start:dim(G2M_single)[1]),-(1:3)];
+
+dim(G2M_single)
+
+S_single <- S_single[-(ercc_start:dim(S_single)[1]),-(1:3)];
+
+dim(S_single)
+
+```
+
+Note that there are `dim(S_single)[2]` cells in each of the three phases. All the cells from one phase were then sequenced in one plate. So, we are likely to observe plate effects which could be confounded with the genetic effects. Pooling the data from G1, G2 and S phases.
+
+```{r echo=TRUE, eval=TRUE}
+pooled_data <- t(cbind(G1_single, S_single, G2M_single));
+```
+
+## Filtering cell cycle genes
+
+Next we filter out the cell cycle genes for mouse (Source: ??). 
+
+```{r echo=TRUE, eval=TRUE}
+cell_cycle_genes <- as.vector(as.matrix((read_excel('../../data/Marioni_data/cellcycle_genes_mouse.xlsx'))))
+
+matched_indices <- match(cell_cycle_genes,colnames(pooled_data))
+cycle_counts_data <- pooled_data[,matched_indices];
+cycle_counts_data <- cycle_counts_data[, -which(colSums(cycle_counts_data)==0)]
+
+dim(cycle_counts_data)
+
+```
+
+Next for each gene, we adjust for the mean and scale by the standard deviation. Then we filter out all the genes that have 0 expression across all the cells. 
+
+```{r echo=TRUE, eval=TRUE}
+cycle_voom_data <- voom(cycle_counts_data)$E;
+cycle_data_norm <- apply(cycle_voom_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+
+dim(cycle_data_norm)
+
+```
+
+## cellcyleR on Marioni data
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, 
+                             save_path="../../rdas/cell_order_marioni.rda")
+
+```
+
+We ran the method above once already (took around 30 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../../rdas/cell_order_marioni.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 3);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+We also provide the violin plot of the cell orders estimated against the labels for G1, S and G2 obtained from the experimenters using FUCCI. There are 91, 80 and 76 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers almost same, you can view it as uniformly split).
+
+```{r echo=TRUE,eval=TRUE}
+vioplot(cell_order_full[which(cell_phases=="G1")],
+        cell_order_full[which(cell_phases=="S")],
+        cell_order_full[which(cell_phases=="G2M")],
+        names=c("G1","S","G2M"),
+        col="red")
+
+iplotCurves(t(cycle_data_norm[c(which(cell_phases=="G1"),which(cell_phases=="S"), which(cell_phases=="G2M")),top_genes]))
+
+```
+
+
+## Redoing on high SNR genes
+
+
+We extract the high SNR genes as they seem to have sinusoidal patterns and repeat the procedure again. The aim here is to see how much robust the analysis is to the selction of the (most) sinusoidal genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+snr_high_indices <- which(SNR > 1);
+
+cycle_data_norm_sinusoidal <- cycle_data_norm[,snr_high_indices];
+
+dim(cycle_data_norm_sinusoidal)
+```
+
+We apply the cell ordering mechanism (it takes around 5 minutes to run)
+
+```{r echo=TRUE, eval=FALSE}
+out2 <- cell_ordering_class(cycle_data_norm_sinusoidal, celltime_levels = 100, num_iter=100,
+                            save_path="../../rdas/cell_order_marioni_sinusoidal.rda")
+```
+
+We reload the output 
+
+```{r echo=TRUE, eval=TRUE}
+out2 <- get(load(file="../rdas/Botstein_cell_cycle_sinusoidal.rdata"));
+cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
+```
+
+We plot the same features as above and check for the robustness. We needed to shift the cell order so as to compare with previous plot on all genes as the method is non-identifiable upto a rotation. 
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out2$amp;
+sd_genes <- out2$sigma;
+phi_genes <- out2$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 0.5);
+new_cell_order <- shift(order(cell_order_full),130,dir="right")
+iplotCurves(t(cycle_data_norm_sinusoidal[new_cell_order,top_genes]))
+
+```
+
+
