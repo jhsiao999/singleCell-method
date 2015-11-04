@@ -22,7 +22,7 @@ library(readxl)
 
 ## Background
 
-In this script, we perform the cellcycleR method on the single cell data collected by John Marioni's group (see the data [here](http://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-2805/).  For the paper with the analysis of this data, see [Buttner et al 2015](http://www.nature.com/nbt/journal/v33/n2/full/nbt.3102.html). The experimental description as provided by the authors is given below 
+In this script, we perform the cellcycleR method on the single cell data collected by John Marioni's group (see the data [here](http://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-2805/)).  For the paper with the analysis of this data, see [Buttner et al 2015](http://www.nature.com/nbt/journal/v33/n2/full/nbt.3102.html). The experimental description as provided by the authors is given below 
 
 ## Experimental Description (by Marioni's group)
 
@@ -34,10 +34,10 @@ Experiment Description	In this study, we aimed to study the gene expression patt
 We first load the data and then explore the data
 
 ```{r echo=TRUE, eval=TRUE}
-setwd('/Users/kushal/Documents/singleCell-method/project/R/cell_order')
-G1_single <- data.frame(fread('../../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
-G2M_single <- data.frame(fread('../../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
-S_single <- data.frame(fread('../../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
+setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+G1_single <- data.frame(fread('../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
+G2M_single <- data.frame(fread('../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
+S_single <- data.frame(fread('../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
 
 cell_phases <- c(rep("G1", 96), rep("S", 96), rep("G2M", 96))
 
@@ -73,7 +73,7 @@ pooled_data <- t(cbind(G1_single, S_single, G2M_single));
 Next we filter out the cell cycle genes for mouse (Source: ??). 
 
 ```{r echo=TRUE, eval=TRUE}
-cell_cycle_genes <- as.vector(as.matrix((read_excel('../../data/Marioni_data/cellcycle_genes_mouse.xlsx'))))
+cell_cycle_genes <- as.vector(as.matrix((read_excel('../data/Marioni_data/cellcycle_genes_mouse.xlsx'))))
 
 matched_indices <- match(cell_cycle_genes,colnames(pooled_data))
 cycle_counts_data <- pooled_data[,matched_indices];
@@ -99,14 +99,14 @@ dim(cycle_data_norm)
 
 ```{r echo=TRUE, eval=FALSE}
 out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, 
-                             save_path="../../rdas/cell_order_marioni.rda")
+                             save_path="../rdas/cell_order_marioni.rda")
 
 ```
 
 We ran the method above once already (took around 30 minutes) and now we just load the output.
 
 ```{r echo=TRUE, eval=TRUE}
-out <- get(load(file="../../rdas/cell_order_marioni.rda"));
+out <- get(load(file="../rdas/cell_order_marioni.rda"));
 cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
 ```
 
@@ -143,7 +143,7 @@ sinusoidal or not.
 iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
 ```
 
-We also provide the violin plot of the cell orders estimated against the labels for G1, S and G2 obtained from the experimenters using FUCCI. There are 91, 80 and 76 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers almost same, you can view it as uniformly split).
+We also provide the violin plot of the cell orders estimated against the labels for G1, S and G2 obtained from the experimenters using FUCCI. There are 96 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers for three phases are same - 96, you can view it as uniformly split).
 
 ```{r echo=TRUE,eval=TRUE}
 vioplot(cell_order_full[which(cell_phases=="G1")],
@@ -175,13 +175,13 @@ We apply the cell ordering mechanism (it takes around 5 minutes to run)
 
 ```{r echo=TRUE, eval=FALSE}
 out2 <- cell_ordering_class(cycle_data_norm_sinusoidal, celltime_levels = 100, num_iter=100,
-                            save_path="../../rdas/cell_order_marioni_sinusoidal.rda")
+                            save_path="../rdas/cell_order_marioni_sinusoidal.rda")
 ```
 
 We reload the output 
 
 ```{r echo=TRUE, eval=TRUE}
-out2 <- get(load(file="../rdas/Botstein_cell_cycle_sinusoidal.rdata"));
+out2 <- get(load(file="../rdas/cell_order_marioni_sinusoidal.rda"));
 cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
 ```
 
@@ -203,9 +203,19 @@ SNR <- ESS/RSS;
 
 plot(SNR, col="red", pch=20, lwd=1)
 top_genes <- which(SNR > 0.5);
-new_cell_order <- shift(order(cell_order_full),130,dir="right")
+new_cell_order <- shift(order(cell_order_full),40,dir="right")
 iplotCurves(t(cycle_data_norm_sinusoidal[new_cell_order,top_genes]))
 
 ```
+
+## Final Thoughts
+
+
+While the method is indeed trying to give us sinusoidal patterns, but it is over representing the noisy or outlying cells, we did not scale the expression relative to cells (which I do not know would be recommended here), but seems like the cells with generally very high or low expression are forming the peaks or the troughs of the sinusoids, which probably is not what we want. But still though it seems the method is not doing what is expected, I kind of fancy the fact the method is doing a good job at trying to pool them together to form a sinusoid. Seems to me we only need to fix these rogue cells to get a more sinusoidal pattern. But should we just remove them? or scale them? are we losing info keeping these cells out?
+
+
+```{r echo=TRUE, eval=TRUE}
+sessionInfo()
+
 
 
