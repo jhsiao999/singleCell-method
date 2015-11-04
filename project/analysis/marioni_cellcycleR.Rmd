@@ -103,7 +103,7 @@ out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100,
 
 ```
 
-We ran the method above once already (took around 30 minutes) and now we just load the output.
+We ran the method above once already (took around 5 minutes) and now we just load the output.
 
 ```{r echo=TRUE, eval=TRUE}
 out <- get(load(file="../rdas/cell_order_marioni.rda"));
@@ -143,7 +143,7 @@ sinusoidal or not.
 iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
 ```
 
-We also provide the violin plot of the cell orders estimated against the labels for G1, S and G2 obtained from the experimenters using FUCCI. There are 96 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers for three phases are same - 96, you can view it as uniformly split).
+We also provide the violin plot of the cell orders estimated against the labels for G1, S and G2 obtained from the experimenters using FACS sorting. There are 96 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers for three phases are same - 96, you can view it as uniformly split).
 
 ```{r echo=TRUE,eval=TRUE}
 vioplot(cell_order_full[which(cell_phases=="G1")],

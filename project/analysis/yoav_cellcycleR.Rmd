@@ -1,0 +1,112 @@
+---
+title: 'Yoav data: cell ordering'
+author: "Kushal K Dey"
+date: "November 4, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+```
+
+## Background
+
+In this script, we perform the cellcycleR method on the iPSC cells data collected by Po Yuan in Yoav's lab. The data is still not publicly available, but you can check out [John Blischak's website](http://jdblischak.github.io/singleCellSeq/analysis/) for the information on the data collection, the preliminary analysis Yoav'a lab have been focussing on so far. For this data, unlike for Oscope and the Marioni data, the other two datasets we are looking at, we do not have any information on the cell phases. The cell phases were estimated using a very ad-hoc approach by Macosko et al, see their paper [here](http://www.ncbi.nlm.nih.gov/pubmed/26000488). 
+
+## Data Description
+
+We have batch corected and individual corrected the expression levels for the iPSC samples. Also, we have fitted admixture models to learn about the distinctive behavior across the different phases. Check our [webpage](http://jhsiao999.github.io/singleCell-method/) for further details. We now load the batch corrected gene expression data.
+
+```{r echo=TRUE, eval=TRUE}
+molecules_single_cell_cycle <- read.table("../../data/molecules_ipsc_single_cell_cycle.txt");
+cycle_counts_data <- t(molecules_single_cell_cycle);
+```
+
+Next, we perform voom to log normalize the gene expression across the cells and then for each gene, we perform mean correction and standardization.
+
+```{r echo=TRUE, eval=TRUE}
+cycle_voom_data <- voom(cycle_counts_data)$E;
+cycle_data_norm <- apply(cycle_voom_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+
+dim(cycle_data_norm)
+
+```
+
+The cell phases as assigned using Macosko method
+
+```{r echo=TRUE, eval=TRUE}
+cell_phase_vector <- as.vector(as.matrix(read.table("../../data/cell_phase_vector_yoav.txt")));
+```
+
+## cellcycleR application
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../../rdas/cell_order_ipsc.rda")
+
+```
+
+We ran the method above once already (took around 5 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_ipsc.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 3);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+We also provide the violin plot of the cell orders estimated against the cell phase labels vector obatiend using Macosko method. There are 96 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers for three phases are same - 96, you can view it as uniformly split).
+
+```{r echo=TRUE,eval=TRUE}
+vioplot(cell_order_full[which(cell_phases=="G1")],
+        cell_order_full[which(cell_phases=="S")],
+        cell_order_full[which(cell_phases=="G2M")],
+        names=c("G1","S","G2M"),
+        col="red")
+
+iplotCurves(t(cycle_data_norm[c(which(cell_phases=="G1"),which(cell_phases=="S"), which(cell_phases=="G2M")),top_genes]))
+
+```
