@@ -70,7 +70,7 @@ pooled_data <- t(cbind(G1_single, S_single, G2M_single));
 
 ## Filtering cell cycle genes
 
-Next we filter out the cell cycle genes for mouse (Source: ??). 
+Next we filter out the cell cycle genes for mouse (Check the paper for link to this file). 
 
 ```{r echo=TRUE, eval=TRUE}
 cell_cycle_genes <- as.vector(as.matrix((read_excel('../data/Marioni_data/cellcycle_genes_mouse.xlsx'))))
