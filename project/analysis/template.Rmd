@@ -4,6 +4,7 @@ author: "your name"
 date: "YYYY-MM-DD"
 output: 
   html_document:
+    css: floating-toc.css
     toc: true
 ---
 

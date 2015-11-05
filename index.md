@@ -47,3 +47,8 @@ tagline:
 * [Structure analysis of Deng data](project/analysis/deng_structure_all_genes.html)
 * [Gene annotations for Deng data K=7](project/analysis/gene_annotations_deng.html)
 
+### cellcycleR applications
+
+* [Applying cellcycleR on Oscope data](project/analysis/oscope_cellcycleR.html)
+* [Applying cellcycleR on Marioni 2015 paper data](project/analysis/marioni_cellcycleR.html)
+* [Applying cellcycleR on Yoav's data](project/analysis/yoav_cellcycleR.html)
