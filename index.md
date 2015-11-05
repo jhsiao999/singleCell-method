@@ -49,5 +49,6 @@ tagline:
 
 ### cellcycleR applications
 
-* [ Applying cellcycleR on Oscope data](project/analysis/oscope_cellcycleR.html)
+* [Applying cellcycleR on Oscope data](project/analysis/oscope_cellcycleR.html)
 * [Applying cellcycleR on Marioni 2015 paper data](project/analysis/marioni_cellcycleR.html)
+* [Applying cellcycleR on Yoav's data](project/analysis/yoav_cellcycleR.html)
