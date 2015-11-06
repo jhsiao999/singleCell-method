@@ -90,3 +90,28 @@ kable(as.data.frame(out))
 
 It seems to me that cellcycleR is picking up some really important genes with known cell cycle functions. There are a quite a few CDC protein related genes and a few cyclin related ones, which are most important driving factors of cell cycle. Also, going by the names of the genes detected, some of them clearly are said to be related to cell cycle and cell division. If we compare to the gene annotations from the admixture method which also separated out the G2.M and M phases from the rest, we did not annotate so many relevant genes. This seems to be a very positive finding.
 
+## Residuals check
+
+Since it came up in discussion, we also observed if the residuals from the model fit are actually white noise or not. We use Yoav's data to validate this.
+
+```{r echo=TRUE, eval=TRUE}
+
+out2 <- get(load(file="../rdas/cell_order_ipsc_sinusoidal.rda"));
+cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
+amp_genes <- out2$amp;
+sd_genes <- out2$sigma;
+phi_genes <- out2$phi;
+fitted <- matrix(0, length(cell_order_full), length(amp_genes));
+for(g in 1:length(amp_genes))
+{
+  fitted[,g] <- amp_genes[g]*sin(cell_order_full+phi_genes[g]) 
+}
+
+residuals <- cycle_data_norm_sinusoidal - fitted;
+```
+
+Plot the residuals for each gene across the samples.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(residuals))
+```
