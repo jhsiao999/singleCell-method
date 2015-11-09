@@ -52,3 +52,6 @@ tagline:
 * [Applying cellcycleR on Oscope data](project/analysis/oscope_cellcycleR.html)
 * [Applying cellcycleR on Marioni 2015 paper data](project/analysis/marioni_cellcycleR.html)
 * [Applying cellcycleR on Yoav's data](project/analysis/yoav_cellcycleR.html)
+* [Post processing of cellcycleR on Yoav data: gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
+* [Applying cellcycleR on LCL data](project/analysis/lcl_cellcycleR.html)
+
