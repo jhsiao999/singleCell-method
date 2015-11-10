@@ -1,0 +1,207 @@
+---
+title: 'Yeast data: cell ordering'
+author: "Kushal K Dey"
+date: "November 10, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+```
+
+## Loading the cdc15 data
+
+```{r echo=TRUE, eval=TRUE}
+setwd("/Users/kushal/Documents/singleCell-method/project/analysis/")
+data <- read.table("../data/Botstein_data/botstein_cdc.txt", sep="\t", header=TRUE, fill=TRUE);
+cdc_data <- data[,grep("cdc15",colnames(data))];
+
+fillNAgaps <- function(x, firstBack=FALSE) {
+    ## NA's in a vector or factor are replaced with last non-NA values
+    ## If firstBack is TRUE, it will fill in leading NA's with the first
+    ## non-NA value. If FALSE, it will not change leading NA's.
+    
+    # If it's a factor, store the level labels and convert to integer
+    lvls <- NULL
+    if (is.factor(x)) {
+        lvls <- levels(x)
+        x    <- as.integer(x)
+    }
+ 
+    goodIdx <- !is.na(x)
+ 
+    # These are the non-NA values from x only
+    # Add a leading NA or take the first good value, depending on firstBack   
+    if (firstBack)   goodVals <- c(x[goodIdx][1], x[goodIdx])
+    else             goodVals <- c(NA,            x[goodIdx])
+
+    # Fill the indices of the output vector with the indices pulled from
+    # these offsets of goodVals. Add 1 to avoid indexing to zero.
+    fillIdx <- cumsum(goodIdx)+1
+    
+    x <- goodVals[fillIdx]
+
+    # If it was originally a factor, convert it back
+    if (!is.null(lvls)) {
+        x <- factor(x, levels=seq_along(lvls), labels=lvls)
+    }
+
+    x
+}
+
+cdc_data <- cdc_data[rowSums(is.na(cdc_data)) < (dim(cdc_data)[2] - 4),];
+cdc_data_mod <- t(apply(cdc_data, 1, function(x) fillNAgaps(x, firstBack = TRUE)));
+
+cycle_data <- t(cdc_data_mod);
+dim(cycle_data)
+```
+
+```{r echo=TRUE, eval=TRUE}
+cycle_data_norm <- apply(cycle_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+
+dim(cycle_data_norm)
+
+```
+
+## cellcycleR application on Yeast cdc 15 data
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_yeast_cdc15.rda")
+
+```
+
+We ran the method above once already (took around 5 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_yeast_cdc15.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 10);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+First we present the data in the order of the columns (sorted by time)
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[,top_genes]))
+```
+
+## Loading the cdc 28 data
+
+```{r echo=TRUE, eval=FALSE}
+
+data <- read.table("../data/Botstein_data/botstein_cdc.txt", sep="\t", header=TRUE, fill=TRUE);
+cdc_data <- data[,grep("cdc28",colnames(data))];
+cdc_data <- cdc_data[rowSums(is.na(cdc_data)) < (dim(cdc_data)[2] - 4),];
+cdc_data_mod <- t(apply(cdc_data, 1, function(x) fillNAgaps(x, firstBack = TRUE)));
+
+cycle_data <- t(cdc_data_mod);
+
+cycle_data_norm <- apply(cycle_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+```
+
+## Applying cellcycleR on cdc28 data
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_yeast_cdc28.rda")
+
+```
+
+We ran the method above once already (took around 5 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_yeast_cdc28.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 10);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+First we present the data in the order of the columns (sorted by time)
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[,top_genes]))
+```
+
+Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[,top_genes]))
+```
