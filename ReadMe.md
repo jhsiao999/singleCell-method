@@ -61,6 +61,16 @@ The limit of 80 characters for code described above does not need to be applied 
 [hadley-style]: http://r-pkgs.had.co.nz/style.html
 
 
+## Collaborating on the project
+
+```bash
+git checkout work-branch  ## move the pointer to local work branch
+git push origin work-branch  ## push edits to remove work branch
+git checkout master  ## move the pointer to local master
+git pull origin master  ## fetch and merge remote master to local master
+git checkout work-branch  ## move the pointer back to local work branch
+git merge master  ## update local work branch
+```
 
 ## Builing the site
 
