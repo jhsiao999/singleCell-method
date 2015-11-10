@@ -6,6 +6,11 @@ output:
   html_document:
     toc: true
 ---
+## Background
+
+In this script, we apply the cellcycleR method on the synchronized cell experiment in yeast in Botstein [paper](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC25624/). The data was collected from [Yeast Protein Database](http://quest7.proteome.com/YPDhome.html).  The main motivation was to see if the sinusoidal like trends in Figure 1 in the paper can be replicated using the cellcycleR mechanism. Botstein's group wrote another methods [paper](http://www.pnas.org/content/97/18/10101.full) where they showed the two eigenegenes to correspond to a sine wave and a cos wave with same phase shift (Check Figs 1 and 3). These were the prior results from their studies that we wanted to validate using cellcycleR.
+
+We here considered only the cdc15 and cdc28 cell lines.
 
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 library(qtlcharts)
@@ -18,7 +23,11 @@ library(vioplot)
 library(limma)
 ```
 
-## Loading the cdc15 data
+## cdc15 Data analysis
+
+### Data exploration
+
+The main concern in analyzing this data was the presence of NA values and how to deal with it. There were many genes which had NA values at different cell time points reported. To get around this problem, I substituted every non-leading NA value with the last non-NA value observed. In case of leading NAs, I replaced them by the first non-NA value. Since the cells were already ordered by time, this seemed the most obvious thing to do. 
 
 ```{r echo=TRUE, eval=TRUE}
 setwd("/Users/kushal/Documents/singleCell-method/project/analysis/")
@@ -65,6 +74,9 @@ cycle_data <- t(cdc_data_mod);
 dim(cycle_data)
 ```
 
+We mean center the genes and scale them by the standard deviation. 
+
+
 ```{r echo=TRUE, eval=TRUE}
 cycle_data_norm <- apply(cycle_data,2,function(x)  return (x-mean(x))/sd(x))
 celltime_levels <- 100;
@@ -74,7 +86,7 @@ dim(cycle_data_norm)
 
 ```
 
-## cellcycleR application on Yeast cdc 15 data
+### cellcycleR application on Yeast cdc 15 data
 
 ```{r echo=TRUE, eval=FALSE}
 out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_yeast_cdc15.rda")
@@ -117,21 +129,25 @@ top_genes <- which(SNR > 10);
 Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
 sinusoidal or not.
 
-First we present the data in the order of the columns (sorted by time)
-
-```{r echo=TRUE, eval=TRUE}
-iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
-```
-
-Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+First we present the data in the order of the columns (the cell times ordering reported by the authors).
 
 ```{r echo=TRUE, eval=TRUE}
 iplotCurves(t(cycle_data_norm[,top_genes]))
 ```
 
-## Loading the cdc 28 data
+Now, the re-ordered cell times by cellcycleR (which do not match with the order of cell times given) are 
 
-```{r echo=TRUE, eval=FALSE}
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+## cdc 28 Data analysis
+
+### Data exploration
+
+We repeat the same exploration as for cdc15 data. 
+
+```{r echo=TRUE, eval=TRUE}
 
 data <- read.table("../data/Botstein_data/botstein_cdc.txt", sep="\t", header=TRUE, fill=TRUE);
 cdc_data <- data[,grep("cdc28",colnames(data))];
@@ -145,7 +161,7 @@ celltime_levels <- 100;
 cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
 ```
 
-## Applying cellcycleR on cdc28 data
+### Applying cellcycleR on cdc28 data
 
 ```{r echo=TRUE, eval=FALSE}
 out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_yeast_cdc28.rda")
@@ -191,17 +207,20 @@ sinusoidal or not.
 First we present the data in the order of the columns (sorted by time)
 
 ```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[,top_genes]))
+
+```
+
+Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+
+```{r echo=TRUE, eval=TRUE}
 iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+
 ```
 
-Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+It seems that the two qtlcharts match up pretty well, also it was found that the relative ordering of the cells as reported by the authors matched pretty nicely with our ordering approach.
 
-```{r echo=TRUE, eval=TRUE}
-iplotCurves(t(cycle_data_norm[,top_genes]))
-```
+## Final Thoughts
 
-Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+The cellcycleR method seemed to pick out two main phase peaks and the qtlcharts showed the phases to be complementary. This is encouraging because the eigengenes mainly showed 2 patterns, which are very close to what we get.
 
-```{r echo=TRUE, eval=TRUE}
-iplotCurves(t(cycle_data_norm[,top_genes]))
-```
