@@ -54,4 +54,7 @@ tagline:
 * [Applying cellcycleR on Yoav's data](project/analysis/yoav_cellcycleR.html)
 * [Post processing of cellcycleR on Yoav data: gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
 * [Applying cellcycleR on LCL data](project/analysis/lcl_cellcycleR.html)
+* [Applying cellcycleR on Monocle data](project/analysis/monocle_cellcycleR.html)
+* [Applying cellcylceR on Botstein yeast data](project/analysis/yeast_cellcycleR.html)
+
 

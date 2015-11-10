@@ -1,0 +1,116 @@
+---
+title: 'Monocle data: cell ordering'
+author: "Kushal K Dey"
+date: "November 9, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+```
+
+## Background
+
+In this script, we apply the cell ordering approach on the Monocle data, by [Leng et al 2015](http://www.nature.com/nbt/journal/v32/n4/full/nbt.2859.html).The data is downloaded from GEO Omnibus (GSE52529). 
+## Data Exploration
+
+We first explore the data.  
+
+```{r echo=TRUE, eval=TRUE}
+setwd("/Users/kushal/Documents/singleCell-method/project/analysis/")
+data <- read.table("../data/Monocle data/GSE52529_fpkm_matrix.txt")
+gene_names <- rownames(data);
+
+gene_names <- unlist(lapply(gene_names,function(x) strsplit(x,"[.]")[[1]][1]))
+
+cycle_counts_data <- t(data);
+
+dim(cycle_counts_data)
+```
+
+Above, we give the dimensionality of the full data, across all genes. However, we concentrate on just the cell cycle genes listed from the Macosko paper initially.We perform voom to log normalize the gene expression across the cells and then for each gene, we perform mean correction and standardization.
+
+```{r echo=TRUE, eval=TRUE}
+
+cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
+cell_cycle_genes_list <- lapply(1:5,function(x){
+                                    temp <- as.character(cell_cycle_genes[,x])
+                                    temp[temp!=""]
+                            })
+labs <- unique(unlist(lapply(1:5, function(k) X = 
+                                 match(cell_cycle_genes_list[[k]],
+                                       gene_names))))
+labs <- labs[!is.na(labs)];
+cycle_counts_data <- cycle_counts_data[,labs]
+
+cycle_voom_data <- voom(cycle_counts_data)$E;
+cycle_data_norm <- apply(cycle_voom_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+
+dim(cycle_data_norm)
+
+```
+
+
+## cellcycleR application on Monocle data
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_monocle.rda")
+
+```
+
+We ran the method above once already (took around 5 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_monocle.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 3);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+## Final thoughts
+
+
+The patterns of expression in this data are not sinusoidal at all. As a result, the method does not seem to reveal any patterns.
+
