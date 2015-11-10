@@ -4,8 +4,15 @@ title: "Single-cell sequencing data analysis and methods"
 tagline: 
 ---
 
+### Home
+  * [Admixture clustering](#admixture-clustering)
+  * [Cell-cycle phase assignment](#assign-cell-cycle)
+  * [cellcycleR](#cellcycleR)
 
-### Admixture clustering
+---
+
+### Admixture clustering <a id = 'admixture-clustering'></a>
+
 * Human iPSC data (Tung et al., 2015)
 	* Endogeneous genes
 		* [Structure plot of iPSC by batch, individual, cell cycle](project/analysis/cell_phase_analysis.html)
@@ -34,12 +41,15 @@ tagline:
 	* [Structure analysis](project/analysis/deng_structure_all_genes.html)
 	* [Gene annotations (K=7)](project/analysis/gene_annotations_deng.html)
 
+---
 
-### Cell-cycle phase assignment (Macosko et al., 2015)
+### Cell-cycle phase assignment (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
 * [Cell ordering of the iPSCs - Macosko method](project/analysis/cell_ordering_iPSC.html)
 * [Cell cycle genes scores - recovered cell order](project/analysis/cell_cycle_score_analysis.html)
 
-### cellcycleR applications
+---
+
+### cellcycleR applications <a id = 'cellcycleR'></a>
 * [Oscope data, Leng et al., 2015](project/analysis/oscope_cellcycleR.html)
 * [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
 * [Human iPSC data, Tung et al., 2015](project/analysis/yoav_cellcycleR.html)
