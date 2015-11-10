@@ -65,6 +65,8 @@ The limit of 80 characters for code described above does not need to be applied 
 
 ```bash
 git checkout work-branch  ## move the pointer to local work branch
+git add new_edits
+git commit -m "new_edits" 
 git push origin work-branch  ## push edits to remove work branch
 git checkout master  ## move the pointer to local master
 git pull origin master  ## fetch and merge remote master to local master
