@@ -220,6 +220,182 @@ iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
 
 It seems that the two qtlcharts match up pretty well, also it was found that the relative ordering of the cells as reported by the authors matched pretty nicely with our ordering approach.
 
+## elu data
+
+### Data preparation
+
+```{r echo=TRUE, eval=TRUE}
+
+data <- read.table("../data/Botstein_data/botstein_cdc.txt", sep="\t", header=TRUE, fill=TRUE);
+elu_data <- data[,grep("elu",colnames(data))];
+elu_data <- elu_data[rowSums(is.na(elu_data)) < (dim(elu_data)[2] - 4),];
+elu_data_mod <- t(apply(elu_data, 1, function(x) fillNAgaps(x, firstBack = TRUE)));
+
+cycle_data <- t(elu_data_mod);
+
+cycle_data_norm <- apply(cycle_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+```
+
+
+### Applying cellcycleR on elu data
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_yeast_elu.rda")
+
+```
+
+We ran the method above once already (took around 5 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_yeast_elu.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 10);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+First we present the data in the order of the columns (sorted by time)
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[,top_genes]))
+
+```
+
+Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+
+```{r echo=TRUE, eval=TRUE}
+new_cell_order <- shift(order(cell_order_full),6,dir="right")
+iplotCurves(t(cycle_data_norm[new_cell_order,top_genes]))
+
+```
+
+Are we getting the true order back?
+
+```{r echo=TRUE, eval=TRUE}
+
+temp <- shift(order(cell_order_full),6,dir="right")
+print(colnames(elu_data)[temp])
+
+```
+
+For the elu data as well, the cellcycleR reordering seems to match pretty well with the original ordering provided by the authors. Also the trends seem to be pretty similar for the cellcycleR order of the cells and the order of the cells provided in the dataset.
+
+## alpha data
+
+### Data exploration
+
+```{r echo=TRUE, eval=TRUE}
+
+data <- read.table("../data/Botstein_data/botstein_cdc.txt", sep="\t", header=TRUE, fill=TRUE);
+alpha_data <- data[,grep("alpha",colnames(data))];
+alpha_data <- alpha_data[rowSums(is.na(alpha_data)) < (dim(alpha_data)[2] - 4),];
+alpha_data_mod <- t(apply(alpha_data, 1, function(x) fillNAgaps(x, firstBack = TRUE)));
+
+cycle_data <- t(alpha_data_mod);
+
+cycle_data_norm <- apply(cycle_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+```
+
+### Applying cellcycleR on alpha data
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_yeast_alpha.rda")
+
+```
+
+We ran the method above once already (took around 5 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_yeast_alpha.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 10);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+First we present the data in the order of the columns (sorted by time)
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[,top_genes]))
+
+```
+
+Now, the re-ordered cell times (which do not match with the order of cell times given) are 
+
+```{r echo=TRUE, eval=TRUE}
+new_cell_order <- shift(order(cell_order_full),6,dir="right")
+iplotCurves(t(cycle_data_norm[new_cell_order,top_genes]))
+
+```
+
+Are we getting the true order back?
+
+```{r echo=TRUE, eval=TRUE}
+
+temp <- shift(order(cell_order_full),6,dir="right")
+print(colnames(alpha_data)[temp])
+
+```
+
+For this data as well, cellcycleR does fairly well and although not perfectly, but still gets close to figuring out the actual order of cell times. 
+
+
 ## Final Thoughts
 
 The cellcycleR method seemed to pick out two main phase peaks and the qtlcharts showed the phases to be complementary. This is encouraging because the eigengenes mainly showed 2 patterns, which are very close to what we get.
