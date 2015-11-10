@@ -1,12 +1,12 @@
 ---
 layout: page
-title: "Single cell sequencing data analysis and methods"
+title: "Single-cell sequencing data analysis and methods"
 tagline: 
 ---
 
 
-### Exploration and Clustering of Po Yuan's iPSC data
-
+### Admixture clustering
+#### iPSC data
 * [Structure plot of iPSC by batch, individual, cell cycle](project/analysis/cell_phase_analysis.html)
 * [Structure plot per individual and per individual & batch](project/analysis/structure_per_individual.html)
 * [Investigating the properties of genes - low counts](project/analysis/low_counts_genes.html)
