@@ -138,8 +138,20 @@ iplotCurves(t(cycle_data_norm[,top_genes]))
 Now, the re-ordered cell times by cellcycleR (which do not match with the order of cell times given) are 
 
 ```{r echo=TRUE, eval=TRUE}
-iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+new_cell_order <- shift(order(cell_order_full),2,dir="right")
+iplotCurves(t(cycle_data_norm[new_cell_order,top_genes]))
 ```
+
+## cellcycleR order vs true (reported) order
+
+```{r echo=TRUE, eval=TRUE}
+
+temp <- shift(order(cell_order_full),2,dir="right")
+print(colnames(cdc_data)[temp])
+
+```
+
+The cellcycleR order does not quite match with the true order but our order gives more sinusoidal patterns, so am not sure which to believe. 
 
 ## cdc 28 Data analysis
 
@@ -214,11 +226,23 @@ iplotCurves(t(cycle_data_norm[,top_genes]))
 Now, the re-ordered cell times (which do not match with the order of cell times given) are 
 
 ```{r echo=TRUE, eval=TRUE}
+new_cell_order <- shift(order(cell_order_full),-7,dir="right")
 iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
 
 ```
 
 It seems that the two qtlcharts match up pretty well, also it was found that the relative ordering of the cells as reported by the authors matched pretty nicely with our ordering approach.
+
+### cellcycleR order vs true (reported) order
+
+```{r echo=TRUE, eval=TRUE}
+
+temp <- shift(order(cell_order_full),-7,dir="right")
+print(colnames(cdc_data)[temp])
+
+```
+
+The cellcycleR method does a pretty decent job at extracting the true order except towards the end of the cycle  when the patterns are not so strong. 
 
 ## elu data
 
@@ -297,7 +321,7 @@ iplotCurves(t(cycle_data_norm[new_cell_order,top_genes]))
 
 ```
 
-Are we getting the true order back?
+### cellcycleR order vs true (reported) order
 
 ```{r echo=TRUE, eval=TRUE}
 
@@ -384,7 +408,7 @@ iplotCurves(t(cycle_data_norm[new_cell_order,top_genes]))
 
 ```
 
-Are we getting the true order back?
+### cellcycleR order vs true (reported) order
 
 ```{r echo=TRUE, eval=TRUE}
 
@@ -398,5 +422,7 @@ For this data as well, cellcycleR does fairly well and although not perfectly, b
 
 ## Final Thoughts
 
-The cellcycleR method seemed to pick out two main phase peaks and the qtlcharts showed the phases to be complementary. This is encouraging because the eigengenes mainly showed 2 patterns, which are very close to what we get.
+The cellcycleR order seemed to conform pretty well with the actual order reported by the authors for the cdc28, elu and alpha cell lines data, but not so strongly for cdc15 line. Also, for all cases, we produced pretty sinusoidal patterns and also our patterns seem to correspond to the patterns they observed for some genes (I did not look very closely, but it may be worth doing so given that the analysis seems to be working well).
+
+
 
