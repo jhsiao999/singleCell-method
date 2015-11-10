@@ -63,6 +63,8 @@ The limit of 80 characters for code described above does not need to be applied 
 
 ## Collaborating on the project
 
+Person A makes changes in the local branch and attemps to merge these changes into the remote master and update the remote master.
+
 ```bash
 git checkout work-branch  ## move the pointer to local work branch
 git add new_edits
@@ -70,8 +72,7 @@ git commit -m "new_edits"
 git push origin work-branch  ## push edits to remove work branch
 git checkout master  ## move the pointer to local master
 git pull origin master  ## fetch and merge remote master to local master
-git checkout work-branch  ## move the pointer back to local work branch
-git merge master  ## update local work branch
+git merge work-branch  ## merge local work-branch into master and update master 
 ```
 
 ## Builing the site
