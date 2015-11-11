@@ -1,11 +1,29 @@
 ---
 title: "Marioni data: cell ordering"
-author: "Kushal K Dey"
-date: "November 4, 2015"
+author: "Kushal K Dey & Joyce Hsiao"
+date: "2015-11-10"
 output: 
   html_document:
-    toc: true
+        css: floating-toc.css
+        toc: true
 ---
+
+
+## Setup
+
+```{r run_date, results='asis', echo=FALSE}
+#last_update = format(Sys.time(), "(<time>%Y-%m-%d</time>)")
+last_update <- Sys.time()
+cat(paste("Last updated:", last_update))
+```
+
+
+```{r knitr_settings, include=FALSE, echo=FALSE}
+library(knitr)
+opts_knit$set(progress = TRUE, verbose = TRUE)
+opts_chunk$set(message = FALSE, warning = FALSE, eval = TRUE, 
+               echo = TRUE)
+``````
 
 
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
@@ -20,22 +38,26 @@ library(limma)
 library(readxl)
 ```
 
+
+
 ## Background
 
 In this script, we perform the cellcycleR method on the single cell data collected by John Marioni's group (see the data [here](http://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-2805/)).  For the paper with the analysis of this data, see [Buttner et al 2015](http://www.nature.com/nbt/journal/v33/n2/full/nbt.3102.html). The experimental description as provided by the authors is given below 
+
 
 ## Experimental Description (by Marioni's group)
 
 * Gene expression pattern of single mES cells during cell cycle stages
 Experiment Description	In this study, we aimed to study the gene expression patterns at single cell level across the different cell cycle stages in mESC. We performed single cell RNA-Seq experiment on mESC that were stained with Hoechst 33342 and Flow cytometry sorted for G1, S and G2M stages of cell cycle. Single cell RNA-Seq was performed using Fluidigm C1 system and libraries were generated using Nextera XT (Illumina) kit.*
 
+
 ## Data Description
 
 We first load the data and then explore the data
 
 ```{r echo=TRUE, eval=TRUE}
-setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
-G1_single <- data.frame(fread('../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
+data_dir <- "../data/Marioni_data"
+G1_single <- data.frame( fread( file.path(data_dir, "/G1_singlecells_counts.txt"), row.names=1) );
 G2M_single <- data.frame(fread('../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
 S_single <- data.frame(fread('../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
 

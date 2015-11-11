@@ -61,6 +61,28 @@ The limit of 80 characters for code described above does not need to be applied 
 [hadley-style]: http://r-pkgs.had.co.nz/style.html
 
 
+## Collaborating on the project
+
+Person A makes changes in the local branch and attemps to merge these changes into the remote master and update the remote master.
+
+```bash
+git checkout work-branch  ## move the pointer to local work branch
+git add new_edits
+git commit -m "new_edits" 
+git push origin work-branch  ## push edits to remove work branch
+
+### At this point, you can make a merge and a pull request to review the edits 
+
+git checkout master  ## move the pointer to local master
+git pull origin master  ## fetch and merge remote master to local master
+git merge work-branch  ## merge local work-branch into master and update master 
+git checkout work-branch  ## move to local work-branch
+git merge master  ## merge remote master to local work-branch
+git push origin work-branch  ## move the pointer back to local work-branch
+
+### At this point, the commit numbers of your work-branch and master should be the same!!!!!!!!!!!!!!!!!!!
+
+```
 
 ## Builing the site
 
