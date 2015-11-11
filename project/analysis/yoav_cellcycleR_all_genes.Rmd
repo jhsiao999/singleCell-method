@@ -1,0 +1,146 @@
+---
+title: 'Yoav data: cell ordering, all genes'
+author: "Kushal K Dey"
+date: "November 11, 2015"
+output: html_document
+---
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+```
+
+## Background
+
+In this script, we perform the cellcycleR method on the iPSC cells data collected by Po Yuan in Yoav's lab. The data is still not publicly available, but you can check out [John Blischak's website](http://jdblischak.github.io/singleCellSeq/analysis/) for the information on the data collection, the preliminary analysis Yoav'a lab have been focussing on so far. For this data, unlike for Oscope and the Marioni data, the other two datasets we are looking at, we do not have any information on the cell phases. The cell phases were estimated using a very ad-hoc approach by Macosko et al, see their paper [here](http://www.ncbi.nlm.nih.gov/pubmed/26000488). 
+
+## Data Description
+
+We have batch corected and individual corrected the expression levels for the iPSC samples. Also, we have fitted admixture models to learn about the distinctive behavior across the different phases. Check our [webpage](http://jhsiao999.github.io/singleCell-method/) for further details. 
+
+We now load the batch corrected gene expression data for all genes (with single cell samples along the rows and the genes on the columns).
+
+```{r echo=TRUE, eval=TRUE}
+setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+molecules_single <- data.frame(fread("../data/batch_removed_counts_all_genes.txt"), row.names=1);
+cycle_counts_data <- molecules_single;
+dim(cycle_counts_data)
+```
+
+Next, we perform voom to log normalize the gene expression across the cells and then for each gene, we perform mean correction and standardization. then we filter out the genes with 0 normalized expression across all the single cells. 
+
+```{r echo=TRUE, eval=TRUE}
+cycle_voom_data <- voom(cycle_counts_data)$E;
+cycle_data_norm <- apply(cycle_voom_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+
+dim(cycle_data_norm)
+
+```
+
+## apply cellcycleR on Yoav data
+
+We next apply the cellcycleR method on the entire Yoav data.
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_ipsc_full.rda")
+
+```
+
+We ran the method above once already (took around 30 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_ipsc_full.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 10);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+We filter out the highly sinusoidal genes and repeat the procedure again.
+
+
+```{r echo=TRUE, eval=TRUE}
+
+snr_high_indices <- which(SNR > 3);
+
+cycle_data_norm_sinusoidal <- cycle_data_norm[,snr_high_indices];
+
+dim(cycle_data_norm_sinusoidal)
+```
+
+We apply the cell ordering mechanism (it takes around 5 minutes to run)
+
+```{r echo=TRUE, eval=FALSE}
+out2 <- cell_ordering_class(cycle_data_norm_sinusoidal, celltime_levels = 100, num_iter=100,
+                            save_path="../rdas/cell_order_ipsc_sinusoidal.rda")
+```
+
+We reload the output 
+
+```{r echo=TRUE, eval=TRUE}
+out2 <- get(load(file="../rdas/cell_order_ipsc_sinusoidal.rda"));
+cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
+```
+
+We plot the same features as above and check for the robustness. We needed to shift the cell order so as to compare with previous plot on all genes as the method is non-identifiable upto a rotation. 
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out2$amp;
+sd_genes <- out2$sigma;
+phi_genes <- out2$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 0.5);
+new_cell_order <- shift(order(cell_order_full),0,dir="right")
+iplotCurves(t(cycle_data_norm_sinusoidal[new_cell_order,top_genes]))
+
+```
