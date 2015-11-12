@@ -20,7 +20,7 @@ tagline:
      * [Investigating the properties of genes - low counts](project/analysis/low_counts_genes.html)
      * [Investigating ERCC spike ins - RUV normalization](project/analysis/RUV_normalization.html)
      * [iPSC Structure plots before and after batch correction](project/analysis/batch_effect_all_genes.html)
-* Cell-cycle genes
+  * Cell-cycle genes
      * [Cell-cycle scores](project/analysis/cell_cycle_score_analysis.html)
      * [Structure plots using before batch, individual correction](project/analysis/clustering_cell_cycle_genes.html)
      * [Structure plots after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
