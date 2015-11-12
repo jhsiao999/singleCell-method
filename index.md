@@ -54,9 +54,10 @@ tagline:
 * [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
 
 * Human iPSC data (Tung et al., 2015)
-  	* [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)		* [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
+  	* [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
+	      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
 	* [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
-	      	* [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
+	      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	       
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
