@@ -53,10 +53,10 @@ tagline:
 * [Oscope data, Leng et al., 2015](project/analysis/oscope_cellcycleR.html)
 * [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
 
-* Human iPSC data (Tung et al., 2015)
-  * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
+* Human iPSC data (Tung et al. 2015)
+ * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
     * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
-  * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
+ * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
     * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	       
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
