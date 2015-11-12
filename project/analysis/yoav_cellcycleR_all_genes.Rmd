@@ -2,7 +2,9 @@
 title: 'Yoav data: cell ordering, all genes'
 author: "Kushal K Dey"
 date: "November 11, 2015"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 
@@ -30,7 +32,7 @@ We now load the batch corrected gene expression data for all genes (with single 
 
 ```{r echo=TRUE, eval=TRUE}
 setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
-molecules_single <- data.frame(fread("../data/batch_removed_counts_all_genes.txt"), row.names=1);
+molecules_single <- data.frame(fread("../data/batch_removed_counts_all_genes.txt"), row.names = 1);
 cycle_counts_data <- molecules_single;
 dim(cycle_counts_data)
 ```
@@ -47,12 +49,18 @@ dim(cycle_data_norm)
 
 ```
 
+The cell phases as assigned using Macosko method
+
+```{r echo=TRUE, eval=TRUE}
+cell_phases <- as.vector(as.matrix(read.table("../data/cell_phase_vector_yoav.txt")));
+```
+
 ## apply cellcycleR on Yoav data
 
 We next apply the cellcycleR method on the entire Yoav data.
 
 ```{r echo=TRUE, eval=FALSE}
-out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_ipsc_full.rda")
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=50, save_path="../rdas/cell_order_ipsc_full.rda")
 
 ```
 
@@ -76,6 +84,22 @@ plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of
 plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
 
 ```
+
+
+
+
+```{r echo=TRUE,eval=FALSE}
+vioplot(cell_order_full[which(cell_phases=="G1.S")],
+        cell_order_full[which(cell_phases=="S")],
+        cell_order_full[which(cell_phases=="G2.M")],
+        cell_order_full[which(cell_phases=="M")],
+        cell_order_full[which(cell_phases=="M.G1")],
+        names=c("G1","S","G2M","M","M.G1"),
+        col="red")
+
+
+```
+
 
 We extract the genes with high SNR - these are more likely to be sinusoidal.
 
@@ -101,7 +125,7 @@ We filter out the highly sinusoidal genes and repeat the procedure again.
 
 ```{r echo=TRUE, eval=TRUE}
 
-snr_high_indices <- which(SNR > 3);
+snr_high_indices <- which(SNR > 1);
 
 cycle_data_norm_sinusoidal <- cycle_data_norm[,snr_high_indices];
 
@@ -112,13 +136,13 @@ We apply the cell ordering mechanism (it takes around 5 minutes to run)
 
 ```{r echo=TRUE, eval=FALSE}
 out2 <- cell_ordering_class(cycle_data_norm_sinusoidal, celltime_levels = 100, num_iter=100,
-                            save_path="../rdas/cell_order_ipsc_sinusoidal.rda")
+                            save_path="../rdas/cell_order_ipsc_sinusoidal_full.rda")
 ```
 
 We reload the output 
 
 ```{r echo=TRUE, eval=TRUE}
-out2 <- get(load(file="../rdas/cell_order_ipsc_sinusoidal.rda"));
+out2 <- get(load(file="../rdas/cell_order_ipsc_sinusoidal_full.rda"));
 cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
 ```
 
@@ -139,8 +163,25 @@ ESS <- amp_genes^2; RSS <- sd_genes^2
 SNR <- ESS/RSS;
 
 plot(SNR, col="red", pch=20, lwd=1)
-top_genes <- which(SNR > 0.5);
-new_cell_order <- shift(order(cell_order_full),0,dir="right")
+top_genes <- which(SNR > 3);
+new_cell_order <- shift(order(cell_order_full),100,dir="right")
 iplotCurves(t(cycle_data_norm_sinusoidal[new_cell_order,top_genes]))
 
 ```
+
+This looks very sinusoidal, there also do not seem to be outliers screwing up the analysis. 
+
+```{r echo=TRUE, eval=FALSE}
+
+vioplot(cell_order_full[which(cell_phases=="G1.S")],
+        cell_order_full[which(cell_phases=="S")],
+        cell_order_full[which(cell_phases=="G2.M")],
+        cell_order_full[which(cell_phases=="M")],
+        cell_order_full[which(cell_phases=="M.G1")],
+        names=c("G1","S","G2M","M","M.G1"),
+        col="red")
+
+```
+
+It seems that our method seems to mainly distinguish the G2.M and M phases from the other phases, which is again plausible because in stem cells, we mainly have the S (synthesis) and the mitosis (M) phase. 
+
