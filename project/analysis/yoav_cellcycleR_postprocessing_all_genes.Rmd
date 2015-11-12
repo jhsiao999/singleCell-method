@@ -42,19 +42,19 @@ ESS <- amp_genes^2; RSS <- sd_genes^2
 
 SNR <- ESS/RSS;
 
-snr_high_indices <- which(SNR > 3);
+snr_high_indices <- which(SNR > 1);
 
 cycle_data_norm_sinusoidal <- cycle_data_norm[,snr_high_indices];
 
 dim(cycle_data_norm_sinusoidal)
 
-rm(SNR); rm(amp_genes); rm(sd_genes); rm(phi_genes);
+#rm(SNR); rm(amp_genes); rm(sd_genes); rm(phi_genes);
 
 ```
 
 Load the cellcycleR output
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=FALSE}
  out2 <- get(load(file="../rdas/cell_order_ipsc_sinusoidal_full.rda"));
  
  amp_genes <- out2$amp;
@@ -72,9 +72,10 @@ Load the cellcycleR output
 Extracting the top 100 gene names with highest SNR.
 
 ```{r echo=TRUE, eval=TRUE}
-sinusoidal_gene_names <- colnames(cycle_data_norm_sinusoidal);
+#sinusoidal_gene_names <- colnames(cycle_data_norm_sinusoidal);
+ sinusoidal_gene_names <- colnames(cycle_data_norm);
 imp_genes <- sinusoidal_gene_names[order(SNR, decreasing=TRUE)]
-top_genes_100 <- imp_genes[1:200];
+top_genes_100 <- imp_genes[1:100];
 ```
 
 We now annotate these top $100$ genes using **mygene** package.
