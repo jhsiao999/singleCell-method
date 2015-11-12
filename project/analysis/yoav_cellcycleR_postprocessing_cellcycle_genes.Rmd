@@ -1,5 +1,5 @@
 ---
-title: 'Yoav cellcycleR post processing: annotating genes'
+title: 'Yoav cellcycleR post processing: cell cycle genes'
 author: "Kushal K Dey"
 date: "November 5, 2015"
 output: 
