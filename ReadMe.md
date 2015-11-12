@@ -99,5 +99,5 @@ git push origin gh-pages
 
 *  Thanks to Karl Broman for maintaining publically accessible 
    instructions of building a github website.
-*  Thanks to John Blischat for sharing his contributing guidelines.
-
+*  Thanks to John Blischak for sharing his contributing guidelines.
+*  Thanks to Raman Shah for helpful tips on Git collaboration.
