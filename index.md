@@ -14,7 +14,7 @@ tagline:
 ### Admixture clustering <a id = 'admixture-clustering'></a>
 
 * Human iPSC data (Tung et al., 2015)
-	* Endogeneous genes
+  	* Endogeneous genes
 		* [Structure plot of iPSC by batch, individual, cell cycle](project/analysis/cell_phase_analysis.html)
 		* [Structure plot per individual and per individual & batch](project/analysis/structure_per_individual.html)
 		* [Investigating the properties of genes - low counts](project/analysis/low_counts_genes.html)
@@ -54,10 +54,9 @@ tagline:
 * [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
 
 * Human iPSC data (Tung et al., 2015)
-        * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
-	   * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
-        * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
-	   * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
+  	* [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)		* [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing.html)
+	* [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
+	      	* [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	       
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
