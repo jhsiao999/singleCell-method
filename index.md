@@ -15,12 +15,12 @@ tagline:
 
 * Human iPSC data (Tung et al., 2015)
   * Endogeneous genes
-		* [Structure plot of iPSC by batch, individual, cell cycle](project/analysis/cell_phase_analysis.html)
-		* [Structure plot per individual and per individual & batch](project/analysis/structure_per_individual.html)
-		* [Investigating the properties of genes - low counts](project/analysis/low_counts_genes.html)
+    * [Structure plot of iPSC by batch, individual, cell cycle](project/analysis/cell_phase_analysis.html)
+    * [Structure plot per individual and per individual & batch](project/analysis/structure_per_individual.html)
+    * [Investigating the properties of genes - low counts](project/analysis/low_counts_genes.html)
 		* [Investigating ERCC spike ins - RUV normalization](project/analysis/RUV_normalization.html)
 		* [iPSC Structure plots before and after batch correction](project/analysis/batch_effect_all_genes.html)
-	* Cell-cycle genes
+  * Cell-cycle genes
 		* [Cell-cycle scores](project/analysis/cell_cycle_score_analysis.html)
 		* [Structure plots using before batch, individual correction](project/analysis/clustering_cell_cycle_genes.html)
 		* [Structure plots after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
