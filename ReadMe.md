@@ -4,11 +4,25 @@ View our website [here](https://jhsiao999.github.io/singleCell-method).
 
 ## Outline
 
-*  [Creating a new analysis](#creating-a-new-analysis)
 *  [Site organization](#site-organization)
-*  [Style guide](#style-guide)
+*  [Creating a new analysis](#creating-a-new-analysis)
+*  [Collaborating on the project](#collaborating-on-the-project)
 *  [Building the site](#building-the-site)
+*  [Style guide](#style-guide)
 *  [Acknowledgements](#acknowledgements)
+
+
+## Site organization
+
+For consistency, we structure the content as follows:
+
+*  `project/analysis`: New analysis (Rmd and html).
+*  `project/analysis/rdas`: Interim or end-of-analysis results that are 
+	saved for later analysis.
+*  `project/analysis/figures`: Image files. 
+*  `project/data`: Input data, such as count matrix and phenotypes.
+*  `project/code`: Data processing or analysis codes.
+*  `project/slides`: Talk slides.
 
 
 ## Creating a new anaysis
@@ -24,17 +38,37 @@ View our website [here](https://jhsiao999.github.io/singleCell-method).
 *  Add, commit, and push the new analysis.
 
 
-## Site organization
 
-For consistency, we structure the content as follows:
+## Collaborating on the project
 
-*  Add new analysis (Rmd and html) to `project/analysis`.
-*  Add input data (e.g., count matrix and phenotypes) to `project/data`.
-*  Add output files (e.g., Admixture proportions and Structure plots)
-   to `project/output/name-of-the-html-page/`.
-*  Add `rda` files (e.g., results) to `project/rdas`.
-*  Add word documents (e.g., method summary) to `project/notes`.
-*  Add figures (pdfs or pngs) to `project/figures`
+Person A makes changes in the local branch and attemps to merge these changes into the remote master and update the remote master.
+
+```bash
+git checkout work-branch  ## move the pointer to local work branch
+git add new_edits
+git commit -m "new_edits" 
+git push origin work-branch  ## push edits to remove work branch
+
+### At this point, you can make a merge and a pull request to review the edits 
+
+git checkout master  ## move the pointer to local master
+git pull origin master  ## fetch and merge remote master to local master
+git merge work-branch  ## merge local work-branch into master and update master 
+git checkout work-branch  ## move to local work-branch
+git merge master  ## merge remote master to local work-branch
+git push origin work-branch  ## move the pointer back to local work-branch
+
+### At this point, the commit numbers of your work-branch and master should be the same!!!!!!!!!!!!!!!!!!!
+```
+
+
+## Builing the site
+
+```bash
+git checkout gh-pages
+git merge master
+git push origin gh-pages
+```
 
 
 
@@ -61,43 +95,11 @@ The limit of 80 characters for code described above does not need to be applied 
 [hadley-style]: http://r-pkgs.had.co.nz/style.html
 
 
-## Collaborating on the project
-
-Person A makes changes in the local branch and attemps to merge these changes into the remote master and update the remote master.
-
-```bash
-git checkout work-branch  ## move the pointer to local work branch
-git add new_edits
-git commit -m "new_edits" 
-git push origin work-branch  ## push edits to remove work branch
-
-### At this point, you can make a merge and a pull request to review the edits 
-
-git checkout master  ## move the pointer to local master
-git pull origin master  ## fetch and merge remote master to local master
-git merge work-branch  ## merge local work-branch into master and update master 
-git checkout work-branch  ## move to local work-branch
-git merge master  ## merge remote master to local work-branch
-git push origin work-branch  ## move the pointer back to local work-branch
-
-### At this point, the commit numbers of your work-branch and master should be the same!!!!!!!!!!!!!!!!!!!
-
-```
-
-## Builing the site
-
-```bash
-git checkout gh-pages
-git merge master
-git add index.md *.html
-git commit -m "Build site"
-git push origin gh-pages
-```
 
 
 ## Acknowledgements
 
 *  Thanks to Karl Broman for maintaining publically accessible 
    instructions of building a github website.
-*  Thanks to John Blischat for sharing his contributing guidelines.
-
+*  Thanks to John Blischak for sharing his contributing guidelines.
+*  Thanks to Raman Shah for helpful tips on Git collaboration.
