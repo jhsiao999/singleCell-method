@@ -172,6 +172,8 @@ batch_id <- sapply(1:length(rownames(counts_data)), function(x) strsplit(rowname
 individual.batch.id <- paste0(individual_id,"_", batch_id);
 batch_corrected_counts <- BatchCorrectedCounts(counts_data,individual.batch.id);
 
+#write.table(batch_corrected_counts,"../data/batch_removed_counts_all_genes.txt");
+
 nclus_vec <- 2:5
 samp_metadata <- cbind.data.frame(individual_id, cell_phase_vector)
 colnames(samp_metadata) <- c("individual", "cell_phase")
