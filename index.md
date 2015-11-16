@@ -58,6 +58,7 @@ tagline:
   * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellcycleR_non_ribosomal.html)  
+	* [On CDC, cyclin and cell cycle genes](project/analysis/yoav_cellcyleR_cdc_cyclin.html)
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
