@@ -63,3 +63,7 @@ tagline:
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
 
 
+---
+
+### Batch effect
+* [ERCC genes](project/analysis/ercc-pca.html)
