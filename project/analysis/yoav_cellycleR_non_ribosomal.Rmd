@@ -61,7 +61,7 @@ save(annotate_genes, file="../rdas/annotate_all_genes.rda")
 
 ```{r echo=TRUE, eval=TRUE}
 annotate_genes <- get(load("../rdas/annotate_all_genes.rda"));
-filter1 <- grep("ribosomal", annotate_genes$name)
+filter1 <- grep("ribo", annotate_genes$name)
 filter2 <- grep("mitochondrial", annotate_genes$name)
 filter <- unique(c(filter1,filter2))
 
@@ -73,10 +73,17 @@ cycle_data_norm <- cycle_data_norm[,labeling_indices];
 
 ```
 
+The cell phases as assigned using Macosko method
+
+```{r echo=TRUE, eval=TRUE}
+cell_phases <- as.vector(as.matrix(read.table("../data/cell_phase_vector_yoav.txt")));
+```
+
+
 ## apply cellcycleR on the filtered non-ribosomal non-mitochondrial genes
 
 ```{r echo=TRUE, eval=FALSE}
-out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=50, save_path="../rdas/cell_order_ipsc_non_ribosomal.rda")
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_ipsc_non_ribosomal.rda")
 
 ```
 
@@ -102,9 +109,7 @@ plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of t
 ```
 
 
-
-
-```{r echo=TRUE,eval=FALSE}
+```{r echo=TRUE,eval=TRUE}
 vioplot(cell_order_full[which(cell_phases=="G1.S")],
         cell_order_full[which(cell_phases=="S")],
         cell_order_full[which(cell_phases=="G2.M")],
