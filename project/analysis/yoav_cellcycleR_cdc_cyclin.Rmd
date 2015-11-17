@@ -2,7 +2,9 @@
 title: 'Yoav data: CDC, cyclin, cell cycle'
 author: "Kushal K Dey"
 date: "November 16, 2015"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 
