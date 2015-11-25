@@ -67,3 +67,9 @@ tagline:
 
 ### Batch effect
 * [ERCC genes](project/analysis/ercc-pca.html)
+  * [RUVg](project/analysis/ercc-ruvg.html)
+* [Bulk RNA]
+  * [RUVg](project/analysis/ercc-ruvg-paper-data.html)
+
+
+
