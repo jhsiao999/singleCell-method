@@ -8,6 +8,7 @@ tagline:
   * [Admixture clustering](#admixture-clustering)
   * [Cell-cycle phase assignment](#assign-cell-cycle)
   * [cellcycleR](#cellcycleR)
+  * [Batch effect](#batch)
 
 ---
 
@@ -65,11 +66,12 @@ tagline:
 
 ---
 
-### Batch effect
+### Batch effect <a id = 'batch'></a>
 * [ERCC genes](project/analysis/ercc-pca.html)
   * [RUVg](project/analysis/ercc-ruvg.html)
+  * [SVA package](project/analysis/ercc-sva.html)
 * [Bulk RNA]
-  * [RUVg](project/analysis/ercc-ruvg-paper-data.html)
+  * [RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
 
 
 
