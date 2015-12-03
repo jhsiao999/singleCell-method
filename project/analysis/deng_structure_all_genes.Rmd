@@ -86,7 +86,7 @@ colnames(reads) <- cell_meta;
 ```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
 samp_metadata <- cbind.data.frame(cell_meta);
 counts <- t(reads);
-colnames(samp_metadata) <- c("cell_type");
+colnames(samp_metadata) <- c("dev_phase");
 
 if(!dir.exists("../figures/deng_structure")) dir.create("../figures/deng_structure")
 
