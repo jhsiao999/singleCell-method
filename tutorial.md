@@ -1,16 +1,28 @@
-# ashlar: A GitHub workflow template
+---
+title: "Setting up the website"
+author: "Joyce Hsiao"
+date: 2015-12-12
+---
 
-[*ashlar*](http://github.com/jhsiao999/ashlar) repository is a workflow template created for [Stephens Lab](http://stephenslab.uchicago.edu/) at the University of Chicago. 
+**Last updated:** `r Sys.Date()`
 
-### Step-by-step guide
-	* [Cloning ashlar](#cloning)
-	* [Resetting git remote directory](#reset-git)
-	* [Producing and publishing website](#publish-website)
+**Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
 
-### Resources(#resources)
+```{r chunk-options, include=FALSE}
+source("chunk-options.R")
+```
 
 ---
-### Cloning [*ashlar*](http://github.com/jhsiao999/ashlar]) <a id = 'cloning'></a>
+
+### Objectives
+
+Copy an exisiting GitHub repository and use GitHub Pages to produce a website for the repository.
+
+I use [*ashlar*](http://github.com/jhsiao999/ashlar) as an example and give a simple tutorial for setting up a website. You don't have to publish this website, but I suggest you do as a practice. 
+
+---
+
+### Cloning [*ashlar*](http://github.com/jhsiao999/ashlar])
 
 [*ashlar*](http://github.com/jhsiao999/ashlar) is set up to mimic the workflow implemented in [*singleCellSeq*](https://github.com/jdblischak/singleCellSeq). Both projects adopt the popular [*rmarkdown*](http://rmarkdown.rstudio.com/) website layout.
 
@@ -22,7 +34,7 @@ git clone https://github.com/jhsiao999/ashlar.git ashlar-trial
 
 ---
 
-### Reset git remote directory <a id = 'reset-git'></a>
+### Reset git remote directory
 
 Remote directory of the clone is still  [*ashlar*][http://github.com/jhsiao999/ashlar]. Make sure you change the name of the remote repository.
 
@@ -41,7 +53,7 @@ git push origin master
 
 ---
 
-### Producing and publishing the website <a id = 'publish-website'></a>
+### Producing and publishing the website
 
 Option 1: All content for my eyes only
 
@@ -111,11 +123,3 @@ git push origin gh-pages
 
 
 
-
-### Resources <a id = 'resources'></a>
-
-* [John Blischak's tips on worflow management.][contrib]
-
-
-[site]: http://jhsiao999.github.io/ashlar/analysis
-[contrib]: https://github.com/jdblischak/singleCellSeq/blob/master/CONTRIBUTING.md
