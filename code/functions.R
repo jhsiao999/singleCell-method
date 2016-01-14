@@ -11,13 +11,15 @@
 #
 # Reference: Zhang et al. 2009 (http://www.ncbi.nlm.nih.gov/pubmed/19763933)
 run_pca <- function(x, retx = TRUE, center = TRUE, scale = TRUE) {
-  library("testit")
 
   pca <- prcomp(t(x), retx = retx, center = center, scale. = scale)
   variances <- pca$sdev^2
   explained <- variances / sum(variances)
-  assert("Variance explained is calculated correctly.",
-         explained[1:2] - summary(pca)$importance[2, 1:2] < 0.0001)
+
+#  library("testit")
+#  assert() is built on stopifnot() and emits an message in case of an error
+#  assert("Variance explained is calculated correctly.",
+#         explained[1:2] - summary(pca)$importance[2, 1:2] < 0.0001)
   return(list(PCs = pca$x, explained = explained))
 }
 
@@ -37,12 +39,12 @@ run_pca <- function(x, retx = TRUE, center = TRUE, scale = TRUE) {
 plot_pca <- function(x, pcx = 1, pcy = 2, explained = NULL, metadata = NULL,
                      color = NULL, shape = NULL, size = NULL, factors = NULL) {
   library("ggplot2")
-  library("testit")
+#    library("testit")
 
   # Prepare data frame to pass to ggplot
   if (!is.null(metadata)) {
-    assert("PC and metadata have same number of rows.",
-           nrow(x) == nrow(metadata))
+#    assert("PC and metadata have same number of rows.",
+#           nrow(x) == nrow(metadata))
     plot_data <- cbind(x, metadata)
     plot_data <- as.data.frame(plot_data)
     # Convert numeric factors to class "factor"
@@ -54,8 +56,8 @@ plot_pca <- function(x, pcx = 1, pcy = 2, explained = NULL, metadata = NULL,
   }
   # Prepare axis labels
   if (!is.null(explained)) {
-    assert("Number of PCs differs between x and explained.",
-           length(explained) == ncol(x))
+#    assert("Number of PCs differs between x and explained.",
+#           length(explained) == ncol(x))
     xaxis <- sprintf("PC%d (%.2f%%)", pcx, round(explained[pcx] * 100, 2))
     yaxis <- sprintf("PC%d (%.2f%%)", pcy, round(explained[pcy] * 100, 2))
   } else {
