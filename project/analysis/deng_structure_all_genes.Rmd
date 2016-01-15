@@ -54,7 +54,6 @@ rownames(reads_no_dups) <- gene_names_new;
 colnames(reads_no_dups) <- cell_meta;
 dim(reads_no_dups);
 
-
 write.table(reads_no_dups,"../data/Deng_cell_data.txt");
 ```
 
@@ -62,16 +61,17 @@ Now we load the data.
 
 ```{r echo=TRUE, eval=TRUE}
 setwd('/Users/kushal/Documents/singleCell-method/project/analysis/')
+library(data.table)
 reads <- data.frame(fread('../data/Deng cell data/Deng_cell_data.txt'),row.names=1);
 files <- list.files("../data/Deng_data/");
 cell_meta <- unlist(lapply(files, function(x) strsplit(x,"_")[[1]][2]));
 cell_meta[grep("zy",cell_meta)]="zy";
-cell_meta[grep("smartseq2", files)]="8cell";
-cell_meta[grep("8cell_2pooled", files)]="8cell";
-cell_meta[grep("8cell_split", files)]="8cell";
-cell_meta[grep("16cell_2pooled", files)]="16cell";
-cell_meta[grep("16cell_split", files)]="16cell";
-indices_not_reqd <- which(cell_meta=="BXC"   | cell_meta=="C57twocell" | cell_meta=="fibroblast");
+cell_meta[grep("smartseq2", files)]="8cell_nd";
+cell_meta[grep("8cell_2pooled", files)]="8cell_nd";
+cell_meta[grep("8cell_split", files)]="8cell_nd";
+cell_meta[grep("16cell_2pooled", files)]="16cell_nd";
+cell_meta[grep("16cell_split", files)]="16cell_nd";
+indices_not_reqd <- which(cell_meta=="BXC"   | cell_meta=="C57twocell" | cell_meta=="fibroblast" | cell_meta =="8cell_nd" | cell_meta == "16cell_nd");
 cell_meta <- cell_meta[-indices_not_reqd];
 reads <- reads[,-indices_not_reqd];
 cell_meta_unique <- c("zy","early2cell","mid2cell","late2cell","4cell","8cell","16cell","earlyblast","midblast","lateblast") ;
@@ -95,7 +95,7 @@ nclus_vec <- 2:7;
 if(file.exists("../../project/rdas/deng_topic_fit.rda")) {
 deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
 } else {
-StructureObj(as.matrix(counts),nclus_vec,samp_metadata = samp_metadata, tol=0.01, batch_lab = NULL, path_rda="../../project/rdas/deng_topic_fit.rda",partition=c('TRUE'),path_struct = "../figures/deng_structure");
+StructureObj(as.matrix(counts),nclus_vec,samp_metadata = samp_metadata, tol=10, batch_lab = NULL, path_rda="../../project/rdas/deng_topic_fit.rda",partition=c('TRUE'),path_struct = "../figures/deng_structure");
 deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
 }
 
@@ -108,8 +108,7 @@ deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
 
 for(nclus in 1:length(nclus_vec)){
   
-docweights <- deng_topics[[nclus]]$omega[-indices_not_reqd,];
-docweights <- docweights[order_of_development,]
+docweights <- deng_topics[[nclus]]$omega;
 
  if(!dir.exists(paste0(path_struct,"/clus_",dim(docweights)[2])))
     dir.create(paste0(path_struct,"/clus_",dim(docweights)[2]))
@@ -131,7 +130,7 @@ color <- control$color;
 png(filename=paste0(path_struct,'/clus_',dim(docweights)[2],'/struct_clus_',dim(docweights)[2],'_',colnames(samp_metadata)[num],'.png'),width=struct.width, height=struct.height);
     par(mar=c(mar.bottom,mar.left, mar.top,mar.right))
     barplot(t(docweights),col=color,axisnames=F,space=0,border=NA,
-            main=paste("Structure arranged by",colnames(samp_metadata)[num],": topics=",(nclus)),
+            main=paste("Structure arranged by",colnames(samp_metadata)[num],": topics=",(nclus+1)),
             las=las,ylim=c(0,1),ylab="admix prop", xlab=paste0(colnames(samp_metadata)[num]),
             cex.axis=cex.axis,cex.main=cex.main);
     labels = match(unique(metadata), metadata);
