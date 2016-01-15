@@ -6,17 +6,14 @@ title: "License"
 
 **Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
 
-## Code
 
-The code is licensed under the [GPLv3][code-license].
-We use multiple [Bioconductor][bioc] packages which are GPL'd.
+The repository is currently licensed under a [Creative Commons Attribution 4.0 International License][site-license]. We encourage others to tweak, remix, and build upon our work.
 
-[bioc]: https://www.bioconductor.org/about
+[site-license]: https://creativecommons.org/licenses/by/4.0/legalcode
 
-## Site
 
-The text is currently licensed under a [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License][site-license].
-A more permissive license will be applied upon future publication of the results.
+We thank John Blischak at the University of Chicago for sharing his workflow template. Check out John's [site][singleCellSeq] that documents data preprocessing steps and statistical analyses for a research project that investigates experimental artifacts in single-cell RNA-seq data. 
 
-[code-license]: https://www.gnu.org/licenses/gpl-3.0.txt
-[site-license]: https://creativecommons.org/licenses/by-nc-nd/4.0/
+[singleCellSeq]: https://github.com/jdblischak/singleCellSeq/
+
+
