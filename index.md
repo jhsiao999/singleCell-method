@@ -63,6 +63,8 @@ tagline:
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
 
+---
+
 ### SMASH in cellcycleR <a id="smash_cellcycleR"></a>
 * [SMASH validation check](project/analysis/smash_validation_check.html)
 
