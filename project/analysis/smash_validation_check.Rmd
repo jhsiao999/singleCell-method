@@ -1,0 +1,126 @@
+---
+title: "SMASH software application in time ordering- validation check"
+author: "Kushal K Dey"
+date: "January 14, 2016"
+output: 
+  html_document:
+    toc: true
+---
+
+## Background
+
+The goal of the study in this analysis is to apply the **SMASH** R package due to Tom Xing and Matthew Stephens for determining a sensible smoothing optimization  criterion for cell cycle data. The **SMASH** package fits nonparameteric models to 
+
+$$ y_{i} = \mu_{i} + \epsilon_{i} $$
+
+$$ \epsilon_{i} \sim N(0, \sigma^2_{i}) $$
+
+Our goal then is to estimate the underlying parameter $\mu$. In the **cellcycleR** set up, we also have similar condition and smoother the $\mu$, the fit is expected to be better (the error variation will be smaller) as wavelet methods make use of the neighborhood behavior at any point. 
+
+## Simulation from sinusoidal model
+
+```{r, echo=TRUE, eval=TRUE}
+library(cellcycleR)
+library(wavethresh)
+```
+
+
+```{r echo=TRUE, eval=TRUE}
+
+G <- 100;
+num_cells <- 256;
+amp_genes1 <- rep(10, G);
+phi_genes1 <- rep(c(2,5), each=G/2);
+sigma_genes1 <- rchisq(G, 4);
+cell_times_sim <- sort(sample(seq(0,2*pi, 2*pi/(num_cells-1)), num_cells, replace=FALSE));
+cycle_data <- t(sim_sinusoidal_cycle(G, amp_genes1, phi_genes1, sigma_genes1, cell_times_sim));
+
+```
+
+The sinusoidal expression pattern for $1$st gene 
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data[1,])
+```
+
+## Permutation of sample labels
+
+Now we permute the labels of the times.
+
+```{r echo=TRUE, eval=TRUE}
+sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
+cycle_data_reorder <- cycle_data[,sample_reorder];
+```
+
+We plot the expression pattern for $1$st gene.
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[1,])
+```
+
+## Applying SMASH
+
+We load the **SMASH** package.
+
+```{r echo=TRUE, eval=TRUE}
+library(smash)
+mu.est.true <- suppressMessages(suppressWarnings(ashsmooth.gaus(cycle_data[1,])))
+plot(mu.est.true, type = "l")
+
+mu.est.reorder <- suppressMessages(suppressWarnings(ashsmooth.gaus(cycle_data_reorder[1,])))
+plot(mu.est.reorder, type = "l")
+```
+
+We then find the deviation of true observations against the fitted mean value from the above method.
+
+```{r echo=TRUE, eval=TRUE}
+disp_reorder <- sum((cycle_data_reorder[1,] - mu.est.reorder)^2)
+disp_true <- sum((cycle_data[1,] - mu.est.true)^2)
+```
+
+Check that the dispersion of actual observations from the fitted mean curve is smaller for the true order compared to the re-ordered time series data.
+
+## Validation of procedure
+
+But this was for one gene only. We can find the average dispersion across all the genes.
+
+```{r echo=TRUE, eval=TRUE}
+disp.true <- array(0,G);
+smash_disp_true <- mean(sapply(1:G, function(g)
+                               {
+                                  mu.est.true <- suppressMessages(suppressWarnings(ashsmooth.gaus(cycle_data[g,])))
+                                  out <- sum((cycle_data[g,] - mu.est.true)^2)
+                                  return(out)
+                               }))
+```
+
+Now we reorder the data and apply the same method $30$ times and plot the density of the dispersion values and check where this density function lies against the true value (corresponding to the true order) we obtained above.
+
+```{r echo=TRUE, eval=TRUE}
+library(parallel)
+outdisp_set <- unlist(mclapply(1:20, function(l)
+               {
+                  sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
+                  cycle_data_reorder <- cycle_data[,sample_reorder];
+                  disp <- mean(sapply(1:G, function(g)
+                               {
+                                  mu.est.reord <- suppressMessages(suppressWarnings(ashsmooth.gaus(cycle_data_reorder[g,])))
+                                  out <- sum((cycle_data_reorder[g,] - mu.est.reord)^2)
+                                  return(out)
+                               }))
+                  return(disp)
+                }, mc.cores=detectCores()))
+
+```
+
+The dispersion set of values for re-ordered data (not true order) after repeating the re-ordering $20$ times 
+
+```{r echo=TRUE, eval=TRUE}
+print(outdisp_set)
+```
+
+The true value of dispersion corresponding to true ordering 
+
+```{r echo=TRUE, eval=TRUE}
+print(smash_disp_true)
+```
