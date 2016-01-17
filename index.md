@@ -65,8 +65,11 @@ tagline:
 
 ---
 
-### SMASH in cellcycleR <a id="smash_cellcycleR"></a>
+### Nonparametric smoothing in cellcycleR <a id="smash_cellcycleR"></a>
 * [SMASH validation check](project/analysis/smash_validation_check.html)
+* [LOESS validation check](project/analysis/loess_validation_check.html)
+* [Splines validation check](project/analysis/splines_validation_check.html)
+* [Wavelets validation check](project/analysis/wavelet_validation_check.html)
 
 
 ---
