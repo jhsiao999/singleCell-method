@@ -22,6 +22,8 @@ Can we do Fourier or wavelet fitting instead.
 
 \section{Model}
 
+\subsection{Sinusoidal set up}
+
 Let the vector of time orders for the $S$ cells is given by $t_{S}$. Usually $S$ could be a pretty big number and that could lead to lots of parameters to estimate. So, we trim down the time points into time classes $\mathcal{T}$ which is a set of uniformly spaced time points on $(0, 2 \pi)$. We can choose the time spacings depending on our computational resources and how much fine tuning we want on the ordering. We follow an iterative scheme, where for each cell $s$, we pick a time class $t^{(0)}_{s}$ randomly from the $ | \mathcal{T} |$ time classes. For any $n$, starting from $0$, we fit the following model for gene $g$ and cell $s$.
 
 $$ Y_{sg} = \alpha_g sin (t^{(n)}_s + \phi_g) + \epsilon_{sg}  \hspace{1 in}  \epsilon_{sg} \sim N(0, \sigma^2_{g}) $$
@@ -54,11 +56,11 @@ We can thus write down the model in matrix notation as
 
 $$ Y^{g}_{S \times 1} = M^{s}_{S \times 2}  \beta^{g}_{2 \times 1} + \epsilon^{g}_{S \times 1} $$
 
-\subsection{Classical model}
+\subsubsection{Classical model}
 
 Fit a classical linear model for each $g$ and get estimates $\hat{\beta}_{1g}$, $\hat{\beta}_{2g}$ and $\hat{\sigma}_{g}$. 
 
-\subsection{Bayesian model}
+\subsubsection{Bayesian model}
 
 Assume flat prior for $\beta^g$
 
@@ -79,7 +81,7 @@ P(\sigma^2_{g} | \beta^{g}, t_{S}, Y) & \propto  \frac{1}{\sigma^2_{g}} N \left 
 \qquad  &  \propto InvGamma \left ( \sigma^{2}_{g} | \frac{S}{2}, \frac{1}{2} (Y^{g} - M^{s}\beta^{g})^{T} (Y^{g} - M^{s}\beta^{g}) \right) \\
 \end{align*}
 
-\subsection{Updating the time classes}
+\subsubsection{Updating the time classes}
 
 Next we need to find the posterior $$ P(t_S | Y, \sigma^{(n)}, \alpha^{(n)}, \phi^{(n)}) $$. Since for each $s$, $t_s$ can take $ | \mathcal{T} | $ values in the range $0, \frac{2 \pi}{T-1},  \frac{4 \pi}{T-1}, \cdots $. For each of the $| \mathcal{T} |$ values, we calculate 
 
@@ -92,6 +94,34 @@ p_s (c | Y_s, \theta^{(n)})  & \stackrel{def}{=} P \left (t_s = c |  Y_s, \sigma
 where $\theta^{(n)} = \left (\sigma^{(n)}, \alpha^{(n)}, \phi^{(n)} \right )$. \\[2 pt]
 
 We calculate this for each $c$ and then generate a sample from the multinomial distribution $ Mult \left (1, p_s (. | Y_s, \theta^{(n)}) \right)$ and assign the cell $s$ to that time class. We repeat this procedure for all the single cells $s$. Note there that the finer the set of time classes $\mathcal{T}$, the higher would be the resolution of the order, but the greater would be the computational expense as well. So, there is a trade-off in how refined we want $\mathcal{T}$ to be.  
+
+\subsection{Non sinusoidal set up}
+
+For the non-sinusoidal set up, we also trim down the points into time classes $\mathcal{T}$ of equal time spacings (irregularities in time spacings may create bias in analysis).  For each cell $s$, we pick a time class $t^{(0)}_{s}$ randomly from the $ \left | \mathcal{T} \right | $ time classes. For any iterate $n$, starting from $0$,  we fit the following model for gene $g$ and cell $s$. 
+
+$$ Y_{sg} = \mu_{t(s),g} + \epsilon_{sg}  \hspace{2 cm} \epsilon_{sg} \sim N(0, \sigma^2_{g}) $$
+
+Assume that we have ordered the unique $t(s) = t$ values, such that $t_{(1)} < t_{(2)} < \cdots, t_{(|\mathcal{T}|)}$.  Then given the $Y$ values or the data values available to us, we can fit a smoothing curve through the points. We use three types of nonparametric smoothers- LOESS (Kernel smoother), Spline smoother (B-splines) and Wavelet smoother (\textbf{wavethresh} package).  For wavelet fit, we need to have the size of the time series to be a power of $2$. So, we fix the number of time classes to be a power of $2$ when we are fitting the wavelets. One can also use the \textbf{smash} package for fitting the smoother, but it has been found to be slower compared to the three smoothers mentioned above (B-splines being the fastest, check validation testing examples in ). So, as of now, we are sticking to the three smoothers mentioned above.
+
+$\sigma^{2}_{g}$ can be estimated by the residual sum of squares from the mean fit obtained using the above smoothers, for each gene $g$. 
+
+\subsubsection{Updating time classes}
+
+We need to obtain the posterior 
+
+$$ P(t_s | Y, \mu^{(n)}) $$
+
+Since for each $s$, $t_s$ can take $ \left | \mathcal{T} \right | $  values in the range $0, \frac{2 \pi}{T-1},  \frac{4 \pi}{T-1}, \cdots $. 
+
+\begin{align*}
+p_s (c | Y_s, \theta^{(n)})  & \stackrel{def}{=} P \left (t_s = c |  Y_s, \mu^{(n)} \right )  \\
+					& \propto P(Y_s | t_s =c,  \mu^{(n)}) \\
+				        & \propto  \prod_{g=1}^{G} N \left ( Y_s, \mu^{(n)}_{c,g}, \sigma^{(n)}_{g} \right ) \\
+\end{align*}
+
+As in sinusoidal case, we calculate this for each $c$ and then generate a sample from the multinomial distribution $ Mult \left (1, p_s (. | Y_s, \theta^{(n)}) \right)$ and assign the cell $s$ to that time class. We repeat this procedure for all the single cells $s$.
+
+
 
 \subsection{A continuous time order}
 
