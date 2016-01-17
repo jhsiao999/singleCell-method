@@ -50,6 +50,7 @@ tagline:
 ---
 
 ### cellcycleR applications <a id = 'cellcycleR'></a>
+* [Methods and Materials](project/docs/cell_reorder.pdf)
 * [Oscope data, Leng et al., 2015](project/analysis/oscope_cellcycleR.html)
 * [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
 * Human iPSC data (Tung et al. 2015)
