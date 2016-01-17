@@ -2,7 +2,9 @@
 title: "Wavelet smoothing time ordering - validation check"
 author: "Kushal K Dey"
 date: "January 16, 2016"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 ## Background
