@@ -71,6 +71,7 @@ tagline:
 * [LOESS validation check](project/analysis/loess_validation_check.html)
 * [Splines validation check](project/analysis/splines_validation_check.html)
 * [Wavelets validation check](project/analysis/wavelet_validation_check.html)
+* [Testing effectiveness of nonparametric cellcycleR](project/analysis/nonparametric_cellcyleR_tests.html)
 
 
 ---
