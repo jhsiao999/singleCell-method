@@ -1,3 +1,7 @@
+# ashlar: A workflow template for statistical computing projects
+
+[*ashlar*](http://github.com/jhsiao999/ashlar) is our attempt to streamline workflow and to do reproducible research here at the University of Chicago [Stephens Lab](http://stephenslab.uchicago.edu/). 
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
@@ -13,11 +17,6 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
-
-## ashlar: A workflow template for statistical computing projects
-
-[*ashlar*](http://github.com/jhsiao999/ashlar) is our attempt to streamline workflow and to do reproducible research here at the University of Chicago [Stephens Lab](http://stephenslab.uchicago.edu/). 
 
 
 
