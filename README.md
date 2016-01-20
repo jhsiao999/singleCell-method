@@ -99,37 +99,14 @@ The site address is under the analysis directory since the contents are under th
 *https://jhsiao999.github.io/ashlar-trial/analysis*
 
 
-This two-branch workflow is set up to keep the source files (such as *Rmds*) 
-separate from the *html* pages and the output figures. It allows me to keep clean repositories: master for the source, and gh-pages only for the website. 
+### A typical git workflow
 
-I mostly use RStudio to generate htmls, but when there are a large number of analysis files that need to be updated, I choose to use the simple make command. Below are two of my most recently used paths of update GitHub Pages.
+This two-branch workflow is set up to separate source codes from their output files.
+The source codes are kept in the master branch, and their output is stored and published
+in the gh-pages branch.
 
-Path 1: I mostly use this one when there's only a small analysis file to be updated.
-
-```
-## Work at the gh-pages branch, push website content to gh-pages,
-## push source to the master
-git checkout gh-pages
-cd analysis
-make # (or use knitr to render the Rmds)
-git add -f *Rmd *html figure/*
-git commit -m "add new analysis"
-git push origin gh-pages
-
-git checkout master
-git merge gh-pages
-git add new-analysis.Rmd index.Rmd
-git commit -m "add new analysis"
-git push origin master
-```
-
-Path 2: I use this when the site has not been update in a while, and I need to compile a large number of Rmds.
 
 ```
-## Work at the master branch, keep all htmls local
-## Push source to the master branch, use make to generate htmls
-## for the gh-pages branch
-
 git checkout master
 cd analysis
 git add new-analysis.Rmd index.Rmd
