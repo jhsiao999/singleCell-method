@@ -65,20 +65,42 @@ If you choose this option, you only have the master branch. The *gitignore* is s
 
 #### Option 2: Publish it! Keep a two-branch workflow.
 
-Create a branch named gh-pages. GitHub turns the htmls in the gh-pages branch into a website. You now have a project website for free. This feature makes all contents in the gh-pages public, even if the master branch is private. 
+Copy the master branch into a new branch named gh-pages. 
 
 ```
 git checkout -b gh-pages 
+```
+
+Use knitr to turn Rmds into htmls. I mostly use RStudio to render Rmds. Sometimes *make*
+file is useful for reproducing a large number of htmls or for rendering Rmds under
+customized options.
+
+```
+cd analysis
+make
+```
+
+Add files to git index and record changes in the local repository.
+
+```
 git add -f --all
 git commit -m "Build site"
+```
+
+Update remote repository with the local changes.
+
+```
 git push origin gh-pages
 ```
 
-The site address is udner the analysis directory since the site contents are kept under the analysis directory.
+
+The site address is under the analysis directory since the contents are under the analysis directory.
 
 *https://jhsiao999.github.io/ashlar-trial/analysis*
 
-This two-branch workflow is set up to keep the source files (such as *Rmds*) separate from the *html* pages and the output figures. It allows me to keep clean repositories: master for the source, and gh-pages only for the website. 
+
+This two-branch workflow is set up to keep the source files (such as *Rmds*) 
+separate from the *html* pages and the output figures. It allows me to keep clean repositories: master for the source, and gh-pages only for the website. 
 
 I mostly use RStudio to generate htmls, but when there are a large number of analysis files that need to be updated, I choose to use the simple make command. Below are two of my most recently used paths of update GitHub Pages.
 
