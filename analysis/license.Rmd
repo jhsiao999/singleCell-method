@@ -7,13 +7,23 @@ title: "License"
 **Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
 
 
-The repository is currently licensed under a [Creative Commons Attribution 4.0 International License][site-license]. We encourage others to tweak, remix, and build upon our work.
+The repository is currently licensed under a [Creative Commons Attribution 4.0 International License][site-license]. 
+We encourage others to tweak, remix, and build upon our work.
 
 [site-license]: https://creativecommons.org/licenses/by/4.0/legalcode
 
 
-We thank John Blischak at the University of Chicago for sharing his workflow template. Check out John's [site][singleCellSeq] that documents data preprocessing steps and statistical analyses for a research project that investigates experimental artifacts in single-cell RNA-seq data. 
+The site layout is modeled after the [RMarkdown][rmarkdown] tutorial site. 
+RMarkdown package is used to create our custom template and also to 
+customize our HTML output. 
 
+Special thanks [John Blischak][john-site] at the University of Chicago 
+for sharing his workflow template. Our workflow was inspired by his [site][singleCellSeq] 
+that documents the steps for preprocessing and statistical analysis 
+in a project that investigates experimental artifacts in single-cell RNA-seq data. 
+
+[rmarkdown]: http://rmarkdown.rstudio.com
+[john-site]: https://github.com/jdblischak
 [singleCellSeq]: https://github.com/jdblischak/singleCellSeq/
 
 
