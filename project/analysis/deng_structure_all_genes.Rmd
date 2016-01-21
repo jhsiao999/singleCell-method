@@ -65,6 +65,7 @@ library(data.table)
 reads <- data.frame(fread('../data/Deng cell data/Deng_cell_data.txt'),row.names=1);
 files <- list.files("../data/Deng_data/");
 cell_meta <- unlist(lapply(files, function(x) strsplit(x,"_")[[1]][2]));
+embryo_id <- unlist(lapply(files, function(x) strsplit(strsplit(x,"_")[[1]][3],"-")[[1]][1]));
 cell_meta[grep("zy",cell_meta)]="zy";
 cell_meta[grep("smartseq2", files)]="8cell_nd";
 cell_meta[grep("8cell_2pooled", files)]="8cell_nd";
@@ -73,20 +74,24 @@ cell_meta[grep("16cell_2pooled", files)]="16cell_nd";
 cell_meta[grep("16cell_split", files)]="16cell_nd";
 indices_not_reqd <- which(cell_meta=="BXC"   | cell_meta=="C57twocell" | cell_meta=="fibroblast" | cell_meta =="8cell_nd" | cell_meta == "16cell_nd");
 cell_meta <- cell_meta[-indices_not_reqd];
+embryo_id <- embryo_id[-indices_not_reqd];
+embryo_id[which(embryo_id == "expression.txt")]="."
+cell_embryo <- paste0(cell_meta,"_", embryo_id);
 reads <- reads[,-indices_not_reqd];
 cell_meta_unique <- c("zy","early2cell","mid2cell","late2cell","4cell","8cell","16cell","earlyblast","midblast","lateblast") ;
 order_of_development <- order(match(cell_meta,cell_meta_unique))
 reads <- reads[,order_of_development];
 cell_meta <- cell_meta[order_of_development]
+cell_embryo <- cell_embryo[order_of_development];
 colnames(reads) <- cell_meta;
 ```
 
 ## Fitting the admixture model
 
 ```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
-samp_metadata <- cbind.data.frame(cell_meta);
+samp_metadata <- cbind.data.frame(cell_meta, cell_embryo);
 counts <- t(reads);
-colnames(samp_metadata) <- c("dev_phase");
+colnames(samp_metadata) <- c("dev_phase", "dev.phase_embryo");
 
 if(!dir.exists("../figures/deng_structure")) dir.create("../figures/deng_structure")
 
@@ -102,7 +107,7 @@ deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
 
 path_struct = "../figures/deng_structure"
 
-num <- 1
+num <- 2
 metadata <- samp_metadata[,num];
 deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
 
