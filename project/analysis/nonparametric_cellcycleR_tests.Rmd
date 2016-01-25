@@ -21,7 +21,7 @@ G <- 100;
 num_cells <- 256;
 phi_genes <- seq(1, pi, length.out=G);
 sigma_genes <- rchisq(G, 1);
-cell_times_sim <- sort(sample(seq(0,2*pi, 2*pi/(num_cells-1)), num_cells, replace=FALSE));
+cell_times_sim <- seq(0,2*pi, length.out=num_cells);
 cycle_data <- matrix(0,num_cells,G)
 for(s in 1:num_cells){
 cycle_data[s,] <- 10*cell_times_sim[s] + 30*sin(2*cell_times_sim[s] + phi_genes) + rnorm(G,0,sigma_genes);
@@ -71,8 +71,9 @@ We now fit nonparameteric model fit to these patterns we recover and compare tha
 system.time(smash_disp_est <- mean(sapply(1:G, function(g)
                                {
                                   mu.est.true <- smooth.spline(sort(out$cell_times), cycle_data_reorder[order(out$cell_times),g]);
-                                  ordered_vec <- as.numeric(tapply(cycle_data_reorder[order(out$cell_times),g], factor(sort(out$cell_times)), mean));
-                                   disp <- sum((ordered_vec - mu.est.true$y)^2)
+                                  tab_cell_times <- as.numeric(table(out$cell_times));
+                                  mu.est.y <- rep(mu.est.true$y, tab_cell_times);
+                                  disp <- mean((cycle_data_reorder[order(out$cell_times),g] - mu.est.y)^2)
                                   return(disp)
                                })))
 
@@ -88,7 +89,7 @@ Now we perform the same analysis on the true data with the true order.
 system.time(smash_disp_true <- mean(sapply(1:G, function(g)
                                {
                                   mu.est.true <- smooth.spline(cell_times_sim, cycle_data[,g])
-                                  out <- sum((cycle_data[,g] - mu.est.true$y)^2)
+                                  out <- mean((cycle_data[,g] - mu.est.true$y)^2)
                                   return(out)
                                })))
 
@@ -98,9 +99,7 @@ print(smash_disp_true)
 
 ## Discussion
 
-Note that the average squared distance between data and the fitted curve is way smaller for the re-ordered data than the true data case. One reason could be the fact that the cell times in the true data are `r length(unique(cell_times_sim)) ` while after we put them to time classes as per our cellcycleR method, we get only `r length(unique(out$cell_times))` classes based on which the model fit is compared. There is a disparity there, which may sustain despite the fact that we are taking average of the distances.
-
-The other problem could be the fact that the squared distance of residuals may not be a good measure. In which case, we may want to have a method that under this above set up, gives a smaller value under true order than the order fitted by the parameteric cellcycleR method. Only when that happens, nonparameteric cellcycleR would be meaningful.
+Note that the average squared distance between data and the fitted curve is way higher for the re-ordered data obtain from sinusoidal or parameteric cellcycleR, thereby ensuring the fact that nonparameteric fit may indeed be useful for performing the re-ordering and may do better than parameteric or sinusoidal cellcycleR.
 
 
 
