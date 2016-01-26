@@ -75,6 +75,8 @@ tagline:
   * [Case Study 3](project/analysis/cellcycleR_compare3.html)
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 
+#### Correlated gene expression patterns <a id = "correlated-expression"></a>
+* [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
 
 ---
 
