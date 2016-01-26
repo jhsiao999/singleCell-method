@@ -69,10 +69,11 @@ tagline:
 * [LOESS (locally weighted scatterplot smoothing) ](project/analysis/loess_validation_check.html)
 * [Smoothing splines](project/analysis/splines_validation_check.html)
 * [Testing effectiveness of nonparametric cellcycleR](project/analysis/nonparametric_cellcycleR_tests.html)
-* [Nonparametric vs Sinusoidal cellcyclerR: Case Study 1](project/analysis/cellcycleR_compare1.html)
-* [Nonparametric vs Sinusoidal cellcyclerR: Case Study 2](project/analysis/cellcycleR_compare2.html)
-* [Nonparametric vs Sinusoidal cellcyclerR: Case Study 3](project/analysis/cellcycleR_compare3.html)
-* [Nonparametric vs Sinusoidal cellcyclerR: Case Study 4](project/analysis/cellcycleR_compare4.html)
+* [Nonparametric vs Sinusoidal cellcyclerR]
+  * [Case Study 1](project/analysis/cellcycleR_compare1.html)
+  * [Case Study 2](project/analysis/cellcycleR_compare2.html)
+  * [Case Study 3](project/analysis/cellcycleR_compare3.html)
+  * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 
 
 ---
