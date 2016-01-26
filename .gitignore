@@ -14,9 +14,9 @@ project/analysis/lcl_structure_cache/
 project/analysis/gene_annotations_ipsc_lcl_cache/
 project/analysis/gene_annotations_ipsc_lcl_files/
 project/data/macosko-2015-dropseq/
-project/analysis/cellcycleR_compare1_files
-project/analysis/cellcycleR_compare2_files
-project/analysis/cellcycleR_compare3_files
-project/analysis/cellcycleR_compare1_cache
-project/analysis/cellcycleR_compare2_cache
-project/analysis/cellcycleR_compare3_cache
+project/analysis/cellcycleR_compare1_files/
+project/analysis/cellcycleR_compare2_files/
+project/analysis/cellcycleR_compare3_files/
+project/analysis/cellcycleR_compare1_cache/
+project/analysis/cellcycleR_compare2_cache/
+project/analysis/cellcycleR_compare3_cache/
