@@ -44,16 +44,13 @@ tagline:
 
 ---
 
-### Cell-cycle phase assignment (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
-* [Cell ordering of the iPSCs - Macosko method](project/analysis/cell_ordering_iPSC.html)
-* [Cell cycle genes scores - recovered cell order](project/analysis/cell_cycle_score_analysis.html)
+### Cell-cycle phase modeling (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
 
----
+#### [Methods and Materials](project/docs/cell_reorder.pdf)
 
-### cellcycleR applications <a id = 'cellcycleR'></a>
-* [Methods and Materials](project/docs/cell_reorder.pdf)
-* [Oscope data, Leng et al., 2015](project/analysis/oscope_cellcycleR.html)
-* [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
+#### Applications
+
+* [Human iPSC data] - ( [Macosko method](project/analysis/cell_ordering_iPSC.html), [explore cell order](project/analysis/cell_cycle_score_analysis.html) )
 * Human iPSC data (Tung et al. 2015)
   * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html)
@@ -62,16 +59,16 @@ tagline:
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellycleR_non_ribosomal.html)  
 	* [On CDC, cyclin and cell cycle genes](project/analysis/yoav_cellcycleR_cdc_cyclin.html)
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
+* [Mouse ESCs, Buettner et al., 2015](project/analysis/marioni_cellcycleR.html)
+* [Oscope data, Leng et al., 2015](project/analysis/oscope_cellcycleR.html)
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
 
----
-
-### Nonparametric smoothing in cellcycleR <a id="smash_cellcycleR"></a>
-* [SMASH validation check](project/analysis/smash_validation_check.html)
-* [LOESS validation check](project/analysis/loess_validation_check.html)
-* [Splines validation check](project/analysis/splines_validation_check.html)
-* [Wavelets validation check](project/analysis/wavelet_validation_check.html)
+#### Nonparametric smoothing <a id="nonparametric-cellcycler"></a>
+* [Wavelets](project/analysis/wavelet_validation_check.html)
+* [SMASH (smoothing wavelets)](project/analysis/smash_validation_check.html)
+* [LOESS (locally weighted scatterplot smoothing) ](project/analysis/loess_validation_check.html)
+* [Smoothing splines](project/analysis/splines_validation_check.html)
 * [Testing effectiveness of nonparametric cellcycleR](project/analysis/nonparametric_cellcycleR_tests.html)
 
 
