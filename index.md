@@ -72,6 +72,7 @@ tagline:
 * [Nonparametric vs Sinusoidal cellcyclerR: Case Study 1](project/analysis/cellcycleR_compare1.html)
 * [Nonparametric vs Sinusoidal cellcyclerR: Case Study 2](project/analysis/cellcycleR_compare2.html)
 * [Nonparametric vs Sinusoidal cellcyclerR: Case Study 3](project/analysis/cellcycleR_compare3.html)
+* [Nonparametric vs Sinusoidal cellcyclerR: Case Study 4](project/analysis/cellcycleR_compare4.html)
 
 
 ---
