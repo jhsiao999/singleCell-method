@@ -2,7 +2,10 @@
 title: 'Parametric vs Nonparameteric cellcycleR: Study3'
 author: "Kushal K Dey"
 date: "January 25, 2016"
-output: html_document
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
 ---
 
 ## Overview
@@ -13,7 +16,7 @@ This script is one in a series of case studies to compare between the parametric
 
 We present a non-sinusoidal gene patterns scenario now. 
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 library(cellcycleR)
 library(wavethresh)
 library(binhf)

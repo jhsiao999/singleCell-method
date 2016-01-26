@@ -2,7 +2,10 @@
 title: 'Parametric vs Nonparametric cellcycleR: Study1'
 author: "Kushal K Dey"
 date: "January 25, 2016"
-output: html_document
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
 ---
 
 ## Overview
