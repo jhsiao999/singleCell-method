@@ -6,8 +6,7 @@ tagline:
 
 ### Home
   * [Admixture clustering](#admixture-clustering)
-  * [Cell-cycle phase assignment](#assign-cell-cycle)
-  * [cellcycleR](#cellcycleR)
+  * [Cell-cycle phase modeling](#assign-cell-cycle)
   * [Batch effect](#batch)
 
 ---
