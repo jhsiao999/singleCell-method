@@ -1,0 +1,189 @@
+---
+title: "SVA/ComBat"
+author: Joyce Hsiao
+date: "2015-11-30"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+## Goal
+
+Apply SVA package for batch effect correction.
+
+## Summary
+
+In our batch-effect correction framework, we corrected within replicate (plate) bias between cells using our information on ERCC percentage, and then remove between-plate bias in molecule counts using a linear mixed model framework. 
+
+Majority of the work done in batch-effect correction literature focues on removing batch-to-batch differences in gene expression distributions. The original SVA ([Leek et al., 2012][Leek2014]) work was designed to compute one or more variates that estimate the batch-to-batch differences in gene expression; they refer to these variates as surrogate variables. The SVA analysis is typically performed in an unsupervised manner using factor analysis to estimate one or more variates of batch-to-batch differences, but can also be applied to estimate surrogate variables based on control genes. RUVseq is similar to SVA but it extends one step further to directly model and remove unwanted variation estimated from control gene expression data in endogeneous gene expression data. 
+
+ComBat is another method that corrects for batch-to-batch differences in gene expresion levels. The method estimates per gene batch effect in an additive linear model and then pools per gene information together to compute a gene-wide batch-effect correction factor. The ComBat framework is similar to the limma framework, which was designed intially to tackle batch effect issues in microarray studies but has since then been extended to numerous RNAseq experiments. 
+
+In practice, we would like to obtain a batch correct data sets with the "corrected" gene expression measurements to compare experimental effects before and after batch correction. SVA computes continuous variable(s) that capture unwanted source(s) of variation - referred to as surrogate variable(s. The method, as described in the vignette, does not output a batch-corrected data set; instead, the surrogate variables are included in the design matrix when testing hypothesis of interest. They also gave an example of using surrogate variables in limma lmFit function.
+
+RUVseq and comBat both output batch-effect corrected data set. However, RUVseq assumes that ERCC percentages are the same across replicates, and comBat is not designed for use with control spike-in genes. 
+
+
+## Set up
+
+```{r, message=FALSE, warning=FALSE}
+library(sva)
+
+library(knitr)
+opts_knit$set(progress = TRUE, verbose = TRUE)
+opts_chunk$set(message = FALSE, warning = FALSE, eval = TRUE, 
+               echo = TRUE)
+
+source("../R/functions.R")
+```
+
+
+## Prepare data
+
+Import filtered molecule count data.
+
+```{r}
+molecules_filter <- read.table("../data/molecules-filter.txt",
+                               header = TRUE, sep = "\t",
+                               stringsAsFactors = FALSE,
+                               row.names = 1)
+head(molecules_filter[1:2, 1:5])
+```
+
+Select ERCC genes
+
+```{r}
+molecules_ercc <- molecules_filter[ grep("ERCC", rownames(molecules_filter)), ]
+```
+
+
+Import filtered molecule CPM ERCC data.
+
+```{r}
+molecules_cpm_ercc <- read.table("../data/molecules-cpm-ercc.txt",
+                               header = TRUE, sep = "\t",
+                               stringsAsFactors = FALSE,
+                               row.names = 1)
+head(molecules_cpm_ercc[1:2, 1:5])
+```
+
+
+Import annotation information fo the filtered data
+
+```{r}
+annotation_filter <- read.table("../data/annotation-filter.txt",
+                                header = TRUE, sep = "\t",
+                                stringsAsFactors = FALSE)
+head(annotation_filter)
+stopifnot(NCOL(molecules_filter) == NROW(annotation_filter))
+```
+
+
+Import endogeneous gene molecule counts before applying mixed effect model.
+
+```{r}
+molecules_cpm_trans <- read.table("../data/molecules-cpm-trans.txt",
+                               header = TRUE, sep = "\t",
+                               stringsAsFactors = FALSE,
+                               row.names = 1)
+```
+
+
+
+## SVA
+
+Here I run over SVA workflow. The surrogate variables are not helpful in our analyses, as they are computed to remove bias in estimate mean differences between the samples. We are interested in comparing differences in variations between samples.
+
+Define a control variable for ERCC genes.
+
+```{r}
+controls <- rownames(molecules_filter) %in% rownames(molecules_filter)[grep("ERCC", rownames(molecules_filter))]
+```
+
+Define design matrices
+```{r}
+# Under alternative hypothesis, excluding batch effect
+mod1 <- model.matrix(~individual, 
+            data = annotation_filter)
+
+# Udner null hypothesis, excluding batch effect
+mod0 <- cbind(mod1[,1])
+```
+
+Perform unsupervised SVA, default option.
+
+```{r}
+svseq <- svaseq(as.matrix(molecules_filter[grep("ERCC", rownames(molecules_filter), invert = TRUE), ]), 
+            mod1, mod0, n.sv=1)$sv
+plot(svseq, pch=19, col="blue")
+```
+
+Perform supervised SVA.
+
+```{r}
+sup_svseq <- svaseq(molecules_filter, 
+                    mod1, mod0, controls=controls, n.sv=1)$sv
+plot(sup_svseq, svseq, pch=19, col="blue")
+```
+
+
+## comBat
+
+Not protecting individual effect. 
+
+```{r}
+batch <- annotation_filter$batch
+
+modcombat <- model.matrix(~1, data = annotation_filter)
+
+combat_edata <- ComBat(dat = molecules_cpm_trans, batch = batch, 
+                       mod = modcombat, par.prior=TRUE, prior.plots=FALSE)
+dim(combat_edata)
+```
+
+
+```{r}
+combat_pca <- run_pca(combat_edata)
+
+plot_pca(x = combat_pca$PCs, 
+         explained = combat_pca$explained,
+         metadata = annotation_filter,
+         color = "individual",
+         shape = "replicate") +
+    labs(title = "ComBat corrected for batch effect")
+```
+
+
+
+
+Protecting individual effect. 
+
+```{r}
+batch <- annotation_filter$batch
+
+modcombat_ind <- model.matrix(~ individual, data = annotation_filter)
+
+combat_edata_ind <- ComBat(dat = molecules_cpm_trans, batch = batch, 
+                       mod = modcombat_ind, par.prior=TRUE, prior.plots=FALSE)
+```
+
+
+
+```{r}
+combat_pca <- run_pca(combat_edata)
+
+plot_pca(x = combat_pca$PCs, 
+         explained = combat_pca$explained,
+         metadata = annotation_filter,
+         color = "individual",
+         shape = "replicate") +
+    labs(title = "ComBat corrected for batch effect")
+```
+
+
+## Session information
+
+```{r info}
+sessionInfo()
+```
