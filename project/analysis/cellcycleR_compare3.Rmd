@@ -1,0 +1,124 @@
+---
+title: 'Parametric vs Nonparameteric cellcycleR: Study3'
+author: "Kushal K Dey"
+date: "January 25, 2016"
+output: html_document
+---
+
+## Overview
+
+This script is one in a series of case studies to compare between the parametric and nonparameteric cellcycleR methods. For nonparameteric case, we use the wavelet smoother as it is likely more efficient compared to B-splines and LOESS smoothers. 
+
+## Simulation Example
+
+We present a non-sinusoidal gene patterns scenario now. 
+
+```{r echo=TRUE, eval=TRUE}
+library(cellcycleR)
+library(wavethresh)
+library(binhf)
+
+G <- 100;
+num_cells <- 256;
+phi_genes <- seq(1, pi, length.out=G);
+sigma_genes <- rchisq(G, 0.01);
+cell_times_sim <- sort(sample(seq(0,2*pi, 2*pi/(num_cells-1)), num_cells, replace=FALSE));
+cycle_data <- matrix(0,num_cells,G)
+base <- c(1:(num_cells/4), (num_cells/4):1, 1:(num_cells/4), (num_cells/4):1);
+for(g in 1:G){
+cycle_data[,g] <- rnorm(num_cells,shift(base,2*g, dir="right"),sigma_genes[g]);
+}
+
+plot(cycle_data[,1], type="l")
+plot(cycle_data[,60], type="l")
+plot(cycle_data[,30], type="l")
+
+
+celltime_levels <- 256;
+
+sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
+cell_times_reorder <- cell_times_sim[sample_reorder];
+cycle_data_reorder <- cycle_data[sample_reorder,];
+
+```
+
+## Sinusoidal cellcycleR
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+system.time(out_sinusoidal <- sin_cell_ordering_class(cycle_data_reorder, celltime_levels = 256, num_iter=500))
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(plotrix)
+library(RColorBrewer)
+radial.plot(lengths=1:length(out_sinusoidal$cell_times),radial.pos=out_sinusoidal$cell_times[order(cell_times_reorder)],
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(out_sinusoidal$cell_times)), lwd=2)
+
+radial.plot(lengths=1:length(cell_times_reorder),radial.pos=sort(cell_times_reorder),
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times_reorder)), lwd=2)
+```
+
+The plots of estimated gene pattern and the true gene pattern.
+
+### First co-ordinate
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),1], type="l")
+plot(cycle_data[,1],type="l")
+```
+
+
+### 30th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l")
+plot(cycle_data[,30],type="l")
+```
+
+### 50th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l")
+plot(cycle_data[,50],type="l")
+```
+
+
+## Nonparametric cellcycleR
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+system.time(out_np <- np_cell_ordering_class(cycle_data_reorder, celltime_levels = 256, num_iter=500))
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(plotrix)
+library(RColorBrewer)
+radial.plot(lengths=1:length(out_np$cell_times),radial.pos=out_np$cell_times[order(cell_times_reorder)],
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(out_np$cell_times)), lwd=2)
+
+radial.plot(lengths=1:length(cell_times_reorder),radial.pos=sort(cell_times_reorder),
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times_reorder)), lwd=2)
+```
+
+The plots of estimated gene pattern and the true gene pattern.
+
+### First co-ordinate
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out_np$cell_times),1], type="l")
+plot(cycle_data[,1],type="l")
+```
+
+
+### 30th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out_np$cell_times),30], type="l")
+plot(cycle_data[,30],type="l")
+```
+
+### 50th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out_np$cell_times),50], type="l")
+plot(cycle_data[,50],type="l")
+```
