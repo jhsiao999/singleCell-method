@@ -1,0 +1,167 @@
+---
+title: 'Yoav data: cell ordering, non-ribosomal genes'
+author: "Kushal K Dey"
+date: "November 15, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+library(mygene)
+library(knitr)
+```
+
+## Background
+
+On applying the cellcycleR method on Yoav data across all genes, the cellcycleR seemed to be picking up the ribosomal proteins. These genes also do not seem to be separating out the S phase and the M phase very clearly. On the other hand, when only the annotated cell cycle genes are used, they seem to be picking up cell phase information, cell cycle genes associated with CDC, cyclin etc are captured. The idea now is to see that if we remove all the genes related to ribosomal proteins, are we capturing these more meaningful cell phase specific genes?
+
+## Removing the ribosomal genes 
+
+```{r, echo=TRUE, eval=TRUE}
+setwd('/Users/kushal/Documents/singleCell-method/project/analysis')
+colnames <- colnames(read.table("../data/batch_removed_counts_all_genes.txt"));
+molecules_single <- data.frame(fread("../data/batch_removed_counts_all_genes.txt"), row.names = 1);
+colnames(molecules_single) <- colnames
+cycle_counts_data <- molecules_single;
+dim(cycle_counts_data)
+
+cycle_voom_data <- voom(cycle_counts_data)$E;
+cycle_data_norm <- apply(cycle_voom_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, which(colSums(cycle_data_norm)!=0)]
+
+dim(cycle_data_norm)
+
+```
+
+
+Next we use the **mygene** package to annotate all the genes and save the output as a rda file.
+
+```{r echo=TRUE, eval=FALSE}
+out <- queryMany(colnames(cycle_data_norm),  scopes="ensembl.gene", fields=c("name","summary"), species="human");
+
+query_names <- out$query;
+unique_query_names <- unique(query_names);
+
+annotate_genes <- out[match(unique_query_names, query_names),];
+save(annotate_genes, file="../rdas/annotate_all_genes.rda")
+
+```
+
+## Filtering out the ribosomal genes 
+
+```{r echo=TRUE, eval=TRUE}
+annotate_genes <- get(load("../rdas/annotate_all_genes.rda"));
+filter1 <- grep("ribo", annotate_genes$name)
+filter2 <- grep("mitochondrial", annotate_genes$name)
+filter <- unique(c(filter1,filter2))
+
+annotate_genes_filtered <- annotate_genes[-filter,];
+gene_names_filtered <- annotate_genes_filtered$query;
+
+labeling_indices <- match(gene_names_filtered, colnames(cycle_data_norm))
+cycle_data_norm <- cycle_data_norm[,labeling_indices];
+
+```
+
+The cell phases as assigned using Macosko method
+
+```{r echo=TRUE, eval=TRUE}
+cell_phases <- as.vector(as.matrix(read.table("../data/cell_phase_vector_yoav.txt")));
+```
+
+
+## apply cellcycleR on the filtered non-ribosomal non-mitochondrial genes
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=100, save_path="../rdas/cell_order_ipsc_non_ribosomal.rda")
+
+```
+
+We ran the method above once already (took around 30 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/cell_order_ipsc_non_ribosomal.rda"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+
+```{r echo=TRUE,eval=TRUE}
+vioplot(cell_order_full[which(cell_phases=="G1.S")],
+        cell_order_full[which(cell_phases=="S")],
+        cell_order_full[which(cell_phases=="G2.M")],
+        cell_order_full[which(cell_phases=="M")],
+        cell_order_full[which(cell_phases=="M.G1")],
+        names=c("G1","S","G2M","M","M.G1"),
+        col="red")
+
+
+```
+
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 10);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+## Gene Annotations
+
+We perform gene annotations on the highly sinusoidal genes obtained from among the non ribosomal genes and see if they have cell phase related functionalities or not. 
+
+```{r echo=TRUE, eval=TRUE}
+sinusoidal_gene_names <- colnames(cycle_data_norm);
+imp_genes <- sinusoidal_gene_names[order(SNR, decreasing=TRUE)]
+top_genes_100 <- imp_genes[1:100];
+
+```
+
+We annotate these genes using the **mygene** package and report them in a tabular format.
+
+
+```{r echo=TRUE, eval=TRUE}
+out <- queryMany(top_genes_100,  scopes="ensembl.gene", fields=c("name","summary"), species="human");
+
+kable(as.data.frame(out))
+
+```
+
+
