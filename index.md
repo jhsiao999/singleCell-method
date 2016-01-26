@@ -71,10 +71,12 @@ tagline:
 * [Testing effectiveness of nonparametric cellcycleR](project/analysis/nonparametric_cellcycleR_tests.html)
 * [Nonparametric vs Sinusoidal cellcyclerR]
   * [Case Study 1](project/analysis/cellcycleR_compare1.html)
-  * [Case Study 2](project/analysis/cellcycleR_compare2.html)
+  * [Case Study 2](project/analysis/cellcycler_compare2.html)
   * [Case Study 3](project/analysis/cellcycleR_compare3.html)
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 
+#### Correlated gene expression patterns <a id = "correlated-expression"></a>
+* [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
 
 ---
 

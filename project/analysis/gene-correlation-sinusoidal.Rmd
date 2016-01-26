@@ -96,8 +96,8 @@ title("Sinusoidal model", outer = TRUE, line = -1)
 ```{r echo=TRUE, eval=TRUE}
 system.time(
   splines_fit <- np_cell_ordering_class(cycle_data_reorder, 
-                                        celltime_levels = 100, 
-                                        num_iter = 100, 
+                                        celltime_levels = 256, 
+                                        num_iter = 500, 
                                         method = "B-spline")
   )
 
@@ -161,7 +161,7 @@ for (which_gene in c(1, 30, 60)) {
 ```{r echo=TRUE, eval=TRUE}
 system.time(
   sinusoidal_fit <- sin_cell_ordering_class(cycle_data_reorder, 
-                                            celltime_levels = 100, num_iter = 100) 
+                                            celltime_levels = 256, num_iter = 300) 
   )
 ```
 
@@ -185,11 +185,12 @@ title("Sinusoidal model", outer = TRUE, line = -1)
 ```{r echo=TRUE, eval=TRUE}
 system.time(
   splines_fit <- np_cell_ordering_class(cycle_data_reorder, 
-                                        celltime_levels = 100, 
-                                        num_iter = 100, 
+                                        celltime_levels = 256, 
+                                        num_iter = 300, 
                                         method = "B-spline")
   )
 ```
+
 
 Recovered cell-order.
 
