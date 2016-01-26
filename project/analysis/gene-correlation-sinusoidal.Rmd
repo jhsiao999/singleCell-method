@@ -1,0 +1,210 @@
+---
+title: 'Assume correlated gene expression'
+author: "Joyce Hsiao"
+date: "January 25, 2016"
+output: 
+  html_document:
+    toc: true
+---
+
+## Background and objective
+
+It is reasonable to assume that gene expression patterns are correlated among genes that regulate similar pathways. When modeling cell-cycle, genes that are involved in regulating the same cell-phase are likely to be correlated in their expression patterns. Here we consider a simple example where mean gene expression levels follow a sinusoidal pattern, and gene expression levels are correlated. The covariance matrix of the gene expression levels is chosen to be symmetric with respect to the diagnonal with all off-diagonal elements to be the same.
+
+Note that assumption of homogeneous correlation between genes is used for a matter of convenience. If we were to discover 
+
+
+## Load packages
+
+Load packages.
+
+```{r echo=FALSE, eval=TRUE}
+library(cellcycleR)
+library(wavethresh)
+```
+
+
+## Case 1: Sinusoidal model, correlated expression
+
+Set parameters.
+
+```{r}
+G <- 100
+num_cells <- 256
+amp_genes <- rep(10, G)
+phi_genes <- rep(c(2,5), each=G/2)
+sigma_genes <- rchisq(G, 4)
+cell_times_sim <- seq(0,2*pi, length.out=num_cells)
+cycle_data <- sim_sinusoidal_cycle(G, amp_genes, phi_genes,
+                                      sigma_genes, cell_times_sim,
+                                      correlation = .3)
+```
+
+Randomly select some genes and plot out the simulated expression pattern.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data[ ,which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+title("Simulated pattern", outer = TRUE, line = -1)
+```
+
+Shuffle labels of cell-phase (pi) between cells.
+
+```{r echo=TRUE, eval=TRUE}
+sample_reorder <- sample(1:num_cells, num_cells, replace=FALSE)
+cell_times_reorder <- cell_times_sim[sample_reorder]
+cycle_data_reorder <- cycle_data[sample_reorder,]
+
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ ,which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+```
+
+
+### Sinusoidal cellcycleR 
+
+```{r echo=TRUE, eval=TRUE}
+system.time(out <- sin_cell_ordering_class(cycle_data_reorder, 
+                                           celltime_levels = 100, num_iter = 100) )
+```
+
+Recovered cell-order.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ order(out$cell_times), which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+title("Sinusoidal model", outer = TRUE, line = -1)
+```
+
+
+### Smoothing splines fitting
+
+```{r echo=TRUE, eval=TRUE}
+system.time(
+  splines_fit <- np_cell_ordering_class(cycle_data_reorder, 
+                                        celltime_levels = 100, 
+                                        num_iter = 100, 
+                                        method = "B-spline")
+  )
+
+str(splines_fit)
+```
+
+Recovered cell-order.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ order(splines_fit$cell_times), which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+title("Smoothing splines", outer = TRUE, line = -1)
+```
+
+
+## Case 2: Non-sinusoidal model, correlated expression
+
+Set parameters.
+
+```{r}
+G <- 100
+num_cells <- 256
+phi_genes <- seq(1, pi, length.out=G)
+cell_times_sim <- seq(0,2*pi, length.out=num_cells)
+correlation <- .3
+Sigma <- diag(G)
+Sigma[upper.tri(Sigma)] <- correlation^2
+Sigma[lower.tri(Sigma)] <- correlation^2
+
+cycle_data <- matrix(0,num_cells,G)
+for(s in 1:num_cells){
+  	 cycle_data[s,] <- 10*cell_times_sim[s] + 30*sin(2*cell_times_sim[s] + phi_genes) + 
+  	               mvrnorm(n = 1, mu = rep(0, G), Sigma = Sigma)
+}
+```
+
+Shuffle labels of cell-phase (pi) between cells.
+
+```{r echo=TRUE, eval=TRUE}
+sample_reorder <- sample(1:num_cells, num_cells, replace=FALSE)
+cell_times_reorder <- cell_times_sim[sample_reorder]
+cycle_data_reorder <- cycle_data[sample_reorder,]
+
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ ,which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+```
+
+
+### Sinusoidal cellcycleR 
+
+```{r echo=TRUE, eval=TRUE}
+system.time(
+  sinusoidal_fit <- sin_cell_ordering_class(cycle_data_reorder, 
+                                            celltime_levels = 100, num_iter = 100) 
+  )
+```
+
+
+Recovered cell-order.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ order(sinusoidal_fit$cell_times), which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+title("Sinusoidal model", outer = TRUE, line = -1)
+```
+
+
+### Smoothing splines fitting
+
+```{r echo=TRUE, eval=TRUE}
+system.time(
+  splines_fit <- np_cell_ordering_class(cycle_data_reorder, 
+                                        celltime_levels = 100, 
+                                        num_iter = 100, 
+                                        method = "B-spline")
+  )
+```
+
+Recovered cell-order.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ order(splines_fit$cell_times), which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+title("Smoothing splines", outer = TRUE, line = -1)
+```
+
+
+
+
+
