@@ -15,6 +15,7 @@
   - [A typical git workflow](#a-typical-git-workflow)
 - [Resources](#resources)
 - [Some tips on how to collaborate with others using GitHub](#tip-collaborate)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
