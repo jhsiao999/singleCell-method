@@ -75,6 +75,7 @@ tagline:
   * [Case Study 3](project/analysis/cellcycleR_compare3.html)
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 * [Comparison of different nonparameteric smoothers in cellcycleR](project/analysis/nonparametric_cellcycler_methods_compare.html)
+* [PCA comparison with cellcycleR](project/analysis/pca_snr_compare.html)
 
 #### Correlated gene expression patterns <a id = "correlated-expression"></a>
 * [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
