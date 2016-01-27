@@ -7,7 +7,12 @@ tagline:
 ### Home
   * [Admixture clustering](#admixture-clustering)
   * [Cell-cycle phase modeling](#assign-cell-cycle)
+    # [Methods](#methods)
+    * [Exploratory analysis](#explore)
+    * [Sinusoidal fitting](#sinusoidal-cellcycler)
+    * [Nonparametric smoothing](#nonparametric-cellcycler)
   * [Batch effect](#batch)
+
 
 ---
 
@@ -45,11 +50,13 @@ tagline:
 
 ### Cell-cycle phase modeling (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
 
-#### [Methods and Materials](project/docs/cell_reorder.pdf)
+#### [Methods and Materials](project/docs/cell_reorder.pdf) <a id="methods"></a>
 
-#### Applications
+#### Exploratory analysis <a id="explore"></a>
 
 * [Human iPSC data] - ( [Macosko method](project/analysis/cell_ordering_iPSC.html), [explore cell order](project/analysis/cell_cycle_score_analysis.html) )
+
+#### Sinusoidal fitting <a id="sinusoidal-cellcycler"></a>
 * Human iPSC data (Tung et al. 2015)
   * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html)
