@@ -1,7 +1,7 @@
 ---
 title: 'Assume correlated gene expression'
 author: "Joyce Hsiao"
-date: "January 25, 2016"
+date: "January 26, 2016"
 output: 
   html_document:
     toc: true
@@ -9,9 +9,9 @@ output:
 
 ## Background and objective
 
-It is reasonable to assume that gene expression patterns are correlated among genes that regulate similar pathways. When modeling cell-cycle, genes that are involved in regulating the same cell-phase are likely to be correlated in their expression patterns. Here we consider a simple example where mean gene expression levels follow a sinusoidal pattern, and gene expression levels are correlated. The covariance matrix of the gene expression levels is chosen to be symmetric with respect to the diagnonal with all off-diagonal elements to be the same.
+It is reasonable to assume that gene expression patterns are correlated among genes that regulate similar pathways. When modeling cell-cycle, genes that are involved in regulating the same cell-phase are likely to be correlated in their expression patterns. Here we consider a simple example where mean gene expression levels follow a sinusoidal pattern and a simple non-sinusoidal pattern. Gene expression levels are assumed to be correlated and follow a homogeneous covarying pattern across all possible gene pairs.
 
-Note that assumption of homogeneous correlation between genes is used for a matter of convenience. If we were to discover 
+Note that assumption of homogeneous correlation between genes is employed for a matter of convenience. 
 
 
 ## Load packages
@@ -39,6 +39,7 @@ cycle_data <- sim_sinusoidal_cycle(G, amp_genes, phi_genes,
                                       sigma_genes, cell_times_sim,
                                       correlation = .3)
 ```
+
 
 Randomly select some genes and plot out the simulated expression pattern.
 
@@ -72,9 +73,10 @@ for (which_gene in c(1, 30, 60)) {
 
 ### Sinusoidal cellcycleR 
 
-```{r echo=TRUE, eval=TRUE}
-system.time(out <- sin_cell_ordering_class(cycle_data_reorder, 
-                                           celltime_levels = 100, num_iter = 100) )
+```{r echo=FALSE, eval=TRUE}
+print(system.time(sinu_trend_fit_sinu <- sin_cell_ordering_class(cycle_data_reorder, 
+                                           celltime_levels = 100, num_iter = 100) ) 
+  )
 ```
 
 Recovered cell-order.
@@ -82,7 +84,8 @@ Recovered cell-order.
 ```{r echo=TRUE, eval=TRUE}
 par(mfrow = c(2,2))
 for (which_gene in c(1, 30, 60)) {
-  plot(cycle_data_reorder[ order(out$cell_times), which_gene], type="l", 
+  plot(cycle_data_reorder[ order(sinu_trend_fit_sinu$cell_times), 
+                           which_gene], type="l", 
        main = paste("Gene no.", which_gene),
        xlab = "Cell ordered by cell-phase",
        ylab = "Gene expression")
@@ -93,14 +96,13 @@ title("Sinusoidal model", outer = TRUE, line = -1)
 
 ### Smoothing splines fitting
 
-```{r echo=TRUE, eval=TRUE}
-system.time(
-  splines_fit <- np_cell_ordering_class(cycle_data_reorder, 
-                                        celltime_levels = 256, 
-                                        num_iter = 500, 
-                                        method = "B-spline")
-  )
-
+```{r echo=FALSE, eval=TRUE}
+print( system.time(
+      splines_fit <- np_cell_ordering_class(cycle_data_reorder, 
+                                            celltime_levels = 256, 
+                                            num_iter = 500, 
+                                            method = "B-spline")
+    ) )
 str(splines_fit)
 ```
 
@@ -115,6 +117,33 @@ for (which_gene in c(1, 30, 60)) {
        ylab = "Gene expression")
 }
 title("Smoothing splines", outer = TRUE, line = -1)
+```
+
+
+
+### Wavelet
+
+```{r echo=FALSE, eval=TRUE}
+print( system.time(
+      wavelet_fit <- np_cell_ordering_class(cycle_data_reorder, 
+                                            celltime_levels = 256, 
+                                            num_iter = 500, 
+                                            method = "Wavelet")
+    ) )
+str(wavelet_fit)
+```
+
+Recovered cell-order.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow = c(2,2))
+for (which_gene in c(1, 30, 60)) {
+  plot(cycle_data_reorder[ order(wavelet_fit$cell_times), which_gene], type="l", 
+       main = paste("Gene no.", which_gene),
+       xlab = "Cell ordered by cell-phase",
+       ylab = "Gene expression")
+}
+title("Wavelet", outer = TRUE, line = -1)
 ```
 
 

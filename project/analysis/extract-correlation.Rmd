@@ -27,6 +27,10 @@ library(wavethresh)
 Load data. Use the filtered data before any transformation.
 
 ```{r}
+molecules_final <- load("../data/molecules-filter.txt",
+                        header = TRUE,
+                        rownames = FALSE,
+                        stringsAsFactor = FALSE)
 ```
 
 Randomly select some genes and plot out the simulated expression pattern.
