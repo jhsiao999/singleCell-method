@@ -14,7 +14,7 @@
     - [Option 2: Publish it! Keep a two-branch workflow.](#option-2-publish-it-keep-a-two-branch-workflow)
   - [A typical git workflow](#a-typical-git-workflow)
 - [Resources](#resources)
-
+- [Some tips on how to collaborate with others using GitHub](#tip-collaborate)
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
@@ -50,6 +50,12 @@ git add -f --all
 git commit -m "first commit"
 git push origin master
 ```
+
+
+
+### Personalize your repository
+
+Now edit these files 
 
 
 
@@ -129,3 +135,34 @@ git push origin gh-pages
 
 [site]: http://jhsiao999.github.io/ashlar/analysis
 [contrib]: https://github.com/jdblischak/singleCellSeq/blob/master/CONTRIBUTING.md
+
+
+## Some tips on how to collaborate with others using GitHub
+
+Many of us collaobrate with scientists from different discipline on code, analysis, or bioinformatic pipelines. There are two common options
+
+1. Each collaborator creats his/her own work branch in the repository.
+
+2. Each collaborator creates his/her own fork of the repository.
+
+Both of these options allow the other collaborators to review changes in a pull request, comment on the changes, and merge the changes. Version control process is also similar in these two options. From my experience, the major difference is your work habits. When I work with a branch inside a repository, I merge the changes to the master or the gh-pages branch when done with the changes. This often results in me forgetting to change the branch back to my work branch, and the next time I work in the repository, I'll end up making changes to the master branch...
+
+I suggest using the forking option. With this option, you are always working under your fork and don't EVER have to worry about working under the wrong branch. The steps are simple. 
+
+How to fork a repo:
+
+https://help.github.com/articles/fork-a-repo/
+
+
+How to sync a fork with the remote repository"
+
+https://help.github.com/articles/syncing-a-fork/
+
+
+
+
+
+
+
+
+
