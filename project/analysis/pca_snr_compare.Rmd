@@ -12,7 +12,7 @@ output:
 
 This script is aimed at showing how the Principal Components Analysis (PCA) behaves for sinusoidal patterned data. The idea is that if the gene patterns have high signal to noise variation, then the PC1 vs PC2 plot would be close to a circle. The more we add noise and randomness to the sinusoidal patterns, the less obvious the circular pattern of the PCs would tend to be.
 
-## Simulation Example
+## Simulation Example 
 
 We present a non-sinusoidal gene patterns scenario now. 
 
