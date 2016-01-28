@@ -90,6 +90,7 @@ tagline:
 
 #### Comparing to the other methods <a id="comparisons"></a>
 * [PCA comparison with cellcycleR](project/analysis/pca_snr_compare.html)
+* [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
 
 
 #### Correlated gene expression patterns <a id = "correlated-expression"></a>
