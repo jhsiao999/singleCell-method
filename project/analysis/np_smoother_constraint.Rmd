@@ -1,0 +1,67 @@
+---
+title: "Nonparameteric smoother on a cycle"
+author: "Kushal K Dey"
+date: "January 27, 2016"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+## Overview
+
+In nonparametric cellcycleR, we previously used a nonparametric smoother, e.g. LOESS, B-spline or wavelets. However in cell-cycle data for which we applied this nonparametric smoothing function, we have one constraint that the gene patterns across the cells as per the order should be cyclical- that is ideally the start and the end points of the gene expression patterns under the actual cell order should meet. This was captured in sinusoidal cellcycleR because we imposed the constraint that the frequency of the sine curve we are fitting is 1. In this script, we present a simple example of a cyclical pattern and then fit a nonparametric smoother with the added constraint that the two end points of the smoother under the recovered order patterns should be close. We will then compare it with the pattern without this smoothing and present an overall comparative assessment of the two methods. 
+
+## Simulation example
+
+```{r echo=TRUE, eval=TRUE}
+
+library(cellcycleR)
+library(wavethresh)
+
+G <- 100;
+num_cells <- 256;
+amp_genes <- rep(10, G);
+phi_genes <- rep(c(2,4,6,8), each=G/4);
+sigma_genes <- rchisq(G, 0.01);
+cell_times_sim <- seq(0,2*pi, length.out=num_cells);
+cycle_data <- sim_sinusoidal_cycle(G, amp_genes, phi_genes, sigma_genes, cell_times_sim);
+
+levels <- 200
+
+```
+
+We cut the cell times slightly before the full cycle (at the point with time order $220$).
+
+```{r echo=TRUE, eval=TRUE}
+cycle_data <- cycle_data[1:levels,]
+```
+
+We plot the sinusoidal curves for two genes.
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data[,1], type="l")
+plot(cycle_data[,40], type="l")
+```
+
+## Nonparameteric smoother (no constraint)
+
+We fit a nonparametric smoother first with no constraint.
+
+```{r echo=TRUE, eval=TRUE}
+mu.est.true <- smooth.spline(cell_times_sim[1:levels], cycle_data[,1])
+plot(mu.est.true, type = "l")
+```
+
+## Constrained Nonparametric smoother
+
+We now impose a constraint that the two ends of the fit need to match.
+
+```{r echo=TRUE, eval=TRUE}
+dupli_response <- rep(cycle_data[,1], 3);
+mu.est.dupli <- smooth.spline(c(cell_times_sim[1:levels],cell_times_sim[1:levels]+2*pi, cell_times_sim[1:levels]+4*pi), dupli_response)
+plot(mu.est.dupli, type="l")
+fit <- mu.est.dupli$y[(levels+1):(2*levels)];
+plot(fit, type="l")
+```
+
