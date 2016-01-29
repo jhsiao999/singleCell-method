@@ -70,6 +70,9 @@ tagline:
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
 
+* [Runtime comparisons: parallel vs. lmFit](project/analysis/sin_cell_order_iter-runtime.html)
+
+
 #### Nonparametric smoothing <a id="nonparametric-cellcycler"></a>
 * [Wavelets](project/analysis/wavelet_validation_check.html)
 * [SMASH (smoothing wavelets)](project/analysis/smash_validation_check.html)
