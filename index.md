@@ -12,6 +12,7 @@ tagline:
     * [Sinusoidal fitting](#sinusoidal-cellcycler)
     * [Nonparametric smoothing](#nonparametric-cellcycler)
   * [Batch effect](#batch)
+  * [Differential testing](#testing)
 
 
 ---
@@ -58,8 +59,7 @@ tagline:
 
 #### Sinusoidal fitting <a id="sinusoidal-cellcycler"></a>
 * Human iPSC data (Tung et al. 2015)
-  * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
-     * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html)
+  * [Annotated cell cycle genes] (2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) )
   * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellycleR_non_ribosomal.html)  
@@ -99,5 +99,12 @@ tagline:
 * [Bulk RNA]
   * [RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
 
+---
+
+### Differential testing <a id = 'testing'></a>
+* [Exploring ECDF](project/analysis/count-cumulative.html)
 
 
+### Differential testing <a id = 'differential-testing'></a>
+
+* [Exploring ECDF](project/analysis/count-cumulative.html)
