@@ -47,19 +47,22 @@ tagline:
 	* [Structure analysis](project/analysis/deng_structure_all_genes.html)
 	* [Gene annotations (K=7)](project/analysis/gene_annotations_deng.html)
 
+
 ---
 
 ### Cell-cycle phase modeling (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
 
-#### [Methods and Materials](project/docs/cell_reorder.pdf) <a id="methods"></a>
+#### Methods and Materials <a id="methods"></a>
+* [Our model](project/docs/cell_reorder.pdf) 
 
 #### Exploratory analysis <a id="explore"></a>
 
 * [Human iPSC data] - ( [Macosko method](project/analysis/cell_ordering_iPSC.html), [explore cell order](project/analysis/cell_cycle_score_analysis.html) )
 
 #### Sinusoidal fitting <a id="sinusoidal-cellcycler"></a>
+
 * Human iPSC data (Tung et al. 2015)
-  * [Annotated cell cycle genes] (2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) )
+  * [Annotated cell cycle genes]( 2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) ) ( 2016-01-28 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes-2016-01-28.html) ) 
   * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellycleR_non_ribosomal.html)  
@@ -70,10 +73,12 @@ tagline:
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
 
+
 * [Runtime comparisons: parallel vs. lmFit](project/analysis/sin_cell_order_iter-runtime.html)
 
 
 #### Nonparametric smoothing <a id="nonparametric-cellcycler"></a>
+
 * [Wavelets](project/analysis/wavelet_validation_check.html)
 * [SMASH (smoothing wavelets)](project/analysis/smash_validation_check.html)
 * [LOESS (locally weighted scatterplot smoothing) ](project/analysis/loess_validation_check.html)
@@ -85,8 +90,12 @@ tagline:
   * [Case Study 3](project/analysis/cellcycleR_compare3.html)
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 * [Comparison of different nonparameteric smoothers in cellcycleR](project/analysis/nonparametric_cellcycler_methods_compare.html)
+
+
+#### Comparing to the other methods <a id="comparisons"></a>
 * [PCA comparison with cellcycleR](project/analysis/pca_snr_compare.html)
 * [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
+
 
 #### Correlated gene expression patterns <a id = "correlated-expression"></a>
 * [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
