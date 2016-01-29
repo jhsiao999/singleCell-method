@@ -62,7 +62,7 @@ tagline:
 #### Sinusoidal fitting <a id="sinusoidal-cellcycler"></a>
 
 * Human iPSC data (Tung et al. 2015)
-  * [Annotated cell cycle genes]( 2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) ) ( 2016-01-28 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes-2016-01-28.html) ) 
+  * Annotated cell cycle genes (2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) ) ( 2016-01-28 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes-2016-01-28.html) ) 
   * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
      * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellycleR_non_ribosomal.html)  
