@@ -1,0 +1,301 @@
+---
+title: ' Cell-cycle modeling: iPSC human cell lines'
+author: "Joyce Hsiao"
+date: "2016-01-28"
+output: 
+  html_document:
+    toc: true
+---
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+library(Humanzee)
+library(mygene)
+library(knitr)
+```
+
+
+## Background and objectives
+
+We fit the sinusoidal model on iPSC scRNA-seq data, one individual at a time. We also compare our fitting results with estimates from an ad hoc approach ([Macosko2015](http://www.ncbi.nlm.nih.gov/pubmed/26000488)) which computes phase-specific scores (G1/S, S, G2/M, M, M/G1) for each cell and classify cells based on the highest scoring phase. 
+
+The data is not yet publicly available, but you can check out [John Blischak's website](http://jdblischak.github.io/singleCellSeq/analysis/) for the description of experiment protocol, and results of preliminary data analyses. 
+
+
+
+## Data prepration
+
+### Import final batch-corrected iPSC data
+
+```{r echo=TRUE, eval=TRUE}
+molecules_final <- read.table("../data/gilad-2015/molecules-final.txt",
+                              header = TRUE,
+                              stringsAsFactors = FALSE)
+anno_filter <- read.table("../data/gilad-2015/annotation-filter.txt",
+                          header = TRUE,
+                          stringsAsFactors = FALSE)
+dim(molecules_final)
+table(anno_filter$individual)
+```
+
+Extract only data of one individual
+
+```{r}
+molecules_final_subset <- molecules_final[ , anno_filter$individual == "NA19239"]
+dim(molecules_final_subset)
+
+molecules_final_subset <- molecules_final_subset
+```
+
+
+Import cell-cycle genes
+
+```{r}
+cellcycle_genes <- read.table("../data/gilad-2015/cellcyclegenes.txt",
+                               header = TRUE,
+                               sep = "\t",
+                               stringsAsFactors = FALSE)
+colnames(cellcycle_genes) <- c("G1.S","S","G2","G2.M","M.G1")
+```
+
+
+Extract only cell-cycle genes
+
+```{r}
+which_cell_cycle <- which (rownames(molecules_final_subset) %in% unlist(cellcycle_genes))
+cycle_data <- t(molecules_final_subset[which_cell_cycle, ])
+dim(cycle_data)
+```
+
+Standardize expression levels into z-scores for for gene. This step is for easy visualization of expression levels in plots.
+
+```{r}
+cycle_data_normed <- apply(cycle_data, 2, 
+                            function(x)  return (x-mean(x))/sd(x))
+```
+
+
+## Cell-cycle score based on Macosko2015 
+
+Compute cell-phase score and assign phases.
+
+```{r}
+cell_phase_score <- cell_phase_assign(cellcycle_genes, t(cycle_data_normed) )
+head(cell_phase_score)
+
+cell_phase <- apply( cell_phase_score, 
+                      1, function(x) colnames(cellcycle_genes)[which.max(x)])
+```
+
+
+## Fitting on cell-cycle gens
+
+```{r}
+if (file.exists("../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28.rda")) {
+    load("../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28.rda")
+} else {
+results <- sin_cell_ordering_class(cycle_data_normed, 
+                                   celltime_levels = 300,
+                                   num_iter = 300)
+save(results, 
+     file ="../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28.rda")
+}
+str(results)
+```
+
+
+Post-processing of cell-phase order.
+
+```{r}
+cell_order_full <- cell_ordering_full(results$signal_intensity, dim(molecules_final)[2])
+str(cell_order_full)
+```
+
+### Model estimates
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r}
+amp_genes <- results$amp
+sd_genes <- results$sigma
+phi_genes <- results$phi
+
+par(mfrow=c(2,2))
+plot(density(phi_genes), col="red", 
+     main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", 
+     main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", 
+     main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2
+RSS <- sd_genes^2
+SNR <- ESS/RSS
+plot(SNR, col="red", pch=20, lwd=1)
+```
+
+
+### Re-ordered expression pattern
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r}
+sum(SNR > .1)
+top_genes <- which(SNR > .1)
+
+cut <- .05
+    top_genes <- which(SNR > cut)
+    new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+    iplotCurves(t(cycle_data_normed[new_cell_order, top_genes]),
+                chartOpts = list(title = paste("SNR > ", cut)))
+
+cut <- .1
+    top_genes <- which(SNR > cut)
+    new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+    iplotCurves(t(cycle_data_normed[new_cell_order, top_genes]),
+                chartOpts = list(title = paste("SNR > ", cut)))
+
+```
+
+We also provide the violin plot of the cell orders estimated against the cell phase labels vector obatiend using Macosko method. There are 96 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers for three phases are same - 96, you can view it as uniformly split).
+
+```{r}
+vioplot(cell_order_full[which(cell_phase=="G1.S")],
+        cell_order_full[which(cell_phase=="S")],
+        cell_order_full[which(cell_phase=="G2")],
+        cell_order_full[which(cell_phase=="G2.M")],
+        cell_order_full[which(cell_phase=="M.G1")],
+        names=c("G1.S","S","G2","G2.M","M.G1"),
+        col="red")
+iplotCurves(t(cycle_data_normed[c(which(cell_phase=="G1"),
+                                which(cell_phase=="S"),
+                                which(cell_phase=="G2"),
+                                which(cell_phase=="G2.M"),
+                                which(cell_phase=="M.G1")), top_genes]))
+```
+
+
+## Re-fitting on high SNR genes
+
+We extract the high SNR genes as they seem to have sinusoidal patterns and repeat the procedure again. 
+
+```{r}
+snr_high_indices <- which(SNR > .1)
+cycle_data_normed_high_snr <- cycle_data_normed[ ,snr_high_indices]
+dim(cycle_data_normed_high_snr)
+```
+
+Modeing fitting...
+
+```{r}
+if (file.exists("../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28-high-snr.rda")) {
+    load("../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28-high-snr.rda")
+} else {
+results_high_snr <- sin_cell_ordering_class(cycle_data_normed_high_snr, 
+                                        celltime_levels = 300, num_iter=200)
+save(results_high_snr, 
+     file = "../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28-high-snr.rda")
+}
+```
+
+Post-processing
+
+```{r}
+cell_order_full <- cell_ordering_full(results_high_snr$signal_intensity,
+                                      dim(cycle_data_normed_high_snr)[2])
+```
+
+
+### Model estimates
+
+We plot the same features as above and check for the robustness. We needed to shift the cell order so as to compare with previous plot on all genes as the method is non-identifiable upto a rotation. 
+
+```{r echo=TRUE, eval=TRUE}
+amp_genes <- results_high_snr$amp;
+sd_genes <- results_high_snr$sigma;
+phi_genes <- results_high_snr$phi;
+
+par(mfrow = c(2,2))
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2; RSS <- sd_genes^2
+SNR <- ESS/RSS;
+plot(SNR, col="red", pch=20, lwd=1)
+```
+
+### Re-ordered expression patterns
+
+```{r}
+# these html widgets require some adding coding to be
+# wrapped inside a loop
+# plot_list <- lapply(c(.1, .5, .1), function(cut) {
+#     top_genes <- which(SNR > cut)
+#     new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+#     return(iplotCurves(t(cycle_data_normed_high_snr[new_cell_order, top_genes]),
+#                 chartOpts = list(title = paste("SNR > ", cut))) )
+#     
+# })
+# plot_list <- lapply(plot_list, htmltools::tags$p)
+# htmltools::tagList(plot_list)
+
+cut <- .1
+    top_genes <- which(SNR > cut)
+    new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+    iplotCurves(t(cycle_data_normed_high_snr[new_cell_order, top_genes]),
+                 chartOpts = list(title = paste("SNR > ", cut))) 
+    
+cut <- .5
+    top_genes <- which(SNR > cut)
+    new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+    iplotCurves(t(cycle_data_normed_high_snr[new_cell_order, top_genes]),
+                 chartOpts = list(title = paste("SNR > ", cut))) 
+
+cut <- 1
+top_genes <- which(SNR > cut)
+new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+print(iplotCurves(t(cycle_data_normed_high_snr[new_cell_order, top_genes]),
+             chartOpts = list(title = paste("SNR > ", cut))) )
+```
+
+The curvees of the top genes show a very string sinusoidal pattern. We compared the estimated cell-order against the assigned cell-phases in Mascoko2015. The violin plot below indicates that 1) most cells are at G1.S or M.G1 phase, a signature of iPSC cells, and 2) our estimated cell-order coincoide with the cell-phase assignment in Mascoko2015.
+
+
+```{r echo=TRUE, eval=TRUE}
+vioplot(cell_order_full[which(cell_phase=="G1.S")],
+        cell_order_full[which(cell_phase=="S")],
+        cell_order_full[which(cell_phase=="G2")],
+        cell_order_full[which(cell_phase=="G2.M")],
+        cell_order_full[which(cell_phase=="M.G1")],
+        names=c("G1.S","S","G2","G2.M","M.G1"),
+        col="red")
+```
+
+
+
+### Annotation
+
+
+```{r}
+sinusoidal_gene_names <- colnames(cycle_data_normed_high_snr)
+#top_genes <- sinusoidal_gene_names[which(SNR > .5)]
+sinusoidal_gene_names_ordered <- sinusoidal_gene_names[order(SNR, decreasing = TRUE)]
+
+gene_query <- queryMany(sinusoidal_gene_names_ordered[1:30],  
+                        scopes="ensembl.gene", 
+                        fields=c("name","summary"), species="human")
+
+kable(as.data.frame(gene_query))
+```
+
+
