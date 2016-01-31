@@ -25,3 +25,5 @@ project/analysis/nonparametric_cellcycler_methods_compare_cache/
 project/analysis/nonparametric_cellcycler_methods_compare_files/
 project/analysis/pca_snr_compare_cache/
 project/analysis/pca_snr_compare_files/
+project/analysis/cellcycler_with_ribosomal_sim_cache/
+project/analysis/cellcycler_with_ribosomal_sim_files/
