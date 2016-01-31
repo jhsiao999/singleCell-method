@@ -16,7 +16,7 @@ It has been seen from our applications of cellcycleR to single cell level data t
 
 Consider the following example
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 
 library(cellcycleR)
 library(wavethresh)
@@ -37,7 +37,7 @@ Notice from the simulation design so far that we have picked most fenes to have 
 
 Now we assume the first $10$ genes to be ribosomal genes. We pick 10 cell states (uniformly spaced) where these ribosomal genes have higher expression.
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 n_states <- 10;
 n_ribo <- 10;
 cell_states <- sapply(1:n_states, function(s) floor((s*length(cell_times_sim))/n_states));
@@ -52,13 +52,14 @@ for(m in 1:n_states){
 We now observe the graphs of a ribosomal gene and a non-ribosomal gene.
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data[,2], type="l")
-plot(cycle_data[,40], type="l")
+par(mfrow=c(1,2))
+plot(cycle_data[,2], type="l", main="gene pattern for 2nd gene (ribosomal)")
+plot(cycle_data[,40], type="l", main="gene pattern for 40th gene (non ribosomal)")
 ```
 
 We now reorder the data.
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
 cell_times_reorder <- cell_times_sim[sample_reorder];
 cycle_data_reorder <- cycle_data[sample_reorder,];
@@ -73,6 +74,7 @@ system.time(out_sinusoidal <- sin_cell_ordering_class(cycle_data_reorder, cellti
 ```{r echo=TRUE, eval=TRUE}
 library(plotrix)
 library(RColorBrewer)
+par(mfrow=c(1,2))
 radial.plot(lengths=1:length(out_sinusoidal$cell_times),radial.pos=out_sinusoidal$cell_times[order(cell_times_reorder)],
             line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(out_sinusoidal$cell_times)), lwd=2)
 
@@ -85,23 +87,26 @@ The plots of estimated gene pattern and the true gene pattern.
 ### 2nd co-ordinate
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data_reorder[order(out_sinusoidal$cell_times),2], type="l")
-plot(cycle_data[,2],type="l")
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),2], type="l", main="gene pattern for estd order")
+plot(cycle_data[,2],type="l", main="gene pattern for true order")
 ```
 
 
 ### 30th coordinate
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l")
-plot(cycle_data[,30],type="l")
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l", main="gene pattern for estd order")
+plot(cycle_data[,30],type="l", main="gene pattern for true order")
 ```
 
 ### 50th coordinate
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l")
-plot(cycle_data[,50],type="l")
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l", main="gene pattern for estd order")
+plot(cycle_data[,50],type="l", main="gene pattern for true order")
 ```
 
 
@@ -109,7 +114,7 @@ plot(cycle_data[,50],type="l")
 
 Consider the following example
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 
 library(cellcycleR)
 library(wavethresh)
@@ -130,7 +135,7 @@ Notice from the simulation design so far that we have picked most fenes to have 
 
 Now we assume the first $10$ genes to be ribosomal genes. We pick 10 cell states (uniformly spaced) where these ribosomal genes have higher expression.
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 n_states <- 10;
 n_ribo <- 10;
 cell_states <- sapply(1:n_states, function(s) floor((s*length(cell_times_sim))/n_states));
@@ -145,13 +150,14 @@ for(m in 1:n_states){
 We now observe the graphs of a ribosomal gene and a non-ribosomal gene.
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data[,2], type="l")
-plot(cycle_data[,40], type="l")
+par(mfrow=c(1,2))
+plot(cycle_data[,2], type="l", main="gene pattern for 2nd gene (ribosomal)")
+plot(cycle_data[,40], type="l", main="gene pattern for 40th gene (non ribosomal)")
 ```
 
 We now reorder the data.
 
-```{r echo=TRUE, eval=TRUE}
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
 sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
 cell_times_reorder <- cell_times_sim[sample_reorder];
 cycle_data_reorder <- cycle_data[sample_reorder,];
@@ -166,6 +172,7 @@ system.time(out_sinusoidal <- sin_cell_ordering_class(cycle_data_reorder, cellti
 ```{r echo=TRUE, eval=TRUE}
 library(plotrix)
 library(RColorBrewer)
+par(mfrow=c(1,2))
 radial.plot(lengths=1:length(out_sinusoidal$cell_times),radial.pos=out_sinusoidal$cell_times[order(cell_times_reorder)],
             line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(out_sinusoidal$cell_times)), lwd=2)
 
@@ -178,23 +185,26 @@ The plots of estimated gene pattern and the true gene pattern.
 ### 2nd co-ordinate
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data_reorder[order(out_sinusoidal$cell_times),2], type="l")
-plot(cycle_data[,2],type="l")
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),2], type="l", main="gene pattern for estd order")
+plot(cycle_data[,2],type="l", main="gene pattern for true order")
 ```
 
 
 ### 30th coordinate
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l")
-plot(cycle_data[,30],type="l")
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l", main="gene pattern for estd order")
+plot(cycle_data[,30],type="l", main="gene pattern for true order")
 ```
 
 ### 50th coordinate
 
 ```{r echo=TRUE, eval=TRUE}
-plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l")
-plot(cycle_data[,50],type="l")
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l", main="gene pattern for estd order")
+plot(cycle_data[,50],type="l", main="gene pattern for true order")
 ```
 
 
