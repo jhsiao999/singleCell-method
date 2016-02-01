@@ -1,0 +1,225 @@
+---
+title: 'iPSC human cell lines: all genmes'
+author: "Joyce Hsiao"
+date: "2016-01-31"
+output: 
+  html_document:
+    toc: true
+---
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+library(Humanzee)
+library(mygene)
+library(knitr)
+```
+
+
+## Background and objectives
+
+We fit the sinusoidal model on iPSC scRNA-seq data, one individual at a time. Here we attempt o include all genes in the model.
+
+The data is not yet publicly available, but you can check out [John Blischak's website](http://jdblischak.github.io/singleCellSeq/analysis/) for the description of experiment protocol, and results of preliminary data analyses. 
+
+
+
+## Data prepration
+
+### Import final batch-corrected iPSC data
+
+```{r echo=TRUE, eval=TRUE}
+molecules_final <- read.table("../data/gilad-2015/molecules-final.txt",
+                              header = TRUE,
+                              stringsAsFactors = FALSE)
+anno_filter <- read.table("../data/gilad-2015/annotation-filter.txt",
+                          header = TRUE,
+                          stringsAsFactors = FALSE)
+dim(molecules_final)
+table(anno_filter$individual)
+```
+
+## NA19239
+
+Extract only data of one individual
+
+```{r}
+molecules_final_19239 <- molecules_final[ , anno_filter$individual == "NA19239"]
+dim(molecules_final_19239)
+```
+
+z-score transformation for each cell
+
+```{r}
+cycle_data_normed_19239 <- apply(molecules_final_19239, 2, 
+                            function(x)  return (x-mean(x))/sd(x))
+cycle_data_normed_19239 <- t(cycle_data_normed_19239)
+```
+
+Fitting on all genes
+
+```{r}
+if (file.exists("../rdas/gilad-ipsc-all-genes-2016-01-31/cellorder-19239.rda")) {
+    load("../rdas/gilad-ipsc-all-genes-2016-01-31/cellorder-19239.rda")
+} else {
+results <- sin_cell_ordering_class(cycle_data_normed_19239, 
+                                   celltime_levels = 300,
+                                   num_iter = 300)
+save(results, 
+     file = "../rdas/gilad-ipsc-all-genes-2016-01-31/cellorder-19239.rda" )
+}
+str(results)
+```
+
+
+Post-processing of cell-phase order.
+
+```{r}
+cell_order_full <- cell_ordering_full(results$signal_intensity, 
+                                      dim(cycle_data_normed_19239)[2])
+str(cell_order_full)
+```
+
+
+### Model estimates
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r}
+amp_genes <- results$amp
+sd_genes <- results$sigma
+phi_genes <- results$phi
+
+par(mfrow=c(2,2))
+plot(density(phi_genes), col="red", 
+     main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", 
+     main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", 
+     main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2
+RSS <- sd_genes^2
+SNR <- ESS/RSS
+plot(SNR, col="red", pch=20, lwd=1)
+```
+
+
+### Re-ordered expression pattern
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r}
+sum(SNR > 500)
+top_genes <- which(SNR > 500)
+
+cut <- 500
+    top_genes <- which(SNR > cut)
+    new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+    iplotCurves(t(cycle_data_normed_19239[new_cell_order, top_genes]),
+                chartOpts = list(title = paste("SNR > ", cut)))
+```
+
+
+## Re-fitting on high SNR genes
+
+We extract the high SNR genes as they seem to have sinusoidal patterns and repeat the procedure again. 
+
+```{r}
+snr_high_indices <- which(SNR > 500)
+cycle_data_normed_high_snr_19239 <- cycle_data_normed_19239[ ,snr_high_indices]
+dim(cycle_data_normed_high_snr_19239)
+```
+
+Modeing fitting...
+
+```{r}
+if (file.exists("../rdas/gilad-ipsc-all-genes-2016-01-31/cellorder-19239-high-snr.rda")) {
+    load("../rdas/gilad-ipsc-all-genes-2016-01-31/cellorder-19239-high-snr.rda")
+} else {
+results_high_snr <- sin_cell_ordering_class(cycle_data_normed_high_snr_19239, 
+                                           celltime_levels = 300, num_iter=200)
+save(results_high_snr, 
+     file = "../rdas/gilad-ipsc-all-genes-2016-01-31/cellorder-19239-high-snr.rda")
+}
+```
+
+Post-processing
+
+```{r}
+cell_order_full_refit <- cell_ordering_full(results_high_snr$signal_intensity,
+                                           dim(cycle_data_normed_high_snr_19239)[2] )
+```
+
+
+### Model estimates
+
+We plot the same features as above and check for the robustness. We needed to shift the cell order so as to compare with previous plot on all genes as the method is non-identifiable upto a rotation. 
+
+```{r echo=TRUE, eval=TRUE}
+amp_genes <- results_high_snr$amp;
+sd_genes <- results_high_snr$sigma;
+phi_genes <- results_high_snr$phi;
+
+par(mfrow = c(2,2))
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2; RSS <- sd_genes^2
+SNR_19239 <- ESS/RSS;
+plot(SNR_19239, col="red", pch=20, lwd=1)
+summary(SNR_19239)
+```
+
+
+### Re-ordered expression patterns
+
+```{r}
+new_cell_order <- binhf::shift(order(cell_order_full_refit), 130, dir = "right")
+iplotCurves(t(cycle_data_normed_high_snr_19239[new_cell_order, ]) ) 
+```
+
+## Compare fits
+
+
+```{r}
+par(mfrow = c(2,2))
+plot(x = cell_order_full, y = cell_order_full_refit) 
+plot(x = rank(cell_order_full), y = rank(cell_order_full_refit))
+plot(x = SNR[which(SNR > 500)], y = SNR_19239)
+```
+
+
+
+## Annotation
+
+
+```{r}
+query_gene_names <- colnames(cycle_data_normed_high_snr_19239)
+query_gene_names_ordered <- query_gene_names[order(SNR_19239, decreasing = TRUE)]
+
+gene_query <- queryMany(query_gene_names_ordered[1:30],  
+                        scopes="ensembl.gene", 
+                        fields=c("name","summary"), species="human")
+
+kable(as.data.frame(gene_query))
+```
+
+
+
+
+## Session information
+
+```{r}
+sessionInfo()
+```
+
