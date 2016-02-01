@@ -62,9 +62,9 @@ tagline:
 #### Sinusoidal fitting <a id="sinusoidal-cellcycler"></a>
 
 * Human iPSC data (Tung et al. 2015)
-  * Annotated cell cycle genes (2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) ) ( 2016-01-28 - [Estimation & annotations](project/analysis/yoav_cellcycleR_cellcycle_genes-2016-01-28.html) ) 
-  * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
-     * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
+  * Annotated cell cycle genes (2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) ) ( 2016-01-28, NA19239 - [Estimation & annotations](project/analysis/yoav_cellcycleR_cellcycle_genes-2016-01-28.html), [Compared with PCA](project/analysis/pca-sinu-ipsc-19239.html) ) 
+  * All genes (2015-11-11 - [Estimation](project/analysis/yoav_cellcycleR_all_genes.html), [Gene annotations]((project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)) ) ( 2016-01-31, NA19239 - [Estimation & annotations](project/analysis/gilad-ipsc-all-genes-2016-01-31.html))
+
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellycleR_non_ribosomal.html)  
 	* [On CDC, cyclin and cell cycle genes](project/analysis/yoav_cellcycleR_cdc_cyclin.html)
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
@@ -93,7 +93,7 @@ tagline:
 
 
 #### Comparing to the other methods <a id="comparisons"></a>
-* [PCA comparison with cellcycleR](project/analysis/pca_snr_compare.html)
+* PCA comparison with cellcycleR - ([Simulation](project/analysis/pca_snr_compare.html), [Gilad-2015-NA19101](project/analysis/pca-sinu-ipsc-19239.html)
 * [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
 * [Simulation study to check how cell states and ribosomal genes may affect cellcycleR](project/analysis/cellcycler_with_ribosomal_sim.html)
 
