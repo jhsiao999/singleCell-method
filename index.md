@@ -102,21 +102,17 @@ tagline:
 #### Correlated gene expression patterns <a id = "correlated-expression"></a>
 * [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
 
+
+#### Cell-cycle classifer
+* [Multinomial lasso, Leng2015](project/analysis/oscope-classifer.html)
+
 ---
 
 ### Batch effect <a id = 'batch'></a>
-* [ERCC genes](project/analysis/ercc-pca.html)
-  * [RUVg](project/analysis/ercc-ruvg.html)
-  * [SVA package](project/analysis/ercc-sva.html)
-* [Bulk RNA]
-  * [RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
+* [ERCC genes](project/analysis/ercc-pca.html) - ([RUVg](project/analysis/ercc-ruvg.html), [SVA package](project/analysis/ercc-sva.html) )
+* [Bulk RNA] -[RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
 
 ---
 
 ### Differential testing <a id = 'testing'></a>
-* [Exploring ECDF](project/analysis/count-cumulative.html)
-
-
-### Differential testing <a id = 'differential-testing'></a>
-
 * [Exploring ECDF](project/analysis/count-cumulative.html)

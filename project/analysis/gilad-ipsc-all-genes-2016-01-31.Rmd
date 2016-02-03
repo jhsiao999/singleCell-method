@@ -215,6 +215,22 @@ kable(as.data.frame(gene_query))
 ```
 
 
+## Compare with fitting when using cell-cycle genes only
+
+Load results from fitting only on cell-cycle genes.
+
+```{r}
+load("../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28.rda")
+cell_order_full_cell_cycle <- cell_ordering_full(results$signal_intensity,
+                                                 length(results$cell_times) )
+
+```
+
+
+```{r}
+plot(x = rank(cell_order_full), y = rank(cell_order_full_cell_cycle))
+head(cbind(cell_order_full, cell_order_full_cell_cycle))
+```
 
 
 ## Session information
