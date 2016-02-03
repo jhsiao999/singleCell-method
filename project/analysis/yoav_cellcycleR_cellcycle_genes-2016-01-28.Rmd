@@ -97,7 +97,7 @@ cell_phase <- apply( cell_phase_score,
 ```
 
 
-## Fitting on cell-cycle gens
+## Fitting on cell-cycle genes
 
 ```{r}
 if (file.exists("../rdas/yoav_cycleR_cellcycle_genes-2016-01-28/cellorder-ipsc-2016-01-28.rda")) {
@@ -262,10 +262,10 @@ cut <- .5
                  chartOpts = list(title = paste("SNR > ", cut))) 
 
 cut <- 1
-top_genes <- which(SNR > cut)
-new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
-print(iplotCurves(t(cycle_data_normed_high_snr[new_cell_order, top_genes]),
-             chartOpts = list(title = paste("SNR > ", cut))) )
+    top_genes <- which(SNR > cut)
+    new_cell_order <- binhf::shift(order(cell_order_full), 130, dir = "right")
+    iplotCurves(t(cycle_data_normed_high_snr[new_cell_order, top_genes]),
+                 chartOpts = list(title = paste("SNR > ", cut))) 
 ```
 
 The curvees of the top genes show a very string sinusoidal pattern. We compared the estimated cell-order against the assigned cell-phases in Mascoko2015. The violin plot below indicates that 1) most cells are at G1.S or M.G1 phase, a signature of iPSC cells, and 2) our estimated cell-order coincoide with the cell-phase assignment in Mascoko2015.
