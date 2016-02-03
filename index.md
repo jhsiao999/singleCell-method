@@ -96,6 +96,7 @@ tagline:
 * PCA comparison with cellcycleR - ([Simulation](project/analysis/pca_snr_compare.html), [Gilad-2015-NA19101](project/analysis/pca-sinu-ipsc-19239.html)
 * [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
 * [Simulation study to check how cell states and ribosomal genes may affect cellcycleR](project/analysis/cellcycler_with_ribosomal_sim.html)
+* [Testing Penalized Matrix Decomposition on cellcycle genes](project/analysis/pmd_cellcycler_test_1.html)
 
 
 #### Correlated gene expression patterns <a id = "correlated-expression"></a>
