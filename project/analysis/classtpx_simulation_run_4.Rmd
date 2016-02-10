@@ -1,7 +1,7 @@
 ---
-title: 'classtpx: simulation Design 3'
+title: 'classtpx: simulation design 4'
 author: "Kushal K Dey"
-date: "February 8, 2016"
+date: "February 10, 2016"
 output: html_document
 ---
 
@@ -10,6 +10,7 @@ output: html_document
 `classtpx` is a R package meant for semi-supervised topic modeling (see [site](https://github.com/kkdey/classtpx)). It is a modification of the `maptpx` package due to Matt Taddy, which performs unsupervised topic models. As a first illustration of the application of the `classtpx` package, we present a simulation example and apply the algorithm on the simulated data. We also compare the results from the `classtpx` application with the `maptpx` method. 
 
 Here we pick a scenario with the number of hidden topics $K=3$. 
+
 
 ```{r echo=TRUE, eval=TRUE}
 n.out <- 200
@@ -32,11 +33,11 @@ counts <- t(do.call(cbind,lapply(1:dim(omega_sim)[1], function(x) rmultinom(1,10
 
 ## classtpx Application
 
-We assume that we have FACS sorted the cells $1$ to $100$ (belonging to first cluster fully), from $200$ to $300$ (belonging to second cluster fully) and from $400$ to $500$ (belonging to third cluster completely).
+We assume that we have FACS sorted the cells $1$ to $100$ (fully belonging to first cluster) and from $200$ to $300$ (fully belonging to second cluster). The third cluster had no samples as training data. 
 
 ```{r echo=TRUE, eval=TRUE}
 library(classtpx)
-known_indices <- c(1:100, 201:300, 401:500);
+known_indices <- c(1:100, 201:300);
 omega_known <- omega_sim[known_indices,];
 Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.001);
 ```
