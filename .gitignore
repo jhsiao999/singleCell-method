@@ -3,6 +3,7 @@
 .RData
 .DS_Store
 project/analysis/.Rhistory
+project/refs
 project/rdas
 project/iPSC+LCL/src/gene_annotations_cache/
 project/iPSC+LCL/src/gene_annotations_files/
