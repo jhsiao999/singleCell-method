@@ -109,8 +109,11 @@ tagline:
 ### Batch effect <a id = 'batch'></a>
 * [ERCC genes](project/analysis/ercc-pca.html) - ([RUVg](project/analysis/ercc-ruvg.html), [SVA package](project/analysis/ercc-sva.html) )
 * [Bulk RNA] -[RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
+* [Proportion of genes detected](project/analysis/pca-correlation-other-umi-data.html)
 
 ---
 
 ### Differential testing <a id = 'testing'></a>
 * [Exploring ECDF](project/analysis/count-cumulative.html)
+
+
