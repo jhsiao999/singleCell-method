@@ -1,0 +1,132 @@
+---
+title: 'Lasso for including categorical variables'
+author: "Joyce Hsiao"
+date: "2016-02-12"
+output: 
+  html_document:
+    toc: true
+---
+
+
+## Background and objectives
+
+Example of using lasso when the model includes categorical variables. 
+
+
+## Set up
+
+```{r, message=FALSE, warning=FALSE}
+library("matrixStats")
+library("glmnet")
+library("knitr")
+library("grplasso")
+```
+
+
+## Simulated data
+
+Simulate a univariate case. For example, lass for one gene. 
+
+```{r}
+n_obs <- 50
+set.seed(999)
+# Create an arbitrary categorical variable of 5 nominal levels
+variable_cat <- as.factor(sample(1:5, n_obs, replace = TRUE))
+
+set.seed(999)
+# Create four variables of continous measurements
+variable_cont <- matrix(rnorm(4*n_obs), nrow = 50)
+
+outcome <- rnorm(n_obs) + as.integer(variable_cat)
+outcome <- outcome + variable_cont[,1]*1.5
+outcome <- outcome + variable_cont[,2]*3
+
+df <- data.frame(outcome, variable_cat, variable_cont)
+head(df)
+```
+
+
+## glmnet
+
+Variables are evaluated one at a time. Dummy variables are treated as different variables. 
+
+```{r}
+fit_glmnet <- glmnet(
+    y = df$outcome, 
+    x = model.matrix(~variable_cat+X1+X2+X3+X4, data = df), 
+    standardize = TRUE, # set variables to be in the same units
+    intercept = FALSE, # set intercept to zero
+    family = "gaussian")
+coef(fit_glmnet, s = .15)
+```
+
+
+
+## grplasso
+
+Manually set the intercept to be 0.
+
+```{r}
+#design <- model.matrix(~., data = df[,c(2,3,4,5)])
+design <- model.matrix(~., data = df[ ,-1])
+design <- design[ ,-1]
+design <- scale(design, scale = FALSE)
+```
+
+Specify which columns are to be grouped together in model selection.
+
+```{r}
+index <- c( rep(1, 4), c(2,3,4,5) )
+```
+
+
+Determine starting value of the regulariazation parameter.
+
+```{r}
+lambda <- lambdamax(
+    x = design, 
+    y = outcome,
+    index = index,
+    model = LinReg(), # for data in gaussian family
+    center = FALSE, # intercept not included
+    standardize = TRUE # set input variables to be in the same unit
+    )
+lambda_vec <- lambda*( 0.5^(0:5))
+```
+
+
+```{r}
+fit_grplasso <- grplasso(
+    x = design, 
+    y = outcome,
+    index = index,
+    model = LinReg(), # for data in gaussian family
+    center = FALSE, # mean-center the variables
+    standardize = TRUE, # set input variables to be in the same unit
+    lambda = lambda_vec)
+```
+
+We chose to look at lambda values between 60 to 14. The variables selected in these
+models are consistent.
+
+```{r}
+plot(fit_grplasso)
+fit_grplasso <- grplasso(
+    x = design, 
+    y = outcome,
+    index = index,
+    model = LinReg(), # for data in gaussian family
+    center = FALSE, # mean-center the variables
+    standardize = TRUE, # set input variables to be in the same unit
+    lambda = 15)
+coef(fit_grplasso)
+```
+
+
+
+## Session information
+
+```{r info}
+sessionInfo()
+```
+
