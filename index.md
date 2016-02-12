@@ -13,6 +13,7 @@ tagline:
     * [Nonparametric smoothing](#nonparametric-cellcycler)
   * [Batch effect](#batch)
   * [Differential testing](#testing)
+  * [Miscellaneous](#misc)
 
 
 ---
@@ -116,4 +117,9 @@ tagline:
 ### Differential testing <a id = 'testing'></a>
 * [Exploring ECDF](project/analysis/count-cumulative.html)
 
+
+---
+
+### Miscellaneous <a id = 'misc'></a>
+* [PCA and SVD for data visualization](project/analysis/pca-svd.html)
 
