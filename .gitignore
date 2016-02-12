@@ -3,7 +3,9 @@
 .RData
 .DS_Store
 project/analysis/.Rhistory
+project/refs
 project/rdas
+project/docs/single-cell-yoav-grant-2016-02-15
 project/iPSC+LCL/src/gene_annotations_cache/
 project/iPSC+LCL/src/gene_annotations_files/
 project/iPSC+LCL/src/tsne_omega_files/

@@ -13,6 +13,7 @@ tagline:
     * [Nonparametric smoothing](#nonparametric-cellcycler)
   * [Batch effect](#batch)
   * [Differential testing](#testing)
+  * [Miscellaneous](#misc)
 
 
 ---
@@ -119,9 +120,18 @@ tagline:
 ### Batch effect <a id = 'batch'></a>
 * [ERCC genes](project/analysis/ercc-pca.html) - ([RUVg](project/analysis/ercc-ruvg.html), [SVA package](project/analysis/ercc-sva.html) )
 * [Bulk RNA] -[RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
+* [Proportion of genes detected](project/analysis/pca-correlation-other-umi-data.html)
 
 ---
 
 ### Differential testing <a id = 'testing'></a>
 * [Exploring ECDF](project/analysis/count-cumulative.html)
 * [Count distributions](project/analysis/count-distributions.html)
+
+
+---
+
+### Miscellaneous <a id = 'misc'></a>
+* [PCA and SVD for data visualization](project/analysis/pca-svd.html)
+
+>>>>>>> work-joyce
