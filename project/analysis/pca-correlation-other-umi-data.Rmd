@@ -1,0 +1,116 @@
+---
+title: "Reproducing Hicks et al. results"
+author: "Joyce Hsiao"
+date: "2016-02-11"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+## Background and objectives
+
+Reproduce findings presented in Hicks et al. using [Jaitin2014][Jaitin2014] UMI counts. 
+
+Note that the PC component scores in Hicks et al. were computed without using unit variance. 
+PC scores computed on unit variances can be different from scores computed on 
+raw variances. We keep our computations here consistent with the method used in Hicks et al.
+
+[Jaitin2014]: https://dx.doi.org/10.1126/science.1247651
+
+
+## Setup
+
+```{r}
+library("edgeR")
+require(matrixStats)
+library("gmodels")
+```
+
+
+## Import data
+
+Import Jaitin counts.
+
+```{r jaitin-data}
+jaitin_data <- read.table("../data/jaitin-2014/GSE54006_umitab.txt", header = TRUE,
+                           stringsAsFactors = FALSE, sep = "\t")
+rownames(jaitin_data) <- jaitin_data[ ,1]
+jaitin_data <- jaitin_data[,-1]
+dim(jaitin_data)
+jaitin_data[1:5, 1:5]
+```
+
+
+Remove cells with total 0 UMI.
+
+```{r jaitin-filter-cell}
+jaitin_filter <- jaitin_data[ , colSums(jaitin_data) != 0]
+dim(jaitin_filter)
+```
+
+
+log2 CPM of Jaitin counts
+
+```{r}
+jaitin_log2cpm <- log2( sweep(jaitin_filter, 2, 
+                               STATS = colSums(jaitin_filter),
+                               FUN = "/") + 1)
+dim(jaitin_log2cpm)
+```
+
+
+Proportion of genes detected. 
+
+```{r}
+detect_jaitin <- colMeans( jaitin_filter != 0)
+hist(detect_jaitin)
+```
+
+
+We noted that in Hicks et al., 4,466 cells were reported in the analysis. This set of cells
+is consistent with the number of cells that have at least 17% genes detected. 
+
+```{r}
+sum(detect_jaitin > .17)
+jaitin_log2cpm_filter <- jaitin_log2cpm[ , !(detect_jaitin > .17)]
+dim(jaitin_log2cpm_filter)
+```
+
+
+## Results
+
+Principal componenet analysis
+
+```{r jaitin-pca}
+if (file.exists("../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")) {
+    load("../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")
+} else {
+    svd_jaitin <- gmodels::fast.svd( scale(t(jaitin_log2cpm_filter), scale = FALSE) )
+    save(svd_jaitin, file = "../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")
+}
+
+pc_proportions_svd <- (svd_jaitin$d^2)/sum(svd_jaitin$d^2)
+round(pc_proportions_svd[1:5], 2)
+```
+
+
+PC1 & Proportion of genes detected
+
+```{r}
+which_detect_include <- which(detect_jaitin < .17)
+plot(x = detect_jaitin[ which_detect_include ],
+     y = -1*svd_jaitin$u[, 1],
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue")
+```
+
+
+
+## Session information
+
+```{r info}
+sessionInfo()
+```
