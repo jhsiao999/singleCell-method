@@ -91,6 +91,14 @@ tagline:
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 * [Comparison of different nonparameteric smoothers in cellcycleR](project/analysis/nonparametric_cellcycler_methods_compare.html)
 
+### Cell classification using classtpx <a id="classtpx"></a>
+
+* [classtpx package](https://github.com/kkdey/classtpx)
+* Simulation Runs (K=2) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_1.html),
+[Simulation Run 2](project/analysis/classtpx_simulation_run_2.html))
+* Simulation Runs (K=3) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_3.html),
+[Simulation Run 2](project/analysis/classtpx_simulation_run_4.html))
+
 
 #### Comparing to the other methods <a id="comparisons"></a>
 * PCA comparison with cellcycleR - ([Simulation](project/analysis/pca_snr_compare.html), [Gilad-2015-NA19101](project/analysis/pca-sinu-ipsc-19239.html)
