@@ -1,0 +1,206 @@
+---
+title: "Visualize distributions"
+author: "Joyce Hsiao"
+date: "2016-02-13"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+## Background and objectives
+
+Visualize the empirical distribution function of count in each individual. We are interested to learn distribution of UMI counts without log transformation. When we visualize density distributions on a log scale, there appear to be multiple modes in the distribution. The mode with the lowest expression value corresponds to cells with zero UMI count.
+
+For simplicity, here I selected a single replicate from each individaul cell line and compare count distributions across individuals.
+
+## Thoughts
+
+1. We didn't observe bimodality of gene expression of the 16 pluripotent genes in our data. This could be due to the fact that our iPSC cell lines are controlled in an undifferentiated and homogeneous state. In the case when differentiation is expected in the cells, we should see a pattern of bimodality in expression distribution. 
+
+2. Density plot is not a useful tool in visuazling count distribution. They create a visual illusion of multiple modes in the distribution when there are big increase or decrease in frequency of the counts.
+
+3. Replicates are consisent in count distributions in each individual cell line.
+
+## Setting up
+
+```{r}
+library(Humanzee)
+```
+
+
+Import list of pluripotent genes.
+
+```{r}
+pluripotent_genes <- read.table("../data/gilad-2015/pluripotency-genes.txt",
+                                header = TRUE,
+                                stringsAsFactors = FALSE, sep = "\t")
+head(pluripotent_genes)
+```
+
+
+Import filtered molecule counts
+
+```{r}
+molecules_filter <- read.table("../data/gilad-2015/molecules-filter.txt",
+                               header = TRUE,
+                               stringsAsFactors = FALSE)
+which_pluripotent <- which(rownames(molecules_filter) %in% pluripotent_genes$To)
+molecules_pluripotent <- molecules_filter[which_pluripotent, ]
+```
+
+Subset pluripotent genes that are mapped in our data.
+
+```{r}
+pluripotent_subset <- pluripotent_genes[
+    which(pluripotent_genes$To %in% rownames(molecules_filter)), ]
+```
+
+Import annotations of the filtered data
+
+```{r}
+anno_filter <- read.table("../data/gilad-2015/annotation-filter.txt",
+                               header = TRUE,
+                               stringsAsFactors = FALSE)
+dim(anno_filter)
+```
+
+
+
+
+## Plots of replicate 3
+
+Plot for a single replicate and all three individuals.
+
+```{r, fig.height=3}
+anno_filter_r3 <- anno_filter[ which(anno_filter$replicate == "r3"), ]
+gene_counts_r3 <- molecules_pluripotent[ , anno_filter_r3$replicate == "r3"]
+ngenes <- dim(gene_counts_r3)[1]
+
+        
+par(mfrow = c(1,3))
+for (which_gene_view in c(1:ngenes)) {
+    cols <- c("red", "green", "blue")
+    individuals <- unique(anno_filter$individual)
+    
+    ## ECDF of all three individuals
+    plot( ecdf( unlist(
+        gene_counts_r3[ which_gene_view, 
+                              anno_filter_r3$individual == individuals[1] ] ) ),
+        main = "", col = cols[1] )
+    for (ii_individual in c(2:length(individuals))) {
+    lines( ecdf( unlist( gene_counts_r3[ which_gene_view, 
+              anno_filter_r3$individual == individuals[ii_individual] ]) ), 
+              col = cols[ii_individual] ) 
+    }
+    
+    ## Density plot of all three individuals
+    plot_density_overlay(gene_counts_r3,
+                 annotation = anno_filter_r3,
+                 which_gene = rownames(gene_counts_r3)[which_gene_view],
+                 gene_symbols = NULL,
+                 labels = "")
+    
+    ## Simple bar plot of counts
+    count_lims <- table( unlist( gene_counts_r3[ which_gene_view, ] ) )
+    ylims <- c(0, max(count_lims))
+    xlims <- range(as.numeric(names(count_lims)))
+    plot( table( unlist(
+        gene_counts_r3[ which_gene_view, 
+                              anno_filter_r3$individual == individuals[1] ] ) ),
+        type = "h", xlab = "Count", ylab = "Frequency", 
+        main = "", col = alpha( cols[1], .5),
+        xlim = xlims, ylim = ylims, axes = F )
+    axis(1); axis(2)
+    for (ii_individual in c(2:length(individuals))) {
+    points( table( unlist(
+            gene_counts_r3[ which_gene_view, 
+                              anno_filter_r3$individual == individuals[ii_individual] ] ) ),
+            type = "h",
+            col = alpha( cols[ii_individual], .5) )
+    }
+
+}
+```
+
+
+
+## Plots of all replicates
+
+Plot for a single replicate and all three individuals.
+
+```{r, fig.height=9, fig.width=9}
+anno_filter_r3 <- anno_filter[ which(anno_filter$replicate == "r3"), ]
+gene_counts_r3 <- molecules_pluripotent[ , anno_filter_r3$replicate == "r3"]
+ngenes <- dim(gene_counts_r3)[1]
+
+        
+par(mfrow = c(3,3))
+for (which_gene_view in c(1:ngenes)) {
+    cols <- c("red", "green", "blue")
+    individuals <- unique(anno_filter$individual)
+    replicates <- unique(anno_filter$replicate)[order(unique(anno_filter$replicate))]
+
+    ## Simple bar plot of counts
+    count_lims <- lapply(1:length(individuals), function(which_individual) {
+        ind_lims <- lapply(1:length(replicates), function(which_replicate) {
+            replicate_lims <- unlist( table( as.matrix(
+                molecules_pluripotent[ which_gene_view, 
+                        anno_filter$individual == individuals[which_individual] &
+                        anno_filter$replicate == replicates[which_replicate] ] ) ) )
+            if (length(replicate_lims) != 0) {
+                list(ylims = max(replicate_lims),
+                     xlims = range(as.numeric(names(replicate_lims)) ) )
+            } else {
+                list(ylims = 0,
+                     xlims = 0)        
+            }
+        })
+        list(ylims = sapply(ind_lims, "[[", 1),
+             xlims = sapply(ind_lims, "[[", 2))
+    }) 
+    
+    ylims <- c(0, max( unlist(sapply(count_lims, "[[", 1)) ) )
+    xlims <- range(  unlist(sapply(count_lims, "[[", 2)) )
+    
+    for (ii_individual in 1:length(individuals)) {
+    
+    df_ind <- molecules_pluripotent[ , anno_filter$individual == individuals[ii_individual]]
+    anno_ind <- anno_filter[anno_filter$individual == individuals[ii_individual], ]
+    for (ii_replicate in 1:length(replicates)) {
+    if (sum(anno_ind$replicate == replicates[ii_replicate]) != 0) {
+    plot( table( unlist(
+        df_ind[ which_gene_view, anno_ind$replicate == replicates[ii_replicate]] ) ),
+        type = "h", xlab = "Count", ylab = "Frequency", 
+        main = "", col = alpha( cols[ii_individual], 1),
+        xlim = xlims, ylim = ylims)
+    } else {
+    plot(0, pch = "", axes = F, xlab = "", ylab = "")
+    }
+    title(paste(individuals[ii_individual],
+                replicates[ii_replicate], sep = "."))
+    }
+    }
+title(rownames(molecules_pluripotent)[which_gene_view], 
+      outer = TRUE, 
+      line = -1)
+}
+```
+
+
+
+## Gene info
+
+```{r}
+library(knitr)
+kable(pluripotent_subset)
+```
+
+
+## Session information
+
+```{r}
+sessionInfo()
+```
+

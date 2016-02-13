@@ -126,11 +126,10 @@ tagline:
 
 ### Differential testing <a id = 'testing'></a>
 
-#### Exploratory data analysis
-  * [ECDF](project/analysis/count-cumulative.html)
-  * [Count distributions](project/analysis/count-distributions.html)
-
-
+#### Visualize counts
+  * iPSC - ([pluripotent genes](project/analysis/count-pluripotent.html), 
+            [differential gene set]()) 
+            
 ---
 
 ### Miscellaneous <a id = 'misc'></a>
