@@ -1,0 +1,202 @@
+---
+title: 'Explore count distribution'
+author: "Joyce Hsiao"
+date: "2016-02-12"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+    
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+library(limma)
+library(readxl)
+library(Humanzee)
+library(mygene)
+library(knitr)
+require(ggplot2)
+require(pscl)
+require(MASS)
+require(boot)
+```
+
+
+
+## Background and objectives
+
+1. Raw count distributions for each replicate. They seem to be consistent across replicates.
+
+
+
+## Data prepration
+
+Import filtered data
+
+```{r echo=TRUE, eval=TRUE}
+molecules_filter <- read.table("../data/gilad-2015/molecules-filter.txt",
+                              header = TRUE,
+                              stringsAsFactors = FALSE)
+anno_filter <- read.table("../data/gilad-2015/annotation-filter.txt",
+                          header = TRUE,
+                          stringsAsFactors = FALSE)
+molecules_filter <- as.matrix(molecules_filter)
+dim(molecules_filter)
+table(anno_filter$individual)
+```
+
+
+## Some count distributions
+
+Import permutaion results
+
+```{r}
+load(file = "../data/gilad-2015/permuted-pval.rda")
+high_pval <- order(permuted_pval, decreasing = FALSE)[1:100]
+```
+
+
+Plot out the genes that were identified as significantly different in 
+expression patterns between individuals after applying our transformation procedures.
+
+
+```{r}
+individuals <- unique(anno_filter$individual)[-1]
+for (which_gene in 1:5) {
+par(mfrow = c(2,3), new = FALSE)
+for (i in 1:length(individuals)) {
+df_sub <- molecules_filter[which_gene, which(anno_filter$individual == individuals[i])]
+anno_sub <- anno_filter[anno_filter$individual == individuals[i], ]
+replicates <- unique(anno_sub$replicate)
+    for (j in 1:length(replicates)) {
+        plot(table(df_sub[ anno_sub$replicate == replicates[j]]), 
+                 type = "h",
+                 xlab = "count", ylab = "frequency",
+                 main = paste(individuals[i],
+                              replicates[j]),
+                 xlim = c(0,17), ylim = c(0,80), axes = F) 
+        axis(1); axis(2)
+    }
+}
+title(rownames(molecules_filter)[which_gene], outer = TRUE, line = -1)
+}
+```
+
+
+```{r, eval = FALSE, include=FALSE}
+pdf(file = "../figures/count-distributions.Rmd/count-plots.pdf")
+individuals <- unique(anno_filter$individual)[-1]
+for (which_gene in 1:length(high_pval)) {
+par(mfrow = c(2,3), new = FALSE)
+for (i in 1:length(individuals)) {
+df_sub <- molecules_filter[which_gene, which(anno_filter$individual == individuals[i])]
+anno_sub <- anno_filter[anno_filter$individual == individuals[i], ]
+replicates <- unique(anno_sub$replicate)
+    for (j in 1:length(replicates)) {
+        plot(table(df_sub[ anno_sub$replicate == replicates[j]]), 
+                 type = "h",
+                 xlab = "count", ylab = "frequency",
+                 main = paste(individuals[i],
+                              replicates[j]),
+                 xlim = c(0,17), ylim = c(0,80), axes = F) 
+        axis(1); axis(2)
+    }
+}
+title(rownames(molecules_filter)[which_gene], outer = TRUE, line = -1)
+}
+dev.off()
+```
+
+
+## Check distributions
+
+### Use counts from one individual 
+
+```{r}
+count <- molecules_filter[, anno_filter$individual == "NA19101"]
+replicate <- as.factor(anno_filter$replicate[anno_filter$individual == "NA19101"]) 
+
+```
+
+Poisson -> Negative Binomial 
+Poisson -> Zero-inflated Poisson
+
+
+### Poisson
+
+```{r}
+require(MASS)
+#formula <- count[1,] ~ replicate
+fit_distr <- function( formula, family) {
+    library(MASS)
+    library(pscl)
+    
+    if (family == "poisson") {
+    fit_poisson <- glm(formula = formula,
+                       family = family)
+    fit_model <- fit_poisson
+    }
+    
+    if (family == "negative binomial") {
+    fit_negbinom <- tryCatch( glm.nb(formula = formula),
+                              warning = function(warning) "warning" )
+        if (fit_negbinom == "warning") {
+            deviance_pval <- "NA"            
+        } else {
+            fit_model <- fit_negbinom
+            deviance_pval <- 1 - pchisq( deviance(fit_model),
+                                 df.residual(fit_model))
+        }
+    }
+    
+    if (family == "zero-inflated poisson") {
+    fit_zifpoisson <- zeroinfl(formula | 1)
+            
+    }
+    
+    return(list(deviance_pval = deviance_pval))
+}
+
+fit_poisson <- do.call(c,
+   lapply(1:NROW(count),
+          function(gene) {
+               fit_distr(formula = count[gene, ] ~ replicate,
+               family = "poisson")$deviance_pval } ) )
+
+fit_negbinom <- do.call(c,
+   lapply(1:NROW(count),
+          function(gene) {
+               fit_distr(formula = count[gene, ] ~ replicate,
+                        family = "negative binomial")$deviance_pval } ) )
+
+
+
+
+
+fit_hurdle <- hurdle(formula = formula,
+                      dist    = "negbin",
+                      data    = count_vec)
+summary(fit_hurdle)
+
+fit_zinb <- zeroinfl(count ~ replicate, 
+                 data = count_vec, dist = "negbin", EM = TRUE)
+summary(fit_zinb)
+```
+
+
+
+## Session information
+
+```{r}
+sessionInfo()
+```
+
