@@ -134,4 +134,4 @@ tagline:
 ### Miscellaneous <a id = 'misc'></a>
 * [PCA and SVD for data visualization](project/analysis/pca-svd.html)
 * [Lasso for categorical variables](project/analysis/lasso-categorical.html)
-* [Make SummarizedExperiment object](project/analysis/summarized-experiment.Rmd)
+* [Make SummarizedExperiment object](project/analysis/summarized-experiment.html)
