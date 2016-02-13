@@ -125,8 +125,10 @@ tagline:
 ---
 
 ### Differential testing <a id = 'testing'></a>
-* [Exploring ECDF](project/analysis/count-cumulative.html)
-* [Count distributions](project/analysis/count-distributions.html)
+
+#### Exploratory data analysis
+  * [ECDF](project/analysis/count-cumulative.html)
+  * [Count distributions](project/analysis/count-distributions.html)
 
 
 ---
