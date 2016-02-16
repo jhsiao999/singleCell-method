@@ -120,7 +120,8 @@ tagline:
 ### Batch effect <a id = 'batch'></a>
 * [ERCC genes](project/analysis/ercc-pca.html) - ([RUVg](project/analysis/ercc-ruvg.html), [SVA package](project/analysis/ercc-sva.html) )
 * [Bulk RNA] -[RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
-* [Proportion of genes detected](project/analysis/pca-correlation-other-umi-data.html)
+* Proportion of genes detected - ([iPSC](project/analysis/pca-correlation-other-umi-data.html), 
+[Leng2015](project/analysis/pca-correlation-other-umi-leng.html))
 
 ---
 
@@ -136,3 +137,10 @@ tagline:
 * [PCA and SVD for data visualization](project/analysis/pca-svd.html)
 * [Lasso for categorical variables](project/analysis/lasso-categorical.html)
 * [Make SummarizedExperiment object](project/analysis/summarized-experiment.html)
+* [scRNA-seq preliminary data](project/analysis/summarized-experiment-all.html)
+
+
+
+
+
+

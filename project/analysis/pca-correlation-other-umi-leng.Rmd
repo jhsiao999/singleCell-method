@@ -1,0 +1,201 @@
+---
+title: "Reproducing Hicks et al. results: Leng data"
+author: "Joyce Hsiao"
+date: "2016-02-15"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+## Background and objectives
+
+Reproduce findings presented in Hicks et al. using [Leng2015][Leng2015] read counts. 
+
+Note that the PC component scores in Hicks et al. were computed without using unit variance. PC scores computed on unit variances can be different from scores computed on raw variances. We keep our computations here consistent with the method used in Hicks et al.
+
+[Leng2015]: https://dx.doi.org/10.1038/nmeth.3549
+
+
+## Conclusions
+
+1. We were able to replicate results in Hicks et al. 
+
+2. Proportion of genes detected: Hicks et al. excluded cells with less than 40% genes detected (n = 2). There was no difference in the PCA results when including the 2 cells back, which is no surprise given the small number of cells. 
+
+3. Pseudocount: no difference between the two methods.
+
+
+## Setup
+
+```{r, message=FALSE, warning = FALSE}
+library("edgeR")
+require(matrixStats)
+library("gmodels")
+require(GenomicRanges)
+```
+
+
+## Pseudocount - edgeR 
+
+We compare two methods of adding pseudocount:
+
+1. log2(1e6*count/depth + prior.count): Used in Hicks et al., 2016. `prior.count = 1`. `depth` denotes total count in the sample.
+
+2. log2( 1e*6(count + prior.count.scaled)/depth.scaled ): Used in edgeR normalization. `prior.count.scaled = lib.size/mean(lib.size)*prior.count` where `prior.count = .25`. `depth.scaled` denotes `lib.size + 2*prior.count.scaled`.
+
+
+## Import data
+
+```{r}
+leng2015 <- readRDS("../data/all-rds/leng2015.rds")
+
+# access count matrix
+counts <- assays(leng2015)$counts
+dim(counts)
+summary(counts[ , 1:3])
+```
+
+log2 CPM of leng counts
+
+```{r}
+leng_log2cpm <- log2( 1e6 * sweep(counts, 2, 
+                                   STATS = colSums(counts),
+                                   FUN = "/") + 1)
+dim(leng_log2cpm)
+```
+
+
+Proportion of genes detected. 
+
+```{r}
+detect_leng <- colMeans( counts != 0)
+hist(detect_leng)
+```
+
+
+We noted that in Hicks et al., 458 cells were reported in the analysis. 2 cells with less than 40% of genes detected were excluded from the analysis.
+
+```{r}
+sum(detect_leng < .40)
+leng_log2cpm_filter <- leng_log2cpm[ , (detect_leng > .40)]
+which_detect_include <- which(detect_leng > .40)
+
+dim(leng_log2cpm_filter)
+```
+
+edgeR pseudocount
+
+```{r}
+leng_log2cpm_edger <- edgeR::cpm( counts[ ,which_detect_include],
+                                  log = TRUE)
+```
+
+
+Define a set of ubiquitous genes that are mapped in every cell.
+
+```{r}
+which_ubiquitous <- which(rowSums(counts > 0) == NCOL(counts))
+```
+
+
+
+
+## PCA
+
+Principal componenet analysis
+
+```{r jaitin-pca}
+if (file.exists("../rdas/pca-correlation-other-umi-leng/pca_leng.rda")) {
+    load("../rdas/pca-correlation-other-umi-leng/pca_leng.rda")
+} else {
+    svd_leng <- gmodels::fast.svd( scale(t(leng_log2cpm_filter), scale = FALSE) )
+    svd_leng_edger <- gmodels::fast.svd( scale(t(leng_log2cpm_edger), scale = FALSE) )
+
+    svd_leng_ubiq <- 
+        gmodels::fast.svd( scale(t(leng_log2cpm_filter[which_ubiquitous, ]), 
+                                 scale = FALSE) )
+    svd_leng_edger_ubiq <- 
+        gmodels::fast.svd( scale(t(leng_log2cpm_edger[which_ubiquitous, ]), 
+                                               scale = FALSE) )
+    save(svd_leng, svd_leng_edger,
+         svd_leng_ubiq, svd_leng_edger_ubiq,
+         file = "../rdas/pca-correlation-other-umi-leng/pca_leng.rda")
+}
+
+```
+
+
+## Proportion of genes detected
+
+All genes
+
+```{r}
+par(mfrow = c(1,2))
+pc_proportions_svd <- (svd_leng$d^2)/sum(svd_leng$d^2)
+plot(x = detect_leng[which_detect_include],
+     y = -1*svd_leng$u[, 1],
+     xlab = "Proportion of genes detected",
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     main = "Pseudocount Hicks et al.")
+lines(lowess(x = detect_leng[which_detect_include],
+            y = -1*svd_leng$u[, 1]),
+      col = "red", lwd = 2)
+
+pc_proportions_svd_edger <- (svd_leng_edger$d^2)/sum(svd_leng_edger$d^2)
+plot(x = detect_leng[which_detect_include],
+     y = -1*svd_leng_edger$u[, 1],
+     xlab = "Proportion of genes detected",
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_edger[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     main = "Pseudocount edgeR")
+lines(lowess(x = detect_leng[which_detect_include],
+            y = -1*svd_leng_edger$u[, 1]),
+      col = "red", lwd = 2)
+
+title(main = "All genes", outer = TRUE, line = -1)
+```
+
+
+Ubiquitous genes
+
+```{r}
+par(mfrow = c(1,2))
+pc_proportions_svd_ubiq <- (svd_leng_ubiq$d^2)/sum(svd_leng_ubiq$d^2)
+plot(x = detect_leng[which_detect_include],
+     y = -1*svd_leng_ubiq$u[, 1],
+     xlab = "Proportion of genes detected",
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_ubiq[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     main = "Pseudocount Hicks et al.")
+lines(lowess(x = detect_leng[which_detect_include],
+            y = -1*svd_leng_ubiq$u[, 1]),
+      col = "red", lwd = 2)
+
+
+pc_proportions_svd_edger_ubiq <- (svd_leng_edger_ubiq$d^2)/sum(svd_leng_edger_ubiq$d^2)
+plot(x = detect_leng[which_detect_include],
+     y = -1*svd_leng_edger_ubiq$u[, 1],
+     xlab = "Proportion of genes detected",
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_edger_ubiq[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     main = "Pseudocount edgeR")
+lines(lowess(x = detect_leng[which_detect_include],
+            y = -1*svd_leng_edger_ubiq$u[, 1]),
+     col = "red", lwd = 2)
+title(main = "Ubiquitous genes", outer = TRUE, line = -1)
+```
+
+
+
+## Session information
+
+```{r info}
+sessionInfo()
+```
