@@ -1,7 +1,7 @@
 ---
 title: "Reproducing Hicks et al. results: Leng data"
 author: "Joyce Hsiao"
-date: "2016-02-15"
+date: "2016-02-16"
 output: 
   html_document:
     css: floating-toc.css
@@ -104,7 +104,7 @@ which_ubiquitous <- which(rowSums(counts > 0) == NCOL(counts))
 
 ## PCA
 
-Principal componenet analysis
+No scaling
 
 ```{r jaitin-pca}
 if (file.exists("../rdas/pca-correlation-other-umi-leng/pca_leng.rda")) {
@@ -126,6 +126,28 @@ if (file.exists("../rdas/pca-correlation-other-umi-leng/pca_leng.rda")) {
 
 ```
 
+
+
+Scaling. In order to use the scaling option, we need to exclude genes that do not have any mapped reads. 
+
+
+```{r}
+which_gene_include <- which(rowSums(leng_log2cpm_filter > 0) > 0)
+if (file.exists("../rdas/pca-correlation-other-umi-leng/pca_leng_scale.rda")) {
+    load("../rdas/pca-correlation-other-umi-leng/pca_leng_scale.rda")
+} else {
+    svd_leng_scale <- gmodels::fast.svd(
+        scale(t(leng_log2cpm_filter[which_gene_include, ]), 
+              scale = TRUE) )
+    svd_leng_edger_scale <- gmodels::fast.svd(
+        scale(t(leng_log2cpm_edger[which_gene_include, ]),
+              scale = TRUE) )
+    save(svd_leng, svd_leng_edger,
+         svd_leng_ubiq, svd_leng_edger_ubiq,
+         file = "../rdas/pca-correlation-other-umi-leng/pca_leng.rda")
+}
+
+```
 
 ## Proportion of genes detected
 
@@ -192,6 +214,39 @@ lines(lowess(x = detect_leng[which_detect_include],
 title(main = "Ubiquitous genes", outer = TRUE, line = -1)
 ```
 
+
+## Proportion of genes detected - scaling
+
+Genes that are mapped in at least one cell. 
+
+```{r}
+par(mfrow = c(1,2))
+pc_proportions_svd <- (svd_leng_scale$d^2)/sum(svd_leng_scale$d^2)
+plot(x = detect_leng[which_detect_include],
+     y = -1*svd_leng_scale$u[, 1],
+     xlab = "Proportion of genes detected",
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     main = "Pseudocount Hicks et al.")
+lines(lowess(x = detect_leng[which_detect_include],
+            y = -1*svd_leng_scale$u[, 1]),
+      col = "red", lwd = 2)
+
+pc_proportions_svd_edger <- (svd_leng_edger_scale$d^2)/sum(svd_leng_edger_scale$d^2)
+plot(x = detect_leng[which_detect_include],
+     y = -1*svd_leng_edger_scale$u[, 1],
+     xlab = "Proportion of genes detected",
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_edger[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     main = "Pseudocount edgeR")
+lines(lowess(x = detect_leng[which_detect_include],
+            y = -1*svd_leng_edger_scale$u[, 1]),
+      col = "red", lwd = 2)
+
+title(main = "All genes", outer = TRUE, line = -1)
+```
 
 
 ## Session information
