@@ -2,7 +2,10 @@
 title: 'classtpx: Simulation Design 2'
 author: "Kushal K Dey"
 date: "February 8, 2016"
-output: html_document
+output: 
+    html_document:
+        css: floating-toc.css
+        toc: true
 ---
 
 ## Classtpx overview
@@ -13,15 +16,21 @@ output: html_document
 
 ```{r echo=TRUE, eval=TRUE}
 n.out <- 600
-omega_sim <-  cbind(seq(0.6,0.4,length.out=n.out), 1- seq(0.6,0.4,length.out=n.out));
-K <- dim(omega_sim)[2];
-barplot(t(omega_sim),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+omega_sim <-  cbind(seq(0.6,0.4,length.out=n.out), 
+                    1- seq(0.6,0.4,length.out=n.out) )
+colSums(omega_sim)
+
+K <- dim(omega_sim)[2]
+barplot(t(omega_sim),col=2:(K+1),
+        axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,
+        ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
 ```
 
 We generate the cluster or topic distributions.
 
 ```{r echo=TRUE, eval=TRUE}
-freq <- rbind(c(0.1,0.2,rep(0.70/98,98)),c(rep(0.70/98,98), 0.1,0.2));
+freq <- rbind( c(0.1, 0.2, rep(0.70/98,98)),
+               c(rep(0.70/98,98), 0.1, 0.2))
 ```
 
 Now we generate the counts table given the topic proportions matrix and the topic distributions.
@@ -32,13 +41,15 @@ counts <- t(do.call(cbind,lapply(1:dim(omega_sim)[1], function(x) rmultinom(1,10
 
 ## classtpx Application
 
-We assume that we have FACS sorted the cells $1$ to $100$ and from $200$ to $300$.
+We assume that we have FACS sorted the cells $1$ to $100$ and from $501$ to $600$.
 
 ```{r echo=TRUE, eval=TRUE}
 library(classtpx)
 known_indices <- c(1:100, 501:600);
 omega_known <- omega_sim[known_indices,];
-Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.001);
+Topic_clus <- classtpx::class_topics(counts, K, 
+                                     known_indices = known_indices, 
+                                     omega_known = omega_known, tol=0.001);
 ```
 
 ### Structure plot 

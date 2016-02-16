@@ -15,11 +15,8 @@ output:
 
 ## Simulation Design
 
-Assume K = 2 hidden subpopulations in the data, and G = 600 genes. We set
+Assume K = 2 hidden subpopulations in the data, and n = 600 cells. We set a 600 by 2 membership weight matrix $\mathbf{q} with $\sum_{K=2} q_{n.} = 1$, where $q_{n.}$ denotes the vector of membership weight (grade?) of cell $n$. 
 
-$\theta_{1g} = c(\mathbb{1}_200, \mathbb{0}_200, seq(0.6, 0.4, lenght.out = 200)$
-
-and $\sum_{g=1}^{G} \theta_{kg} = 1$.
 
 ```{r echo=TRUE, eval=TRUE}
 n.out <- 200
@@ -42,31 +39,29 @@ barplot(t(omega_sim),
 ```
 
 
-We generate the cluster or topic distributions. These are also known as membership weights of individual cells. Here we simulate n = 100 cells, and membership weight
-matrix $q_{n.}$ is
+We generate the cluster or topic distributions. These are also known as relative gene expression weights of individual cells. Here we simulate $G = 100$ genes, and membership weight
 
-$\begin{pmatrix} q_{11} & q_{21} & \dots & q_{n1} \\
-  q_{12} & q_{22} & \dots & q_{n2} 
+$\begin{pmatrix} q_{,11} & q_{1,2} & \dots & q_{1,G} \\
+  q_{2,1} & q_{2,2} & \dots & q_{2,G} 
   \end{pmatrix}$
 
 
 ```{r echo=TRUE, eval=TRUE}
 freq <- rbind( c(0.1, 0.2, rep(0.70/98, 98)),
-               c(rep(0.70/98,98), 0.1,0.2) )
+               c(rep(0.70/98,98), 0.1, 0.2) )
 str(freq)
-freq[ ,1:5]
 ```
 
 
 Now we generate the counts table given the topic proportions matrix and the topic distributions.
 
-For every gene, we assume that $C_{n.}$ the vector of read counts coming from genes 1 to G follows a multinomial distribution where $\left( p_{n,1}, \dots, p_{n,G} \right)$ the probabilities of a read coming from genes 1 to $g$ sum up to 1. That is, 
+For every cell $n$, we assume that $C_{n.}$ the vector of read counts coming from genes 1 to G follows a multinomial distribution where $\left( p_{n,1}, \dots, p_{n,G} \right)$ the probabilities of a read coming from genes 1 to $G$ sum up to 1. That is, 
 
 $C_{n.} \sim Multinomial \left( C_{n+}, p_{n.} \right)$ 
 
 and 
 
-$p_{n.}= q^{\prime}_{n.} \begin{pmatrix} \theta_{1.} \\ \theta{2.} \end{pmatrix}$
+$p_{n.}= \sum_{k=1}^{K} q_{nk} \theta_{kg}$.
 
 
 ```{r echo=TRUE, eval=TRUE}
@@ -86,38 +81,58 @@ We assume that we have FACS sorted the cells into two known cell types. Cells nu
 ```{r echo=TRUE, eval=TRUE}
 library(classtpx)
 known_indices <- c(1:100, 201:300)
-omega_known <- omega_sim[known_indices,];
-Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.001);
+omega_known <- omega_sim[known_indices,]
+Topic_clus <- classtpx::class_topics(
+    counts, 
+    K, 
+    known_indices = known_indices, 
+    omega_known = omega_known, 
+    tol=0.001)
 ```
 
-### Structure plot 
+
 
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
-docweights <- Topic_clus$omega;
-library(permute);
+# These are estimated gene relative expression
+docweights <- Topic_clus$omega
+
+library(permute)
 library(BioPhysConnectoR)
-perm_set=rbind(1:K,allPerms(1:K));
-diff=array(0,dim(perm_set)[1]);
+
+# Decide on the correspondance of the simulated
+# and of the estimated relative expression matrix
+# 
+# We consider all possible cluster ordering in the 
+# estimated relative expression matrix and select
+# the relative expression matrix with the nearest
+# distance to the simulate relative experssion matrix
+# (forbieus norm)
+
+perm_set <- rbind(1:K,allPerms(1:K))
+diff <- array(0,dim(perm_set)[1]) 
 for (p in 1:dim(perm_set)[1])
 {
-    temp=docweights[,perm_set[p,]];
-    diff[p]=fnorm(temp,omega_sim);
+    temp <- docweights[, perm_set[p,]]
+    diff[p] <- fnorm(temp,omega_sim)
 }
 
-p_star=which(diff==min(diff));
-docweights=docweights[,perm_set[p_star,]];
+p_star <- which(diff==min(diff))
+docweights <- docweights[,perm_set[p_star,]]
 
-barplot(t(docweights),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+barplot(t(docweights),
+        col = 2:(K+1),
+        axisnames = F, space = 0, border = NA, 
+        main=paste("No. of clusters=", K),
+        las=1, ylim=c(0,1), cex.axis=1.5, cex.main=1.4)
 ```
 
 ## maptpx Application
 
 ```{r echo=TRUE, eval=TRUE}
 library(maptpx)
-Topic_clus <- maptpx::topics(counts, K, tol=0.001);
+Topic_clus <- maptpx::topics(counts, K, tol=0.001)
 ```
 
-### Structure plot 
 
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 docweights <- Topic_clus$omega;
