@@ -30,6 +30,7 @@ omega_sim <- rbind( cbind( rep(1, n.out), rep(0, n.out)),
 dim(omega_sim)
 ```
 
+
 ```{r}
 K <- dim(omega_sim)[2]
 barplot(t(omega_sim), 
