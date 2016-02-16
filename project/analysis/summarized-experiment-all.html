@@ -72,6 +72,7 @@ img {
 <ul>
 <li><a href="#background-and-objectives">Background and objectives</a></li>
 <li><a href="#load-packages">Load packages</a></li>
+<li><a href="#jaitin2014-umi">Jaitin2014, UMI</a></li>
 <li><a href="#tung2016-umi">Tung2016, UMI</a></li>
 <li><a href="#leng2015-reads">Leng2015, reads</a></li>
 <li><a href="#session-information">Session information</a></li>
@@ -85,6 +86,57 @@ img {
 <div id="load-packages" class="section level2">
 <h2>Load packages</h2>
 <pre class="r"><code>require(GenomicRanges)</code></pre>
+</div>
+<div id="jaitin2014-umi" class="section level2">
+<h2>Jaitin2014, UMI</h2>
+<pre class="r"><code># import count matrix, convert to a matrix object
+counts &lt;- as.matrix(
+    read.table(&quot;../data/jaitin-2014/GSE54006_umitab.txt&quot;,
+               header = TRUE, stringsAsFactors = FALSE,
+               sep = &quot;\t&quot;) )
+gene_names &lt;- counts[ ,1]
+sample_names &lt;- colnames(counts)[-1]
+counts &lt;- counts[ ,-1]
+counts &lt;- matrix(as.numeric(counts), byrow = FALSE,
+                 nrow = length(gene_names))
+rownames(counts) &lt;- gene_names
+
+
+# import annotation matrix, conver to a DatFrame object
+col_data &lt;- read.table(&quot;../data/jaitin-2014/GSE54006_experimental_design.txt&quot;,
+               header = TRUE, 
+               stringsAsFactors = FALSE,
+               sep = &quot;\t&quot;) 
+colnames(col_data) &lt;- unlist(col_data[6,])
+col_data &lt;- col_data[-c(1:6), ]
+
+# annotation matrix does not match the count matrix
+temp_colnames &lt;- do.call(c,
+        lapply(sample_names, function(x) strsplit(x, &quot;X&quot;)[[1]][[2]]) )
+col_data &lt;- col_data[which(col_data$Column_name_in_processed_data_file %in%
+                         temp_colnames), ]
+col_data &lt;- DataFrame(col_data)
+dim(col_data)
+
+# make an empty GRanges list 
+row_data &lt;- relist(GRanges(), vector(&quot;list&quot;, length=nrow(counts)))
+mcols(row_data) &lt;- gene_names
+
+# experiment description
+exptData &lt;- c(&quot;single-cell RNA-seq data collected on 96-well Fluidigm C1 plate &quot;)
+
+# putting all together
+jaitin2014 &lt;- SummarizedExperiment(
+        assays = list(counts=counts),
+        rowRanges = row_data,
+        colData = col_data,
+        exptData = SimpleList(exptData = exptData) )
+
+# assign row names
+rownames(jaitin2014) &lt;- gene_names
+
+saveRDS(jaitin2014,
+        file = &quot;../data/all-rds/jaitin2014.rds&quot;)</code></pre>
 </div>
 <div id="tung2016-umi" class="section level2">
 <h2>Tung2016, UMI</h2>

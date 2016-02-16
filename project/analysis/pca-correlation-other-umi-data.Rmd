@@ -24,6 +24,7 @@ Note that the PC component scores in Hicks et al. were computed without using un
 library("edgeR")
 require(matrixStats)
 library("gmodels")
+library("GenomicRanges")
 ```
 
 
@@ -43,10 +44,8 @@ We compare two methods of adding pseudocount:
 Import Jaitin counts.
 
 ```{r jaitin-data}
-jaitin_data <- read.table("../data/jaitin-2014/GSE54006_umitab.txt", header = TRUE,
-                           stringsAsFactors = FALSE, sep = "\t")
-rownames(jaitin_data) <- jaitin_data[ ,1]
-jaitin_data <- jaitin_data[,-1]
+jaitin_data <- readRDS("../data/all-rds/jaitin2014.rds")
+jaitin_data <- assays(jaitin_data)$counts
 dim(jaitin_data)
 jaitin_data[1:5, 1:5]
 ```

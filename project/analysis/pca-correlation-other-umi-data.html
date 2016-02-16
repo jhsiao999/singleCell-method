@@ -94,7 +94,51 @@ img {
 <pre><code>## Loading required package: matrixStats</code></pre>
 <pre><code>## Warning: package 'matrixStats' was built under R version 3.2.3</code></pre>
 <pre><code>## matrixStats v0.50.1 (2015-12-14) successfully loaded. See ?matrixStats for help.</code></pre>
-<pre class="r"><code>library(&quot;gmodels&quot;)</code></pre>
+<pre class="r"><code>library(&quot;gmodels&quot;)
+library(&quot;GenomicRanges&quot;)</code></pre>
+<pre><code>## Warning: package 'GenomicRanges' was built under R version 3.2.2</code></pre>
+<pre><code>## Loading required package: BiocGenerics</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## 
+## Attaching package: 'BiocGenerics'</code></pre>
+<pre><code>## The following objects are masked from 'package:parallel':
+## 
+##     clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+##     clusterExport, clusterMap, parApply, parCapply, parLapply,
+##     parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
+<pre><code>## The following object is masked from 'package:limma':
+## 
+##     plotMA</code></pre>
+<pre><code>## The following object is masked from 'package:stats':
+## 
+##     xtabs</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     anyDuplicated, append, as.data.frame, as.vector, cbind,
+##     colnames, do.call, duplicated, eval, evalq, Filter, Find, get,
+##     intersect, is.unsorted, lapply, Map, mapply, match, mget,
+##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+##     rbind, Reduce, rep.int, rownames, sapply, setdiff, sort,
+##     table, tapply, union, unique, unlist, unsplit</code></pre>
+<pre><code>## Loading required package: S4Vectors</code></pre>
+<pre><code>## Warning: package 'S4Vectors' was built under R version 3.2.2</code></pre>
+<pre><code>## Loading required package: stats4</code></pre>
+<pre><code>## Creating a generic function for 'nchar' from package 'base' in package 'S4Vectors'</code></pre>
+<pre><code>## Loading required package: IRanges</code></pre>
+<pre><code>## Warning: package 'IRanges' was built under R version 3.2.2</code></pre>
+<pre><code>## Warning in .recacheSubclasses(def@className, def, doSubclasses, env):
+## undefined subclass &quot;externalRefMethod&quot; of class &quot;expressionORfunction&quot;;
+## definition not updated</code></pre>
+<pre><code>## Warning in .recacheSubclasses(def@className, def, doSubclasses, env):
+## undefined subclass &quot;externalRefMethod&quot; of class &quot;functionORNULL&quot;;
+## definition not updated</code></pre>
+<pre><code>## Loading required package: GenomeInfoDb</code></pre>
+<pre><code>## Warning: package 'GenomeInfoDb' was built under R version 3.2.2</code></pre>
+<pre><code>## 
+## Attaching package: 'GenomicRanges'</code></pre>
+<pre><code>## The following object is masked from 'package:matrixStats':
+## 
+##     rowRanges</code></pre>
 </div>
 <div id="pseudocount---edger" class="section level2">
 <h2>Pseudocount - edgeR</h2>
@@ -107,14 +151,12 @@ img {
 <div id="import-data" class="section level2">
 <h2>Import data</h2>
 <p>Import Jaitin counts.</p>
-<pre class="r"><code>jaitin_data &lt;- read.table(&quot;../data/jaitin-2014/GSE54006_umitab.txt&quot;, header = TRUE,
-                           stringsAsFactors = FALSE, sep = &quot;\t&quot;)
-rownames(jaitin_data) &lt;- jaitin_data[ ,1]
-jaitin_data &lt;- jaitin_data[,-1]
+<pre class="r"><code>jaitin_data &lt;- readRDS(&quot;../data/all-rds/jaitin2014.rds&quot;)
+jaitin_data &lt;- assays(jaitin_data)$counts
 dim(jaitin_data)</code></pre>
 <pre><code>## [1] 20190  4590</code></pre>
 <pre class="r"><code>jaitin_data[1:5, 1:5]</code></pre>
-<pre><code>##                    X0_1 X0_2 X0_3 X0_4 X0_5
+<pre><code>##                    [,1] [,2] [,3] [,4] [,5]
 ## 0610007C21Rik_Apr3    0    0    0    1    0
 ## 0610007L01Rik         0    1    0    0    0
 ## 0610007P08Rik         0    0    0    0    0
@@ -234,17 +276,19 @@ title(main = &quot;Ubiquitous genes&quot;, outer = TRUE, line = -1)</code></pre>
 ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## [1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+## [8] methods   base     
 ## 
 ## other attached packages:
-## [1] gmodels_2.16.2     matrixStats_0.50.1 edgeR_3.10.5      
-## [4] limma_3.24.15     
+## [1] GenomicRanges_1.20.8 GenomeInfoDb_1.4.3   IRanges_2.2.9       
+## [4] S4Vectors_0.6.6      BiocGenerics_0.14.0  gmodels_2.16.2      
+## [7] matrixStats_0.50.1   edgeR_3.10.5         limma_3.24.15       
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] gtools_3.5.0    digest_0.6.9    MASS_7.3-45     formatR_1.2.1  
-##  [5] magrittr_1.5    evaluate_0.8    stringi_1.0-1   gdata_2.17.0   
-##  [9] rmarkdown_0.9.2 tools_3.2.1     stringr_1.0.0   yaml_2.1.13    
-## [13] htmltools_0.3   knitr_1.12.3</code></pre>
+##  [5] magrittr_1.5    evaluate_0.8    stringi_1.0-1   XVector_0.8.0  
+##  [9] gdata_2.17.0    rmarkdown_0.9.2 tools_3.2.1     stringr_1.0.0  
+## [13] yaml_2.1.13     htmltools_0.3   knitr_1.12.3</code></pre>
 </div>
 
 
