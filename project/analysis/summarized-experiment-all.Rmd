@@ -1,0 +1,118 @@
+---
+title: "Make SummarizedExperiment objects"
+author: "Joyce Hsiao"
+date: "2016-02-15"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(eval = FALSE, echo = TRUE)
+```
+
+
+## Background and objectives
+
+Make SummarizedExperiment objects for scRNA-seq data.
+
+
+
+## Load packages
+
+```{r}
+require(GenomicRanges)
+```
+
+
+## Tung2016, UMI
+
+Import molecule counts after QC-filtering.
+
+```{r}
+# import count matrix, convert to a matrix object
+counts <- as.matrix(
+    read.table("../data/gilad-2015/molecules-filter.txt",
+               header = TRUE, stringsAsFactors = FALSE) )
+
+# import annotation matrix, conver to a DatFrame object
+col_data <- DataFrame(
+    read.table("../data/gilad-2015/annotation-filter.txt",
+               header = TRUE, stringsAsFactors = FALSE) )
+
+# make an empty GRanges list 
+row_data <- relist(GRanges(), vector("list", length=nrow(counts)))
+mcols(row_data) <- rownames(counts)
+
+# experiment description
+exptData <- c("single-cell RNA-seq data collected on 96-well Fluidigm C1 plate ")
+
+# putting all together
+tung2016 <- SummarizedExperiment(
+        assays = list(counts=counts),
+        rowRanges = row_data,
+        colData = col_data,
+        exptData = SimpleList(exptData = exptData) )
+
+# assign row names
+rownames(tung2016) <- rownames(counts)
+
+saveRDS(tung2016,
+        file = "../data/all-rds/tung2016.rds")
+```
+
+
+## Leng2015, reads
+
+Two sets of experiments were performed in Leng2015. In the first set of experiments, human embryonic stem cells (hESC) were sorted into three C1 plates corresponding to cell-cycle phase of G1, S, and G2. Fluorescent ubiquitination-based cell-cycle indicator (FUCCI) was used. The H1-FUCCI cell line provides a two-color fluorescence labeling system allowing single-cell suspensions from G1, S or G2/M cell-cycle phases to be isolated by FACS. In the second set of experiments, in order to validate their method of identifying oscillating genes, they collected hESCs with unknown cell-cycles in three C1 plates.
+
+
+```{r}
+# import read count matrix
+leng_data <- read.csv("../data/leng-2015/GSE64016_H1andFUCCI_normalized_EC.csv")
+rownames(leng_data) <- leng_data[ ,1]
+counts <- as.matrix(leng_data[,-1])
+dim(counts)
+
+
+# construct annotation matrix
+col_data <- colnames(counts)
+col_data <- DataFrame(
+    cell_state = sapply(col_data, 
+                       function(xx) strsplit(xx, "_")[[1]][1]),
+    replicate = sapply(col_data, 
+                   function(xx) strsplit(xx, "_")[[1]][2]),
+    cell_id = sapply(col_data,
+                     function(xx) strsplit(xx, ".", fixed = TRUE)[[1]][2]),
+    sample_id = col_data)
+
+# make an empty GRanges list 
+row_data <- relist(GRanges(), vector("list", length=nrow(counts)))
+mcols(row_data) <- rownames(counts)
+
+# experiment description
+exptData <- c("single-cell RNA-seq data collected on 96-well Fluidigm C1 plate. Include three plates of hESCs with unknown cell-cycle phase, and three plates of hESCs sorted into cell-cycle phase of G1, S, and G2.")
+
+# putting all together
+leng2015 <- SummarizedExperiment(
+        assays = list(counts=counts),
+        rowRanges = row_data,
+        colData = col_data,
+        exptData = SimpleList(exptData = exptData) )
+
+# assign row names
+rownames(leng2015) <- rownames(counts)
+
+saveRDS(leng2015,
+        file = "../data/all-rds/leng2015.rds")
+```
+
+
+## Session information
+```{r}
+sessionInfo()
+```
+
