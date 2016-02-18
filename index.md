@@ -11,7 +11,8 @@ tagline:
     * [Exploratory analysis](#explore)
     * [Sinusoidal fitting](#sinusoidal-cellcycler)
     * [Nonparametric smoothing](#nonparametric-cellcycler)
-  * [Batch effect](#batch)
+    * [Cell-cycle classifier](#classifier)
+  * [Cell classification](#classtpx)
   * [Differential testing](#testing)
   * [Miscellaneous](#misc)
 
@@ -32,9 +33,10 @@ tagline:
      * [Structure plots using before batch, individual correction](project/analysis/clustering_cell_cycle_genes.html)
      * [Structure plots after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
 
-* LCL data (Tung et al., 2015)
+* LCL data (Tung et al., 2016)
 	*  [Endogeneous genes](project/analysis/lcl_structure.html)
 	*  [Cell-cycle genes](project/analysis/lcl_structure_cell_cycle_genes.html)
+
 * iPSC +LCL pooled data analysis (Tung et al., 2015)
 	* [Admixture analysis (All genes + Cell cycle genes)](project/analysis/ipsc_lcl_structure.html)
 	* [Gene annotations of iPSC and LCL data](project/analysis/gene_annotations_ipsc_lcl.html)
@@ -51,9 +53,10 @@ tagline:
 
 ---
 
-### Cell-cycle phase modeling (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
+### Cell-cycle phase modeling  <a id = 'assign-cell-cycle'></a>
 
 #### Methods and Materials <a id="methods"></a>
+
 * [Our model](project/docs/cell_reorder.pdf) 
 
 #### Exploratory analysis <a id="explore"></a>
@@ -76,6 +79,11 @@ tagline:
 
 
 * [Runtime comparisons: parallel vs. lmFit](project/analysis/sin_cell_order_iter-runtime.html)
+* PCA comparison with cellcycleR - ([Simulation](project/analysis/pca_snr_compare.html), [Gilad-2015-NA19101](project/analysis/pca-sinu-ipsc-19239.html)
+* [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
+* [Simulation study to check how cell states and ribosomal genes may affect cellcycleR](project/analysis/cellcycler_with_ribosomal_sim.html)
+* [Testing Penalized Matrix Decomposition on cellcycle genes](project/analysis/pmd_cellcycler_test_1.html)
+* [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
 
 
 #### Nonparametric smoothing <a id="nonparametric-cellcycler"></a>
@@ -92,6 +100,12 @@ tagline:
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
 * [Comparison of different nonparameteric smoothers in cellcycleR](project/analysis/nonparametric_cellcycler_methods_compare.html)
 
+#### Cell-cycle classifer <a id="classifier"></a>
+* [Multinomial lasso, Leng2015](project/analysis/oscope-classifer.html)
+
+
+---
+
 ### Cell classification using classtpx <a id="classtpx"></a>
 
 * [classtpx package](https://github.com/kkdey/classtpx)
@@ -100,28 +114,6 @@ tagline:
 * Simulation Runs (K=3) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_3.html),
 [Simulation Run 2](project/analysis/classtpx_simulation_run_4.html))
 
-
-#### Comparing to the other methods <a id="comparisons"></a>
-* PCA comparison with cellcycleR - ([Simulation](project/analysis/pca_snr_compare.html), [Gilad-2015-NA19101](project/analysis/pca-sinu-ipsc-19239.html)
-* [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
-* [Simulation study to check how cell states and ribosomal genes may affect cellcycleR](project/analysis/cellcycler_with_ribosomal_sim.html)
-* [Testing Penalized Matrix Decomposition on cellcycle genes](project/analysis/pmd_cellcycler_test_1.html)
-
-
-#### Correlated gene expression patterns <a id = "correlated-expression"></a>
-* [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
-
-
-#### Cell-cycle classifer
-* [Multinomial lasso, Leng2015](project/analysis/oscope-classifer.html)
-
----
-
-### Batch effect <a id = 'batch'></a>
-* [ERCC genes](project/analysis/ercc-pca.html) - ([RUVg](project/analysis/ercc-ruvg.html), [SVA package](project/analysis/ercc-sva.html) )
-* [Bulk RNA] -[RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
-* Proportion of genes detected - ([iPSC](project/analysis/pca-correlation-other-umi-data.html), 
-[Leng2015](project/analysis/pca-correlation-other-umi-leng.html))
 
 ---
 
@@ -134,10 +126,21 @@ tagline:
 ---
 
 ### Miscellaneous <a id = 'misc'></a>
+
+#### Batch effect
+* [Source of variation in ERCC genes](project/analysis/ercc-pca.html) - ([RUVg batch correction](project/analysis/ercc-ruvg.html))
+* [Batch effect correction example using SVA & comBat](project/analysis/ercc-sva.html)
+* [Batch effect correction example using RUVg (Zebarfish)](project/analysis/ercc-ruvg-paper-data.html)
+* Proportion of genes detected - ([iPSC](project/analysis/pca-correlation-other-umi-data.html), 
+[Leng2015](project/analysis/pca-correlation-other-umi-leng.html))
+
+#### Computational examples
 * [PCA and SVD for data visualization](project/analysis/pca-svd.html)
 * [Lasso for categorical variables](project/analysis/lasso-categorical.html)
 * [Make SummarizedExperiment object](project/analysis/summarized-experiment.html)
-* [scRNA-seq preliminary data](project/analysis/summarized-experiment-all.html)
+
+#### Others
+* [scRNA-seq published datasets](project/analysis/summarized-experiment-all.html)
 
 
 
