@@ -153,10 +153,10 @@ library(&quot;GenomicRanges&quot;)</code></pre>
 <h2>Import data</h2>
 <p>Import Jaitin counts.</p>
 <pre class="r"><code>jaitin_data &lt;- readRDS(&quot;../data/all-rds/jaitin2014.rds&quot;)
-jaitin_data &lt;- assays(jaitin_data)$counts
-dim(jaitin_data)</code></pre>
+counts &lt;- assays(jaitin_data)$counts
+dim(counts)</code></pre>
 <pre><code>## [1] 20190  4590</code></pre>
-<pre class="r"><code>jaitin_data[1:5, 1:5]</code></pre>
+<pre class="r"><code>counts[1:5, 1:5]</code></pre>
 <pre><code>##                    [,1] [,2] [,3] [,4] [,5]
 ## 0610007C21Rik_Apr3    0    0    0    1    0
 ## 0610007L01Rik         0    1    0    0    0
@@ -164,7 +164,7 @@ dim(jaitin_data)</code></pre>
 ## 0610007P14Rik         0    1    0    0    0
 ## 0610007P22Rik         0    0    0    0    0</code></pre>
 <p>Remove cells with total 0 UMI.</p>
-<pre class="r"><code>jaitin_filter &lt;- jaitin_data[ , colSums(jaitin_data) != 0]
+<pre class="r"><code>jaitin_filter &lt;- counts[ , colSums(counts) != 0]
 dim(jaitin_filter)</code></pre>
 <pre><code>## [1] 20190  4500</code></pre>
 <p>log2 CPM of Jaitin counts</p>

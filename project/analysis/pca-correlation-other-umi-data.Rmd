@@ -45,16 +45,16 @@ Import Jaitin counts.
 
 ```{r jaitin-data}
 jaitin_data <- readRDS("../data/all-rds/jaitin2014.rds")
-jaitin_data <- assays(jaitin_data)$counts
-dim(jaitin_data)
-jaitin_data[1:5, 1:5]
+counts <- assays(jaitin_data)$counts
+dim(counts)
+counts[1:5, 1:5]
 ```
 
 
 Remove cells with total 0 UMI.
 
 ```{r jaitin-filter-cell}
-jaitin_filter <- jaitin_data[ , colSums(jaitin_data) != 0]
+jaitin_filter <- counts[ , colSums(counts) != 0]
 dim(jaitin_filter)
 ```
 
