@@ -131,7 +131,7 @@ tagline:
 * [Source of variation in ERCC genes](project/analysis/ercc-pca.html) - ([RUVg batch correction](project/analysis/ercc-ruvg.html))
 * [Batch effect correction example using SVA & comBat](project/analysis/ercc-sva.html)
 * [Batch effect correction example using RUVg (Zebarfish)](project/analysis/ercc-ruvg-paper-data.html)
-* Proportion of genes detected - ([iPSC](project/analysis/pca-correlation-other-umi-data.html), 
+* Proportion of genes detected - ([Jaitin2014](project/analysis/pca-correlation-other-umi-data.html), 
 [Leng2015](project/analysis/pca-correlation-other-umi-leng.html))
 
 #### Computational examples
