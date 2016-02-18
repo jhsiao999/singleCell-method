@@ -140,7 +140,7 @@ tagline:
 * [Make SummarizedExperiment object](project/analysis/summarized-experiment.html)
 
 #### Others
-* [scRNA-seq published datasets](project/analysis/summarized-experiment-all.html)
+* [scRNA-seq published datasets](project/analysis/summarized-experiment-all.html) - (description[project/analysis/data-description.html])
 
 
 
