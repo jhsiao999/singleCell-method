@@ -1,7 +1,7 @@
 ---
 title: "Reproducing Hicks et al. results"
 author: "Joyce Hsiao"
-date: "2016-02-11"
+date: "2016-02-16"
 output: 
   html_document:
     css: floating-toc.css
@@ -13,9 +13,7 @@ output:
 
 Reproduce findings presented in Hicks et al. using [Jaitin2014][Jaitin2014] UMI counts. 
 
-Note that the PC component scores in Hicks et al. were computed without using unit variance. 
-PC scores computed on unit variances can be different from scores computed on 
-raw variances. We keep our computations here consistent with the method used in Hicks et al.
+Note that the PC component scores in Hicks et al. were computed without using unit variance. PC scores computed on unit variances can be different from scores computed on raw variances. We keep our computations here consistent with the method used in Hicks et al.
 
 [Jaitin2014]: https://dx.doi.org/10.1126/science.1247651
 
@@ -26,7 +24,19 @@ raw variances. We keep our computations here consistent with the method used in 
 library("edgeR")
 require(matrixStats)
 library("gmodels")
+library("GenomicRanges")
 ```
+
+
+
+## Pseudocount - edgeR 
+
+We compare two methods of adding pseudocount:
+
+1. log2(1e6*count/depth + prior.count): Used in Hicks et al., 2016. `prior.count = 1`. `depth` denotes total count in the sample.
+
+2. log2( 1e*6(count + prior.count.scaled)/depth.scaled ): Used in edgeR normalization. `prior.count.scaled = lib.size/mean(lib.size)*prior.count` where `prior.count = .25`. `depth.scaled` denotes `lib.size + 2*prior.count.scaled`.
+
 
 
 ## Import data
@@ -34,19 +44,17 @@ library("gmodels")
 Import Jaitin counts.
 
 ```{r jaitin-data}
-jaitin_data <- read.table("../data/jaitin-2014/GSE54006_umitab.txt", header = TRUE,
-                           stringsAsFactors = FALSE, sep = "\t")
-rownames(jaitin_data) <- jaitin_data[ ,1]
-jaitin_data <- jaitin_data[,-1]
-dim(jaitin_data)
-jaitin_data[1:5, 1:5]
+jaitin_data <- readRDS("../data/all-rds/jaitin2014.rds")
+counts <- assays(jaitin_data)$counts
+dim(counts)
+counts[1:5, 1:5]
 ```
 
 
 Remove cells with total 0 UMI.
 
 ```{r jaitin-filter-cell}
-jaitin_filter <- jaitin_data[ , colSums(jaitin_data) != 0]
+jaitin_filter <- counts[ , colSums(counts) != 0]
 dim(jaitin_filter)
 ```
 
@@ -75,37 +83,164 @@ is consistent with the number of cells that have at least 17% genes detected.
 ```{r}
 sum(detect_jaitin > .17)
 jaitin_log2cpm_filter <- jaitin_log2cpm[ , !(detect_jaitin > .17)]
+which_detect_include <- which(detect_jaitin < .17)
+
 dim(jaitin_log2cpm_filter)
 ```
 
 
-## Results
+Pseudocount - edgeR 
 
-Principal componenet analysis
+```{r}
+jaitin_log2cpm_edger <- cpm(jaitin_filter[ , which_detect_include],
+                            log = TRUE)
+```
+
+
+Ubiquitous genes
+
+Define a set of ubiquitous genes that are mapped in every cell. Because only four genes are mapped in every single cell (in the data set that is already filtered out cells with total zero count across genes), we relax the criterion an din
+
+```{r}
+# All genes
+which_ubiquitous <- which(rowSums(jaitin_filter[ ,which_detect_include] > 0) == NCOL(jaitin_filter[ ,which_detect_include]) )
+length(which_ubiquitous)
+
+# Genes detected in all cells
+which_ubiquitous <- which(rowSums(jaitin_filter[ ,which_detect_include] > 0) > 100)
+length(which_ubiquitous)
+```
+
+
+
+## PCA
+
+No scaling
 
 ```{r jaitin-pca}
 if (file.exists("../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")) {
     load("../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")
 } else {
-    svd_jaitin <- gmodels::fast.svd( scale(t(jaitin_log2cpm_filter), scale = FALSE) )
-    save(svd_jaitin, file = "../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")
+    svd_jaitin <- gmodels::fast.svd( scale(t(jaitin_log2cpm_filter), 
+                                 scale = FALSE) )
+    svd_jaitin_edger <- gmodels::fast.svd( scale(t(jaitin_log2cpm_edger), 
+                                                 scale = FALSE) )
+    svd_jaitin_ubiq <- 
+        gmodels::fast.svd( scale(t(jaitin_log2cpm_filter[which_ubiquitous, ]), 
+                                 scale = FALSE) )
+    svd_jaitin_edger_ubiq <- 
+        gmodels::fast.svd( scale(t(jaitin_log2cpm_edger[which_ubiquitous, ]), 
+                                                 scale = FALSE) )
+    save(svd_jaitin, svd_jaitin_edger,
+         svd_jaitin_ubiq, svd_jaitin_edger_ubiq,        
+         file = "../rdas/pca-correlation-other-umi-data/pca_jaitin.rda")
 }
 
-pc_proportions_svd <- (svd_jaitin$d^2)/sum(svd_jaitin$d^2)
-round(pc_proportions_svd[1:5], 2)
 ```
 
 
-PC1 & Proportion of genes detected
+
+Scaling
+
+```{r jaitin-pca-scale}
+which_gene_include <- which( rowSums(jaitin_log2cpm_filter > 0) > 0)
+if (file.exists("../rdas/pca-correlation-other-umi-data/pca_jaitin_scale.rda")) {
+    load("../rdas/pca-correlation-other-umi-data/pca_jaitin_scale.rda")
+} else {
+    svd_jaitin_scale <- 
+        gmodels::fast.svd( scale(t(jaitin_log2cpm_filter[which_gene_include, ]), 
+                                 scale = TRUE) )
+    svd_jaitin_edger_scale <- 
+        gmodels::fast.svd( scale(t(jaitin_log2cpm_edger[which_gene_include, ]), 
+                                 scale = TRUE) )
+    save(svd_jaitin_scale, svd_jaitin_edger_scale,
+         file = "../rdas/pca-correlation-other-umi-data/pca_jaitin_scale.rda")
+}
+
+```
+
+## Proportion of genes detected
+
+All genes
 
 ```{r}
-which_detect_include <- which(detect_jaitin < .17)
+par(mfrow = c(1,2))
+pc_proportions_svd <- (svd_jaitin$d^2)/sum(svd_jaitin$d^2)
 plot(x = detect_jaitin[ which_detect_include ],
      y = -1*svd_jaitin$u[, 1],
      ylab = paste("Pricipal component 1 (", 
                   100*round(pc_proportions_svd[1], 2),"%)"),
-     pch = 16, cex = .3, col = "blue")
+     pch = 16, cex = .3, col = "blue",
+     xlab = "Proportion of genes detected",
+     main = "Pseudocount Hicks et al.")
+
+pc_proportions_svd_edger <- (svd_jaitin_edger$d^2)/sum(svd_jaitin_edger$d^2)
+plot(x = detect_jaitin[ which_detect_include ],
+     y = -1*svd_jaitin_edger$u[, 1],
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_edger[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     xlab = "Proportion of genes detected",
+     main = "Pseudocount edgeR")
+
+title(main = "All genes", outer = TRUE, line = -1)
 ```
+
+
+
+Ubiquitous genes.
+
+```{r}
+par(mfrow = c(1,2))
+pc_proportions_svd_ubiq <- (svd_jaitin_ubiq$d^2)/sum(svd_jaitin_ubiq$d^2)
+plot(x = detect_jaitin[ which_detect_include ],
+     y = svd_jaitin_ubiq$u[, 1],
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_ubiq[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     xlab = "Proportion of genes detected",
+     main = "Pseudocount Hicks et al.")
+
+pc_proportions_svd_edger_ubiq <- (svd_jaitin_edger_ubiq$d^2)/sum(svd_jaitin_edger_ubiq$d^2)
+plot(x = detect_jaitin[ which_detect_include ],
+     y = svd_jaitin_edger_ubiq$u[, 1],
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_edger_ubiq[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     xlab = "Proportion of genes detected",
+     main = "Pseudocount edgeR")
+
+title(main = "Ubiquitous genes", outer = TRUE, line = -1)
+```
+
+
+## Proportion of genes detected - scaling
+
+Genes that are detected in at least one cell
+
+```{r}
+par(mfrow = c(1,2))
+pc_proportions_svd <- (svd_jaitin_scale$d^2)/sum(svd_jaitin_scale$d^2)
+plot(x = detect_jaitin[ which_detect_include ],
+     y = -1*svd_jaitin_scale$u[, 1],
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     xlab = "Proportion of genes detected",
+     main = "Pseudocount Hicks et al.")
+
+pc_proportions_svd_edger <- (svd_jaitin_edger_scale$d^2)/sum(svd_jaitin_edger_scale$d^2)
+plot(x = detect_jaitin[ which_detect_include ],
+     y = svd_jaitin_edger_scale$u[, 1],
+     ylab = paste("Pricipal component 1 (", 
+                  100*round(pc_proportions_svd_edger[1], 2),"%)"),
+     pch = 16, cex = .3, col = "blue",
+     xlab = "Proportion of genes detected",
+     main = "Pseudocount edgeR")
+
+title(main = "All genes", outer = TRUE, line = -1)
+```
+
 
 
 
