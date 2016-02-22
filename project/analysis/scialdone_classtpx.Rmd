@@ -2,7 +2,9 @@
 title: "Scialdone 2015 classtpx analysis"
 author: "Kushal K Dey"
 date: "February 18, 2016"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 ## Overview
@@ -38,7 +40,7 @@ counts <- t(data_mod);
 is.na(ercc_start <- grep("ERCC", rownames(data_mod))[1])
 ```
 
-## classtpx model fit
+## Classtpx model fit
 
 Now we apply the `classtpx` model fixing the first three rows to the cell types $G1$, $G2M$ and $S$. 
 
@@ -66,4 +68,43 @@ obj <- StructureObj_omega(Topic_clus$omega, samp_metadata = samp_metadata, batch
 
 The Structure plots clearly show cell phase effects
 
-<img src='../figures/scialdone_structure/clus_3/struct_clus_3_cycle_phase.png' style="width:350px;height:300px;">
+<img src='../figures/scialdone_structure/clus_3/struct_clus_3_cycle_phase.png' style="width:450px;height:500px;">
+
+It was observed that the FACS data had $10^3$ times higher sequencing depth compared to the liver data which were used for classifying. So, in order to account for the difference in sequencing depth, we first thin the data.
+
+## Analysis of thinned data
+
+```{r echo=TRUE, eval=TRUE}
+counts_thin_top_3 <- apply(counts[1:3,], c(1,2), function(x) rbinom(1,x,0.001))
+counts[1:3,] <- counts_thin_top_3;
+```
+
+```{r echo=TRUE, eval=TRUE}
+K <- 3;
+known_indices <- 1:3;
+omega_known <- rbind(c(1,0,0), c(0,1,0), c(0,0,1));
+Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.001);
+
+```
+
+
+```{r structure_pooled_thin, echo=TRUE, eval=TRUE}
+samp_metadata <- cbind.data.frame(c("G1", "G2", "S", 1:96));
+colnames(samp_metadata) <- c("cycle_phase");
+
+if(!dir.exists("../figures/scialdone_structure/thinned")) dir.create("../figures/scialdone_structure/thinned")
+
+library(CountClust)
+obj <- StructureObj_omega(Topic_clus$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/scialdone_structure/thinned",control=list(cex.axis=1));
+
+  
+```
+
+The Structure plots clearly show cell phase effects
+
+<img src='../figures/scialdone_structure/thinned/clus_3/struct_clus_3_cycle_phase.png' style="width:450px;height:500px;">
+
+## Observations
+
+It is clear from the above Structure plot analysis that both with and without thinning, almost all of the liver cells seem to be classified in the phase G1 (except a few exceptions under thinned data). This is not
+entirely surprising because most of the cells usually are in the growth phase. 
