@@ -38,7 +38,7 @@ We assume that we have FACS sorted the cells $1$ to $100$ and from $200$ to $300
 library(classtpx)
 known_indices <- c(1:100, 501:600);
 omega_known <- omega_sim[known_indices,];
-Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.001);
+Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.0001);
 ```
 
 ### Structure plot 
