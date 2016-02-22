@@ -2,6 +2,8 @@
 .Rhistory
 .RData
 .DS_Store
+.key
+project/docs/my-notes
 project/analysis/.Rhistory
 project/refs
 project/rdas

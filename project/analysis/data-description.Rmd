@@ -1,0 +1,38 @@
+---
+title: "Data description"
+author: "Joyce Hsiao"
+date: "2016-02-17"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+Hicks et al. provided detail accounts of experimental design for each of the studies. See their [supplemental material][Hicks-SI].
+
+
+## [Jaitin2014][Jaitin2014]
+
+__Accession code__: NCBI Gene Expression Omnibus: GSE54006. (UMI counts)
+
+The *SummarizedExperiment* object includes 4590 cells deposited in the GEO data bank. The authors described in their supplemental materials that wells with more than 2 cells were removed in quality filter. However, the number of cells removed in quality filtering was not provided. 
+
+Hicks et al. included 4,460 cells. Cells with a total of 0 UMI count and cells with a proportion of genes detected greater than 20% were removed from their analysis.
+
+
+
+
+## [Leng2015][Leng2015]
+
+__Accession code__: NCBI Gene Expression Omnibus: GSE64016.
+
+The *SummarizedExpeirment* object includes 460 cells that were evaluated and passed the quality filtering criterion in the experiment - having fewer than 5,000 genes with TPM > 1. These include 213 unlabeld human embryonic stem cells (hESCs), and 91, 80, and 76 hESCS that were sorted into G1, S, and G2/M phases. Note that the unlabeld hESCs were collected on three C1 plates, and that the sorted cells that belong to the same cell-cycle were plated onto the same C1 plate.
+
+Hicks et al. includes 458 cells in their analysis. Two outlier cells with more than 40% of genes detected were removed. 
+
+
+
+[Hicks-SI]: http://biorxiv.org/content/early/2015/08/25/025528
+[Jaitin2014]: https://dx.10.1126/science.1247651
+[Leng2015]: https://dx.doi.org/10.1038/nmeth.3549
+
