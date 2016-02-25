@@ -114,6 +114,7 @@ tagline:
 * Simulation Runs (K=3) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_3.html),
 [Simulation Run 2](project/analysis/classtpx_simulation_run_4.html))
 * [Scialdone 2015 classtpx analysis](project/analysis/scialdone_classtpx.html)
+* [Using Buettner 2015 and Scialdone 2015 cell cycle data in classtpx](project/analysis/buettner_scialdone_classtpx.html)
 
 
 
