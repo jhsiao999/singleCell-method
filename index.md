@@ -115,7 +115,7 @@ tagline:
 [Simulation Run 2](project/analysis/classtpx_simulation_run_4.html))
 * [Scialdone 2015 classtpx analysis](project/analysis/scialdone_classtpx.html)
 * [Using Buettner 2015 and Scialdone 2015 cell cycle data in classtpx](project/analysis/buettner_scialdone_classtpx.html)
-* [Classtpx on manufactured bulk + single cell in Buettner 2015](project/analysis/buettner_classtpx_2015.html)
+* [classtpx on manufactured bulk + single cell in Buettner 2015](project/analysis/buettner_classtpx_2015.html)
 
 
 
