@@ -1,5 +1,5 @@
 ---
-title: "Deng single cell analysis"
+title: "Deng et al., admixture"
 author: "Kushal K Dey"
 date: "October 8, 2015"
 output: 
