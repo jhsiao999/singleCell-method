@@ -1,0 +1,245 @@
+---
+title: "Store scRNASeq data in ExpressionSet objects"
+author: "Joyce Hsiao"
+date: "2016-02-21"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(eval = FALSE, echo = TRUE)
+```
+
+
+## Background and objectives
+
+Make Summarizedperiment objects for scRNA-seq data.
+
+## Output format
+
+Because these output datasets were mainly intended for internal data packages, I saved them in the Rda format which is the norm in building data packages. 
+
+## Load packages
+
+```{r}
+library(data.table)
+library(Biobase)
+```
+
+
+
+
+## Buettner et al., 2015, mouse ESC, reads + ERCC
+
+
+```{r}
+# import count matrix, convert to a matrix object
+G1_cells <- data.frame( fread('../data/Marioni_data/G1_singlecells_counts.txt'),
+                        row.names = 1)
+G2M_cells <- data.frame( fread('../data/Marioni_data/G2M_singlecells_counts.txt'),
+                         row.names = 1)
+S_cells <- data.frame( fread('../data/Marioni_data/S_singlecells_counts.txt'),
+                       row.names = 1)
+stopifnot(all.equal(rownames(G1_cells), rownames(G2M_cells)))
+
+
+# make a count matrix
+counts <- cbind(G1_cells[, -c(1:3)],
+                G2M_cells[, -c(1:3)],
+                S_cells[, -c(1:3)] )
+
+# feature info
+gene_info <- data.frame(G1_cells[ ,1:3])
+row_data <- gene_info
+
+# phenotype info
+meta_list <- data.frame(labelDescription = c("cell-cycle phase"),
+                    row.names = c("cell_cycle"))
+col_data <- data.frame(cell_cycle = as.character(
+    rep(c("G1", "G2M", "S"), each = 96)) )
+rownames(col_data) <- colnames(counts)
+stopifnot(all.equal(rownames(col_data), colnames(counts)))
+    
+
+# putting all together
+MouseBuettnerESC <- new("ExpressionSet",
+                exprs = as.matrix(counts),
+                phenoData = new("AnnotatedDataFrame",
+                                data = col_data,
+                                varMetadata = meta_list),
+                featureData = new("AnnotatedDataFrame",
+                                  data = row_data),
+                experimentData = new("MIAME",
+                                     title = "Buttner Mouse ESC"))
+
+
+save(MouseBuettnerESC,
+        file = "../data/all-rds/MouseBuettnerESC.rda")
+```
+
+
+
+## Jaitin et al., 2014, mouse spleen cells, counts + UMI
+
+
+```{r}
+# import count matrix, convert to a matrix object
+counts <- as.matrix(
+    read.table("../data/jaitin-2014/GSE54006_umitab.txt",
+               header = TRUE, stringsAsFactors = FALSE,
+               sep = "\t") )
+gene_names <- counts[ ,1]
+sample_names <- colnames(counts)[-1]
+counts <- counts[ ,-1]
+counts <- matrix(as.numeric(counts), byrow = FALSE,
+                 nrow = length(gene_names))
+rownames(counts) <- gene_names
+
+# feature information
+row_data <- data.frame(gene_names = gene_names)
+
+# import annotation matrix
+col_data <- read.table("../data/jaitin-2014/GSE54006_experimental_design.txt",
+               header = TRUE, 
+               stringsAsFactors = FALSE,
+               sep = "\t") 
+colnames(col_data) <- unlist(col_data[6,])
+col_data <- col_data[ - c(1:6), ]
+head(col_data)
+
+
+# match annotation matrix with the count matrix
+temp_colnames <- do.call(c,
+        lapply(sample_names, function(x) strsplit(x, "X")[[1]][[2]]) )
+col_data <- col_data[which(col_data$Column_name_in_processed_data_file %in%
+                         temp_colnames), ]
+col_data <- data.frame(col_data)
+
+meta_list <- data.frame(row.names = colnames(col_data))
+
+# putting all together
+MouseJaitinSpleen <- new("ExpressionSet",
+                exprs = as.matrix(counts),
+                phenoData = new("AnnotatedDataFrame",
+                                data = col_data,
+                                varMetadata = meta_list),
+                featureData = new("AnnotatedDataFrame",
+                                  data = row_data),
+                experimentData = new("MIAME",
+                                     title = "Jaitin Mouse Spleen"))
+
+save(MouseJaitinSpleen,
+        file = "../data/all-rds/MouseJaitinSpleen.rda")
+```
+
+
+
+
+
+
+## Tung2016, UMI
+
+Import molecule counts after QC-filtering.
+
+```{r}
+# import count matrix, convert to a matrix object
+counts <- as.matrix(
+    read.table("../data/gilad-2015/molecules-filter.txt",
+               header = TRUE, stringsAsFactors = FALSE) )
+
+# import annotation matrix, conver to a DatFrame object
+col_data <- data.frame(
+    read.table("../data/gilad-2015/annotation-filter.txt",
+               header = TRUE, stringsAsFactors = FALSE) )
+rownames(col_data) <- colnames(counts)
+meta_list <- data.frame(labelDescription = c("Individual cell line",
+                                             "C1 replicate",
+                                             "well ID",
+                                             "processing batch",
+                                             "unique sample ID"),
+                            row.names = colnames(col_data) )
+
+# feature data
+row_data <- data.frame(gene_name = as.character(rownames(counts)),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- rownames(counts)
+
+# putting all together
+HumanTungiPSC <- new("ExpressionSet",
+                    exprs = as.matrix(counts),
+                    phenoData = new("AnnotatedDataFrame",
+                                    data = col_data,
+                                    varMetadata = meta_list),
+                    featureData = new("AnnotatedDataFrame",
+                                      data = row_data),
+                    experimentData = new("MIAME",
+                                         title = "Tung Human iPSC"))
+
+
+save(HumanTungiPSC,
+     file = "../data/all-rds/HumanTungiPSC.rda")
+```
+
+
+## Leng2015, reads
+
+Two sets of experiments were performed in Leng2015. In the first set of experiments, human embryonic stem cells (hESC) were sorted into three C1 plates corresponding to cell-cycle phase of G1, S, and G2. Fluorescent ubiquitination-based cell-cycle indicator (FUCCI) was used. The H1-FUCCI cell line provides a two-color fluorescence labeling system allowing single-cell suspensions from G1, S or G2/M cell-cycle phases to be isolated by FACS. In the second set of experiments, in order to validate their method of identifying oscillating genes, they collected hESCs with unknown cell-cycles in three C1 plates.
+
+
+```{r}
+# import read count matrix
+leng_data <- read.csv("../data/leng-2015/GSE64016_H1andFUCCI_normalized_EC.csv")
+rownames(leng_data) <- leng_data[ ,1]
+counts <- as.matrix(leng_data[,-1])
+dim(counts)
+
+
+# construct annotation matrix
+col_data <- colnames(counts)
+col_data <- data.frame(
+    cell_state = sapply(col_data, 
+                       function(xx) strsplit(xx, "_")[[1]][1]),
+    replicate = sapply(col_data, 
+                   function(xx) strsplit(xx, "_")[[1]][2]),
+    cell_id = sapply(col_data,
+                     function(xx) strsplit(xx, ".", fixed = TRUE)[[1]][2]),
+    sample_id = col_data)
+rownames(col_data) <- colnames(counts)
+
+meta_list <- data.frame(labelDescription = c("cell-cycle state",
+                                             "C1 replicate",
+                                             "Unique cell ID for each replicate",
+                                             "Unique cell ID"),
+                    row.names = colnames(col_data))
+
+# make featureData
+row_data <- data.frame(gene_names = rownames(counts),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- rownames(counts)
+
+
+# putting all together
+HumanLengESC <- new("ExpressionSet",
+                    exprs = as.matrix(counts),
+                    phenoData = new("AnnotatedDataFrame",
+                                    data = col_data,
+                                    varMetadata = meta_list),
+                    featureData = new("AnnotatedDataFrame",
+                                      data = row_data),
+                    experimentData = new("MIAME",
+                                         title = "Buttner Mouse ESC"))
+
+save(HumanLengESC,
+        file = "../data/all-rds/HumanLengESC.rda")
+```
+
+
+## Session information
+```{r}
+sessionInfo()
+```
+

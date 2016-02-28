@@ -1,0 +1,145 @@
+---
+title: 'Fitting count distribution'
+author: "Joyce Hsiao"
+date: "2016-02-13"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(limma)
+library(Humanzee)
+library(knitr)
+require(ggplot2)
+require(pscl)
+require(MASS)
+require(boot)
+```
+
+
+
+## Background and objectives
+
+1. Raw count distributions for each replicate. They seem to be consistent across replicates.
+
+
+
+## Import data
+
+Import counts
+
+```{r echo=TRUE, eval=TRUE}
+molecules_filter <- read.table("../data/gilad-2015/molecules-filter.txt",
+                              header = TRUE,
+                              stringsAsFactors = FALSE)
+anno_filter <- read.table("../data/gilad-2015/annotation-filter.txt",
+                          header = TRUE,
+                          stringsAsFactors = FALSE)
+molecules_filter <- as.matrix(molecules_filter)
+dim(molecules_filter)
+table(anno_filter$individual)
+```
+
+
+Use counts from NA19101 replicate 1. Remove genes with all zero count ells.
+
+```{r}
+count <- molecules_filter[, anno_filter$individual == "NA19101" &
+                              anno_filter$replicate == "r1"]
+count <- count[rowSums(count) != 0, ]
+```
+
+
+## Poisson vs. Negative binomial
+
+
+```{r}
+require(MASS)
+fit_poisson <- lapply(1:NROW(count),
+      function(gene) {
+           fit <- fit_count_distr(formula = count[gene, ] ~ 1,
+                            family = "poisson")
+           return(fit) 
+           }) 
+
+fit_negbinom <- lapply(1:NROW(count),
+  function(gene) {
+       fit <- fit_count_distr(formula = count[gene, ] ~ 1,
+                        family = "negative binomial")
+       return(fit) 
+       }) 
+```
+
+Compute LRT statistic p-value.
+
+```{r}
+pval <- 1 - pchisq( -2*(sapply(fit_poisson, "[[", 1) - as.numeric(sapply(fit_negbinom, "[[", 1) ) ), 1) 
+
+summary(pval)                    
+hist(pval)
+```
+
+
+Many of the genes did not reach convergence in the fitting of negative binomial model.
+
+```{r}
+which_na <- which(is.na(as.numeric(sapply(fit_negbinom, "[[", 1) )))
+levels <- c(min(count[which_na, ]): max(count[which_na, ]))
+    
+count_na <- matrix(0, 
+                  nrow = length(which_na),
+                  ncol = length(levels))
+colnames(count_na) <- levels
+rownames(count_na) <- rownames(count)[which_na]
+
+for (i in levels) {
+    count_na[ ,i+1] <- rowSums(count[which_na, ] == i)   
+}
+```
+
+
+## Zero-inflated distributions
+
+*pscl::zeroinfl* requires the observations to start from zero, otherwise returns error message. We will bypass these error messages and record NA for these observations.
+
+
+```{r, eval = FALSE}
+fit_zipoisson <- lapply(1:NROW(count),
+  function(gene) {
+       fit <- fit_count_distr(formula = count[gene, ] ~ 1,
+                        family = "zero-inflated poisson")
+       return(fit) 
+       })
+
+fit_zinegbin <- lapply(1:NROW(count),
+  function(gene) {
+       fit <- fit_count_distr(formula = count[gene, ] ~ 1,
+                        family = "zero-inflated negbin")
+       return(fit) 
+       })
+
+```
+
+
+## Bayesian 
+
+```{r}
+library(bayescount)
+
+```
+
+
+
+
+## Compound count model
+
+## Session information
+
+```{r}
+sessionInfo()
+```
+

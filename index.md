@@ -7,7 +7,15 @@ tagline:
 ### Home
   * [Admixture clustering](#admixture-clustering)
   * [Cell-cycle phase modeling](#assign-cell-cycle)
-  * [Batch effect](#batch)
+    # [Methods](#methods)
+    * [Exploratory analysis](#explore)
+    * [Sinusoidal fitting](#sinusoidal-cellcycler)
+    * [Nonparametric smoothing](#nonparametric-cellcycler)
+    * [Cell-cycle classifier](#classifier)
+  * [Cell classification](#classtpx)
+  * [Differential testing](#testing)
+  * [Miscellaneous](#misc)
+
 
 ---
 
@@ -25,9 +33,10 @@ tagline:
      * [Structure plots using before batch, individual correction](project/analysis/clustering_cell_cycle_genes.html)
      * [Structure plots after batch effect correction](project/analysis/batch_effect_cell_cycle_genes.html)
 
-* LCL data (Tung et al., 2015)
+* LCL data (Tung et al., 2016)
 	*  [Endogeneous genes](project/analysis/lcl_structure.html)
 	*  [Cell-cycle genes](project/analysis/lcl_structure_cell_cycle_genes.html)
+
 * iPSC +LCL pooled data analysis (Tung et al., 2015)
 	* [Admixture analysis (All genes + Cell cycle genes)](project/analysis/ipsc_lcl_structure.html)
 	* [Gene annotations of iPSC and LCL data](project/analysis/gene_annotations_ipsc_lcl.html)
@@ -41,20 +50,25 @@ tagline:
 	* [Structure analysis](project/analysis/deng_structure_all_genes.html)
 	* [Gene annotations (K=7)](project/analysis/gene_annotations_deng.html)
 
+
 ---
 
-### Cell-cycle phase modeling (Macosko et al., 2015) <a id = 'assign-cell-cycle'></a>
+### Cell-cycle phase modeling  <a id = 'assign-cell-cycle'></a>
 
-#### [Methods and Materials](project/docs/cell_reorder.pdf)
+#### Methods and Materials <a id="methods"></a>
 
-#### Applications
+* [Our model](project/docs/cell_reorder.pdf) 
+
+#### Exploratory analysis <a id="explore"></a>
 
 * [Human iPSC data] - ( [Macosko method](project/analysis/cell_ordering_iPSC.html), [explore cell order](project/analysis/cell_cycle_score_analysis.html) )
+
+#### Sinusoidal fitting <a id="sinusoidal-cellcycler"></a>
+
 * Human iPSC data (Tung et al. 2015)
-  * [On annotated cell cycle genes](project/analysis/yoav_cellcycleR_cellcycle_genes.html)
-     * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html)
-  * [On all genes](project/analysis/yoav_cellcycleR_all_genes.html)
-     * [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)
+  * Annotated cell cycle genes (2015-11-04 - [Estimation](project/analysis/yoav_cellcycleR_cellcycle_genes.html), [Gene annotations](project/analysis/yoav_cellcycleR_postprocessing_cellcycle_genes.html) ) ( 2016-01-28, NA19239 - [Estimation & annotations](project/analysis/yoav_cellcycleR_cellcycle_genes-2016-01-28.html), [Compared with PCA](project/analysis/pca-sinu-ipsc-19239.html) ) 
+  * All genes (2015-11-11 - [Estimation](project/analysis/yoav_cellcycleR_all_genes.html), [Gene annotations]((project/analysis/yoav_cellcycleR_postprocessing_all_genes.html)) ) ( 2016-01-31, NA19239 - [Estimation & annotations](project/analysis/gilad-ipsc-all-genes-2016-01-31.html))
+
 	* [On non ribosomal genes + gene annotations](project/analysis/yoav_cellycleR_non_ribosomal.html)  
 	* [On CDC, cyclin and cell cycle genes](project/analysis/yoav_cellcycleR_cdc_cyclin.html)
 * [Human LCL data, Tung et al., 2015](project/analysis/lcl_cellcycleR.html)
@@ -63,7 +77,17 @@ tagline:
 * [Monocle data, Trapnell et al., 2014](project/analysis/monocle_cellcycleR.html)
 * [Botstein yeast data (cdc, elu and alpha)](project/analysis/yeast_cellcycleR.html)
 
+
+* [Runtime comparisons: parallel vs. lmFit](project/analysis/sin_cell_order_iter-runtime.html)
+* PCA comparison with cellcycleR - ([Simulation](project/analysis/pca_snr_compare.html), [Gilad-2015-NA19101](project/analysis/pca-sinu-ipsc-19239.html)
+* [Nonparameteric smoothing - make ends meet](project/analysis/np_smoother_constraint.html)
+* [Simulation study to check how cell states and ribosomal genes may affect cellcycleR](project/analysis/cellcycler_with_ribosomal_sim.html)
+* [Testing Penalized Matrix Decomposition on cellcycle genes](project/analysis/pmd_cellcycler_test_1.html)
+* [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
+
+
 #### Nonparametric smoothing <a id="nonparametric-cellcycler"></a>
+
 * [Wavelets](project/analysis/wavelet_validation_check.html)
 * [SMASH (smoothing wavelets)](project/analysis/smash_validation_check.html)
 * [LOESS (locally weighted scatterplot smoothing) ](project/analysis/loess_validation_check.html)
@@ -74,18 +98,56 @@ tagline:
   * [Case Study 2](project/analysis/cellcycler_compare2.html)
   * [Case Study 3](project/analysis/cellcycleR_compare3.html)
   * [Case Study 4](project/analysis/cellcycleR_compare4.html)
+* [Comparison of different nonparameteric smoothers in cellcycleR](project/analysis/nonparametric_cellcycler_methods_compare.html)
 
-#### Correlated gene expression patterns <a id = "correlated-expression"></a>
-* [Homegeneous correlation](project/analysis/gene-correlation-sinusoidal.html)
+#### Cell-cycle classifer <a id="classifier"></a>
+* [Multinomial lasso, Leng2015](project/analysis/oscope-classifer.html)
+
 
 ---
 
-### Batch effect <a id = 'batch'></a>
-* [ERCC genes](project/analysis/ercc-pca.html)
-  * [RUVg](project/analysis/ercc-ruvg.html)
-  * [SVA package](project/analysis/ercc-sva.html)
-* [Bulk RNA]
-  * [RUVg zibrafish](project/analysis/ercc-ruvg-paper-data.html)
+### Cell classification using classtpx <a id="classtpx"></a>
+
+* [classtpx package](https://github.com/kkdey/classtpx)
+* Simulation Runs (K=2) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_1.html),
+[Simulation Run 2](project/analysis/classtpx_simulation_run_2.html))
+* Simulation Runs (K=3) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_3.html),
+[Simulation Run 2](project/analysis/classtpx_simulation_run_4.html))
+* [Scialdone 2015 classtpx analysis](project/analysis/scialdone_classtpx.html)
+* [Using Buettner 2015 and Scialdone 2015 cell cycle data in classtpx](project/analysis/buettner_scialdone_classtpx.html)
+* [classtpx on manufactured bulk + single cell in Buettner 2015](project/analysis/buettner_classtpx_2015.html)
+
+
+
+---
+
+### Differential testing <a id = 'testing'></a>
+
+#### Visualize counts
+  * iPSC - ([pluripotent genes](project/analysis/count-pluripotent.html), 
+            [differential gene set]()) 
+            
+---
+
+### Miscellaneous <a id = 'misc'></a>
+
+#### Batch effect
+* [Source of variation in ERCC genes](project/analysis/ercc-pca.html) - ([RUVg batch correction](project/analysis/ercc-ruvg.html))
+* [Batch effect correction example using SVA & comBat](project/analysis/ercc-sva.html)
+* [Batch effect correction example using RUVg (Zebarfish)](project/analysis/ercc-ruvg-paper-data.html)
+* Proportion of genes detected - ([Jaitin2014](project/analysis/pca-correlation-other-umi-data.html), 
+[Leng2015](project/analysis/pca-correlation-other-umi-leng.html))
+
+#### Computational examples
+* [PCA and SVD for data visualization](project/analysis/pca-svd.html)
+* [Lasso for categorical variables](project/analysis/lasso-categorical.html)
+* [Make SummarizedExperiment object](project/analysis/summarized-experiment.html)
+
+#### Others
+* [scRNA-seq published datasets](project/analysis/scRNA-expressionSet.html) - ( [description](project/analysis/data-description.html) )
+
+
+
 
 
 
