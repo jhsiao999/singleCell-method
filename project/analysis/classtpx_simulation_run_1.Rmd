@@ -81,10 +81,7 @@ We assume that we have FACS sorted the cells into two known cell types. Cells nu
 ```{r echo=TRUE, eval=TRUE}
 library(classtpx)
 known_indices <- c(1:100, 201:300)
-<<<<<<< HEAD
-omega_known <- omega_sim[known_indices,];
-Topic_clus <- classtpx::class_topics(counts, K, known_indices = known_indices, omega_known = omega_known, tol=0.0001);
-=======
+
 omega_known <- omega_sim[known_indices,]
 Topic_clus <- classtpx::class_topics(
     counts, 
@@ -92,7 +89,6 @@ Topic_clus <- classtpx::class_topics(
     known_indices = known_indices, 
     omega_known = omega_known, 
     tol=0.001)
->>>>>>> 52e4ca1d410af0b26a63e79a45d80c204b80b6df
 ```
 
 
