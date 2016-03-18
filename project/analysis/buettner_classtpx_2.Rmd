@@ -1,0 +1,178 @@
+---
+title: 'Buettner single cell data (variable selection): classtpx'
+author: "Kushal K Dey"
+date: "March 17, 2016"
+output: html_document
+---
+
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+rm(list=ls())
+library(maptpx)
+library(CountClust)
+library(classtpx)
+library(limma)
+library(data.table)
+```
+
+
+## Overview
+
+When `classtpx` was used on the combined single cell RNA-seq FACS sorted data due to [Buettner et al 2015](http://www.nature.com/nbt/journal/v33/n2/full/nbt.3102.html) and the bulk RNA FACS sorted data due to [Scialdone et al 2015](http://www.sciencedirect.com/science/article/pii/S1046202315300098). The results were not very satisfactory as the classifier on test data would always put them in the G1 phase cluster. 
+
+The idea now is to explore the Buettner et al data and try to see if the difference in library size between the single cell RNA-seq and the bulk RNA-seq model when used jointly as in this case, is indeed a problem. 
+
+## Buettner et al 2015 data 
+
+```{r echo=TRUE, eval=TRUE}
+library(data.table)
+G1_single <- data.frame(fread('../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
+G2M_single <- data.frame(fread('../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
+S_single <- data.frame(fread('../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
+
+cell_phases <- c(rep("G1", 96), rep("S", 96), rep("G2M", 96))
+```
+
+We filter out ERCC spike ins.
+
+```{r echo=TRUE, eval=TRUE}
+ercc_start <- grep("ERCC", rownames(G1_single))[1]
+G1_single <- G1_single[-(ercc_start:dim(G1_single)[1]),-(1:3)];
+G2M_single <- G2M_single[-(ercc_start:dim(G2M_single)[1]),-(1:3)];
+S_single <- S_single[-(ercc_start:dim(S_single)[1]),-(1:3)];
+pooled_data <- t(cbind(G1_single, S_single, G2M_single));
+```
+
+```{r echo=TRUE, eval=TRUE}
+
+G1.bulk <- rowSums(G1_single[,1:48])
+G1_single_half <- G1_single[,-(1:48)];
+G2M.bulk <- rowSums(G2M_single[,1:48])
+G2M_single_half <- G2M_single[,-(1:48)];
+S.bulk <- rowSums(S_single[,1:48])
+S_single_half <- S_single[,-(1:48)];
+
+bulk_data <- cbind(G1.bulk, S.bulk, G2M.bulk);
+sc_data <- cbind(G1_single_half, G2M_single_half, S_single_half);
+
+pooled_data <- sc_data;
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+counts_class <- t(cbind(G1_single[,1:48], G2M_single[,1:48], S_single[,1:48]));
+class_labs <- c(rep(1,48), rep(2,48), rep(3,48));
+```
+
+We compute the F-statistic scores for all the genes.
+
+```{r echo=TRUE, eval=TRUE}
+mean_features <- apply(counts_class, 2, mean);
+FeatureSummary_class <- parallel::mclapply(1:dim(counts_class)[2], 
+        function(l) {
+                sd_element <- tapply(counts_class[,l], class_labs, sd);
+                mean_element <- tapply(counts_class[,l], class_labs, mean);
+                beta_element <- mean_element - mean_features[l];
+                n.element <- as.numeric(table(class_labs));
+                sebeta_element <- sd_element/sqrt(n.element);
+                ll <- list("mean_element"=mean_element, "sd_element"=sd_element,                                                   "beta_element"=beta_element, "sebeta_element"=sebeta_element);
+                return(ll)
+                })
+
+mean_class <- do.call(rbind, lapply(1:dim(counts_class)[2], function(l)
+                          {
+                            return(FeatureSummary_class[[l]]$mean_element)
+}))
+
+sebeta_class <- do.call(rbind, lapply(1:dim(counts_class)[2], function(l)
+                          {
+                            return(FeatureSummary_class[[l]]$sebeta_element)
+}))
+
+beta_class <- do.call(rbind, lapply(1:dim(counts_class)[2], function(l)
+                          {
+                            return(FeatureSummary_class[[l]]$beta_element)
+}))
+
+ash_beta_class <- do.call(cbind, lapply(1:length(unique(class_labs)), 
+                                        function(l)
+                                          {
+                                          out <- array(0,dim(counts_class)[2]);
+                                          ind <- which(sebeta_class[,l]==0);
+                                          
+                                          if(length(ind)>0){
+                                          out[ind] <- beta_class[ind,l];
+                                          out[-ind] <- suppressWarnings(ashr::ash(beta_class[-ind,l], sebeta_class[-ind,l], mixcompdist="normal")$PosteriorMean);
+                                          }else{
+                                            out  <- suppressWarnings(ashr::ash(beta_class[,l], sebeta_class[,l], mixcompdist="normal")$PosteriorMean);
+                                          }
+                                          
+                                        return(out)
+                                        }))
+
+
+ash_mean_class <- ash_beta_class + mean_features;
+ash_theta_class <- normalize(ash_mean_class+1e-20, byrow=FALSE)
+#barplot(ash_theta_class[,1])
+#barplot(ash_theta_class[,2])
+
+theta_class <- normalize(mean_class+1e-20, byrow=FALSE)
+#barplot(theta_class[,1])
+#barplot(theta_class[,2])
+
+```
+
+```{r echo=TRUE, eval=FALSE}
+classTopics <- class_topics(t(pooled_data), K=3, 
+                                theta_known = ash_theta_class, 
+                                    tol=0.1);
+
+saveRDS(classTopics, "../rdas/botstein_topic_fit_classtpx_ash_theta_known.rda")
+
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx_ash_theta_known.rda")
+
+samp_metadata <- cbind.data.frame(c(rep("G1", 48), rep("S", 48), rep("G2", 48)));
+colnames(samp_metadata) <- c("cycle_phase");
+
+if(!dir.exists("../figures/buettner_structure/")) dir.create("../figures/buettner_structure/")
+
+if(!dir.exists("../figures/buettner_structure/classtpx/")) dir.create("../figures/buettner_structure/classtpx/")
+
+if(!dir.exists("../figures/buettner_structure/classtpx/ash_theta_known/")) dir.create("../figures/buettner_structure/classtpx/ash_theta_known/")
+
+
+library(CountClust)
+obj <- StructureObj_omega(Topic_clus$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/buettner_structure/classtpx/ash_theta_known",control=list(cex.axis=1));
+```
+
+
+```{r echo=TRUE, eval=FALSE}
+classTopics <- class_topics(t(pooled_data), K=3, 
+                                theta_known = theta_class, 
+                                    tol=0.1);
+
+saveRDS(classTopics, "../rdas/botstein_topic_fit_classtpx_theta_known.rda")
+
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx_theta_known.rda")
+
+samp_metadata <- cbind.data.frame(c(rep("G1", 48), rep("S", 48), rep("G2", 48)));
+colnames(samp_metadata) <- c("cycle_phase");
+
+if(!dir.exists("../figures/buettner_structure/")) dir.create("../figures/buettner_structure/")
+
+if(!dir.exists("../figures/buettner_structure/classtpx/")) dir.create("../figures/buettner_structure/classtpx/")
+
+if(!dir.exists("../figures/buettner_structure/classtpx/theta_known/")) dir.create("../figures/buettner_structure/classtpx/theta_known/")
+
+
+library(CountClust)
+obj <- StructureObj_omega(Topic_clus$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/buettner_structure/classtpx/theta_known",control=list(cex.axis=1));
+```
