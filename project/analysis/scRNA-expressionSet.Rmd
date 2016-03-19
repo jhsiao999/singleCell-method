@@ -1,7 +1,7 @@
 ---
 title: "Store scRNASeq data in ExpressionSet objects"
 author: "Joyce Hsiao"
-date: "2016-02-21"
+date: "2016-03-18"
 output: 
   html_document:
     css: floating-toc.css
@@ -17,11 +17,8 @@ opts_chunk$set(eval = FALSE, echo = TRUE)
 
 ## Background and objectives
 
-Make Summarizedperiment objects for scRNA-seq data.
+This document contains the code for storing scRNA-seq data set in `ExpressionSet` objects. Each scRNA-seq data set is stored in its own GitHub repository and can be loaded as an R package.
 
-## Output format
-
-Because these output datasets were mainly intended for internal data packages, I saved them in the Rda format which is the norm in building data packages. 
 
 ## Load packages
 
@@ -32,18 +29,20 @@ library(Biobase)
 
 
 
-
 ## Buettner et al., 2015, mouse ESC, reads + ERCC
 
 
-```{r}
+```{r, eval = FALSE}
 # import count matrix, convert to a matrix object
-G1_cells <- data.frame( fread('../data/Marioni_data/G1_singlecells_counts.txt'),
-                        row.names = 1)
-G2M_cells <- data.frame( fread('../data/Marioni_data/G2M_singlecells_counts.txt'),
-                         row.names = 1)
-S_cells <- data.frame( fread('../data/Marioni_data/S_singlecells_counts.txt'),
-                       row.names = 1)
+G1_cells <- data.frame( 
+    fread('../data/MouseBuettnerESC/G1_singlecells_counts.txt'),
+    row.names = 1)
+G2M_cells <- data.frame(
+    fread('../data/MouseBuettnerESC/G2M_singlecells_counts.txt'),
+    row.names = 1)
+S_cells <- data.frame(
+    fread('../data/MouseBuettnerESC/S_singlecells_counts.txt'),
+    row.names = 1)
 stopifnot(all.equal(rownames(G1_cells), rownames(G2M_cells)))
 
 
@@ -83,13 +82,14 @@ save(MouseBuettnerESC,
 
 
 
+
 ## Jaitin et al., 2014, mouse spleen cells, counts + UMI
 
 
-```{r}
+```{r, eval = FALSE}
 # import count matrix, convert to a matrix object
 counts <- as.matrix(
-    read.table("../data/jaitin-2014/GSE54006_umitab.txt",
+    read.table("../data/MouseJaitinSpleen/GSE54006_umitab.txt",
                header = TRUE, stringsAsFactors = FALSE,
                sep = "\t") )
 gene_names <- counts[ ,1]
@@ -103,7 +103,7 @@ rownames(counts) <- gene_names
 row_data <- data.frame(gene_names = gene_names)
 
 # import annotation matrix
-col_data <- read.table("../data/jaitin-2014/GSE54006_experimental_design.txt",
+col_data <- read.table("../data/MouseJaitinSpleen/GSE54006_experimental_design.txt",
                header = TRUE, 
                stringsAsFactors = FALSE,
                sep = "\t") 
@@ -141,19 +141,19 @@ save(MouseJaitinSpleen,
 
 
 
-## Tung2016, UMI
+## Tung et al., 2016, Human iPSC + UMI
 
 Import molecule counts after QC-filtering.
 
-```{r}
+```{r, eval = FALSE}
 # import count matrix, convert to a matrix object
 counts <- as.matrix(
-    read.table("../data/gilad-2015/molecules-filter.txt",
+    read.table("../data/HumanTungiPSC/molecules-filter.txt",
                header = TRUE, stringsAsFactors = FALSE) )
 
 # import annotation matrix, conver to a DatFrame object
 col_data <- data.frame(
-    read.table("../data/gilad-2015/annotation-filter.txt",
+    read.table("../data/HumanTungiPSC/annotation-filter.txt",
                header = TRUE, stringsAsFactors = FALSE) )
 rownames(col_data) <- colnames(counts)
 meta_list <- data.frame(labelDescription = c("Individual cell line",
@@ -181,7 +181,7 @@ HumanTungiPSC <- new("ExpressionSet",
 
 
 save(HumanTungiPSC,
-     file = "../data/all-rds/HumanTungiPSC.rda")
+     file = "../data/all-rda/HumanTungiPSC.rda")
 ```
 
 
@@ -190,9 +190,9 @@ save(HumanTungiPSC,
 Two sets of experiments were performed in Leng2015. In the first set of experiments, human embryonic stem cells (hESC) were sorted into three C1 plates corresponding to cell-cycle phase of G1, S, and G2. Fluorescent ubiquitination-based cell-cycle indicator (FUCCI) was used. The H1-FUCCI cell line provides a two-color fluorescence labeling system allowing single-cell suspensions from G1, S or G2/M cell-cycle phases to be isolated by FACS. In the second set of experiments, in order to validate their method of identifying oscillating genes, they collected hESCs with unknown cell-cycles in three C1 plates.
 
 
-```{r}
+```{r, eval = F}
 # import read count matrix
-leng_data <- read.csv("../data/leng-2015/GSE64016_H1andFUCCI_normalized_EC.csv")
+leng_data <- read.csv("../data/HumanLengESC/GSE64016_H1andFUCCI_normalized_EC.csv")
 rownames(leng_data) <- leng_data[ ,1]
 counts <- as.matrix(leng_data[,-1])
 dim(counts)
@@ -234,7 +234,220 @@ HumanLengESC <- new("ExpressionSet",
                                          title = "Buttner Mouse ESC"))
 
 save(HumanLengESC,
-        file = "../data/all-rds/HumanLengESC.rda")
+        file = "../data/all-rda/HumanLengESC.rda")
+```
+
+
+
+
+
+
+## Treutlein et al., 2014, Mouse lung + reads
+
+__GSE52583__
+
+
+```{r, eval = FALSE}
+###<-- import count data sts
+data_list <- list.files(path = "../data/MouseTreutleinLung/",
+                        pattern = "*.fpkm_tracking",
+                        full.name = TRUE)
+
+data_list_gse_label <- sapply(lapply(strsplit(data_list, split = "/"), "[[",5),
+                    function(x) strsplit(x, split = "_", fixed = TRUE)[[1]][1])
+length(data_list_gse_label)
+
+library(data.table)
+library(dplyr)
+counts_list <- lapply(1:length(data_list), function(i) {
+    df <- read.table(data_list[[i]], stringsAsFactors = FALSE)[,c(1,10)]
+    df <- data.table(df, key = "V1")
+    df <- summarise(group_by(df, V1 ), V10 = sum( V10 ) ) 
+    colnames(df) <- c("gene_id", paste0("sam_",i))
+    return(df)
+})
+
+counts <- Reduce(merge, counts_list)
+
+counts <- data.frame(counts)
+rownames(counts) <- counts[,1]
+counts <- counts[,-1]
+colnames(counts) <- data_list_gse_label
+
+###<--- construct annotation matrix
+library(GEOquery)
+gpl13112 <- getGEO(filename = "../data/MouseTreutleinLung/GSE52583-GPL13112_series_matrix.txt")
+gpl16417 <- getGEO(filename = "../data/MouseTreutleinLung/GSE52583-GPL16417_series_matrix.txt")
+dim(gpl13112)
+dim(gpl16417)
+
+df_col_data <- rbind(
+    pData(gpl13112)[ , which(colnames(pData(gpl13112)) %in% 
+                      c("title", "geo_accession", "instrument_model"))],
+    pData(gpl16417)[ , which(colnames(pData(gpl16417))  %in% 
+                      c("title", "geo_accession", "instrument_model"))])
+cell_type <- sapply(1:length(df_col_data$title), function(i) {
+    gsub(",", replacement = "",
+         strsplit(as.character(df_col_data$title[i]), 
+                  split = " ", fixed = TRUE)[[1]][1]) }) 
+replicate <- sapply(1:length(df_col_data$title), function(i) {
+    gsub(",", replacement = "",
+         strsplit(as.character(df_col_data$title[i]), 
+                  split = " ", fixed = TRUE)[[1]][4]) }) 
+
+col_data <- data.frame(
+    cell_type = unlist(cell_type),
+    replicate = unlist(replicate),
+    gse = as.character(df_col_data$geo_accession),
+    unique_id = c(1:length(cell_type)),
+    sample_id = paste0(cell_type,".rep", replicate, ".", c(1:length(cell_type))),
+    stringsAsFactors = FALSE)
+rownames(col_data) <- col_data$sample_id
+
+meta_list <- data.frame(labelDescription = c("cell type",
+                                             "biological replicate",
+                                             "GEO accession number",
+                                             "Unique ID",
+                                             "Unique sample ID"),
+                    row.names = colnames(col_data))
+
+# match the order of the count data and the annotation data
+ii_match <- match(colnames(counts), col_data$gse)
+col_data <- col_data[ii_match, ]
+stopifnot(all.equal(colnames(counts), col_data$gse))
+
+# rename columns of the count matrix to unique sample ID
+colnames(counts) <- col_data$sample_id
+
+###<--- make featureData
+row_data <- data.frame(gene_names = rownames(counts),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- rownames(counts)
+
+
+# putting all together
+MouseTreutleinLung <- new("ExpressionSet",
+                    exprs = as.matrix(counts),
+                    phenoData = new("AnnotatedDataFrame",
+                                    data = col_data,
+                                    varMetadata = meta_list),
+                    featureData = new("AnnotatedDataFrame",
+                                      data = row_data),
+                    experimentData = new("MIAME",
+                                         title = "Treutlein mouse lung"))
+
+save(MouseTreutleinLung,
+        file = "../data/all-rda/MouseTreutleinLung.rda")
+```
+
+
+
+
+
+
+## Ziesel et al., 2015, Mouse brain + UMI
+
+http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE60361
+
+> We have applied a recently developed, highly accurate and sensitive single-cell RNA-seq method (STRT/C1) to perform a molecular census of two regions of the mouse cerebral cortex: the somatosensory cortex and hippocampus CA1. We isolated cells fresh from somatosensory cortex (S1) and hippocampus CA1 area of juvenile (P22 - P32) CD1 mice, 33 males and 34 females. Cells were collected without selection, except that 116 cells were obtained by FACS from 5HT3a-BACEGFP transgenic mice. A total of 76 Fluidigm C1 runs were performed, each attempting 96 cell captures and resulting in 3005 high-quality single-cell cDNAs, containing Unique Molecular Identifiers allowing counting of individual mRNA molecules, even after PCR amplification.
+
+
+```{r, eval = F}
+library(data.table)
+library(Biobase)
+
+# import annotation matrix, conver to a DatFrame object
+df_col_data <- as.matrix(
+    fread("../data/MouseZeiselBrain/expression_mRNA_17-Aug-2014.txt") )[1:10, ]
+
+col_data <- data.frame(
+    tissue = colnames(df_col_data)[-(1:2)],
+    group_no = round(as.numeric(df_col_data[1, -(1:2)])),
+    total_mrna_vol = as.numeric(df_col_data[2, -(1:2)]),
+    well_id = round(as.numeric(df_col_data[3, -(1:2)])),
+    sex = factor(as.numeric(df_col_data[4, -(1:2)]),
+                 levels = c(-1, 1, 0),
+                 labels = c("male", "female", "transgenic")),
+    age = as.numeric(df_col_data[5, -(1:2)]),
+    diameter = as.numeric(df_col_data[6, -(1:2)]),
+    cell_id = df_col_data[7, -(1:2)],
+    level1_class = df_col_data[8, -(1:2)],
+    level2_class = df_col_data[9, -(1:2)],
+    stringsAsFactors = FALSE)
+rownames(col_data) <- col_data$cell_id
+
+
+
+# import data
+df <- as.matrix(
+    read.table("../data/MouseZeiselBrain/GSE60361_C1-3005-Expression.txt",
+    header = TRUE, quote = "", sep = "\t",
+    stringsAsFactors = FALSE))
+
+# save counts to a matrix object
+counts <- matrix(as.numeric(df[ ,-1]),
+                    nrow = NROW(df),
+                    byrow = FALSE)
+colnames(counts) <- colnames(df)[-1]
+rownames(counts) <- df[,1]
+
+
+# two genes are duplicates...
+rownames(counts)[which(duplicated(rownames(counts)))]
+
+# check the difference between the duplicates
+table((counts[rownames(counts) == "Mar-02", ])[1,])
+table((counts[rownames(counts) == "Mar-02", ])[2,])
+
+# check the difference between the duplicates
+table((counts[rownames(counts) == "Mar-01", ])[1,])
+table((counts[rownames(counts) == "Mar-01", ])[2,])
+
+# removing these two genes as I am not sure the duplicates
+# are drastically different in gene abundance levels
+counts <- counts[which(rownames(counts) != "Mar-01" & rownames(counts) != "Mar-02"), ]
+
+# remote X in the beginning of column names
+counts_colnames <- gsub("X", replacement = "", x = colnames(counts))
+colnames(counts) <- counts_colnames
+
+# feature data
+row_data <- data.frame(gene_name = as.character(rownames(counts)),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- rownames(counts)
+
+# match count matrix with annotation data.frame
+match_cell_id <- match(col_data$cell_id, colnames(counts))
+counts <- counts[ ,match_cell_id]
+
+meta_list <- data.frame(
+    labelDescription = c("Tissue type",
+                         "Group nubmer",
+                         "Total mRNA volume",
+                         "Well ID",
+                         "Sex",
+                         "Age (in days)",
+                         "Cell diameter",
+                         "Cell unique ID",
+                         "Level 1 class",
+                         "Level 2 class"),
+    row.names = colnames(col_data) )
+
+
+# putting all together
+MouseZeiselBrain <- new("ExpressionSet",
+                        exprs = as.matrix(counts),
+                        phenoData = new("AnnotatedDataFrame",
+                                        data = col_data,
+                                        varMetadata = meta_list),
+                        featureData = new("AnnotatedDataFrame",
+                                          data = row_data),
+                        experimentData = new("MIAME",
+                                             title = "Zeisel Mouse Brain"))
+
+
+save(MouseZeiselBrain,
+     file = "../data/all-rda/MouseZeiselBrain.rda")
 ```
 
 ## Deng et al 2014, counts
@@ -290,6 +503,7 @@ Deng2014MouseESC <- new("ExpressionSet",
 save(Deng2014MouseESC,
         file = "../data/all-rds/Deng2014MouseEsc.rda")
 ```
+
 
 
 ## Session information

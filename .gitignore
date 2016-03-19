@@ -2,12 +2,8 @@
 .Rhistory
 .RData
 .DS_Store
-<<<<<<< HEAD
-project/joyce-notes
-=======
 .key
-project/docs/my-notes
->>>>>>> dcb7c30fd6bef5b66eb10100e717373592a55528
+project/joyce-notes
 project/analysis/.Rhistory
 project/refs
 project/rdas
@@ -29,8 +25,6 @@ project/analysis/cellcycler_compare2_cache/
 project/analysis/cellcycleR_compare3_cache/
 project/analysis/cellcycleR_compare4_cache/
 project/analysis/cellcycleR_compare4_files/
-<<<<<<< HEAD
-=======
 project/analysis/nonparametric_cellcycler_methods_compare_cache/
 project/analysis/nonparametric_cellcycler_methods_compare_files/
 project/analysis/pca_snr_compare_cache/
@@ -39,4 +33,3 @@ project/analysis/cellcycler_with_ribosomal_sim_cache/
 project/analysis/cellcycler_with_ribosomal_sim_files/
 project/analysis/pmd_cellcycler_test_1_cache/
 project/analysis/pmd_cellcycler_test_1_files/
->>>>>>> dcb7c30fd6bef5b66eb10100e717373592a55528
