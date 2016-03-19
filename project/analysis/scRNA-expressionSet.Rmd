@@ -450,9 +450,10 @@ save(MouseZeiselBrain,
      file = "../data/all-rda/MouseZeiselBrain.rda")
 ```
 
+
 ## Deng et al 2014, counts
 
-```{r}
+```{r, eval = F}
 reads <- data.frame(data.table::fread('../data/Deng_Data/Deng_cell_data.txt'),row.names=1);
 files <- list.files("../data/Deng_Data/Deng_files/");
 
