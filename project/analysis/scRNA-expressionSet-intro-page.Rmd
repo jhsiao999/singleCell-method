@@ -1,0 +1,46 @@
+---
+title: "scRNASeq data sets"
+author: "Joyce Hsiao"
+date: "2016-03-18"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+
+```{r, include = FALSE}
+library(knitr)
+opts_chunk$set(eval = FALSE, echo = TRUE)
+```
+
+
+This document list some single-cell RNA-seq data sets downloaded from GEO. We store each of the data sets in `ExpressionSet` object and make the data available as an R package on GitHub. 
+
+
+
+## Human
+
+* [Tung et al., 2016](https://github.com/jhsiao999/singleCellRNASeqHumanTungiPSC): Human iPSC, counts, UMI
+
+* [Leng et al., 2015](https://github.com/jhsiao999/singleCellRNASeqHumanLengESC): Human ESC, reads, cell-cycle sorted
+
+
+
+## Mouse
+
+* [Buettner et al., 2015](https://github.com/jhsiao999/singleCellRNASeqMouseBuettnerESC): mouse ESC, reads, ERCC spike-in control
+
+* [Jaitin et at., 2014](https://github.com/jhsiao999/singleCellRNASeqMouseJaitinSpleen): mouse spleen cells, counts, UMI
+
+* [Treutlein et al., 2014](https://github.com/jhsiao999/singleCellRNASeqMouseTreutleinLung): mouse lung cells, reads
+
+* [Zeisel et al., 2015](https://github.com/jhsiao999/singleCellRNASeqMouseZeiselBrain): Mouse brain, counts + UMI
+
+
+
+## Session information
+```{r}
+sessionInfo()
+```
+
