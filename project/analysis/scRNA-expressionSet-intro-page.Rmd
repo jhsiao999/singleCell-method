@@ -41,8 +41,9 @@ This document list some single-cell RNA-seq data sets downloaded from GEO. We st
 
 ## Make ExpressionSet packages
 
-See this page for how we make these packages: http://jhsiao999.github.io/singleCell-method/project/analysis/scRNA-expressionSet.html
+See this page for how we make these packages: scRNA-expressionSet.html
 
+See this page for data description: data-description.html
 
 ## Session information
 

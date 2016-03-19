@@ -143,8 +143,9 @@ tagline:
 * [Lasso for categorical variables](project/analysis/lasso-categorical.html)
 * [Make SummarizedExperiment object](project/analysis/summarized-experiment.html)
 
-#### Others
-* [scRNA-seq published datasets](project/analysis/scRNA-expressionSet.html) - ( [description](project/analysis/data-description.html) )
+#### Existing single-cell RNA-seq data sets
+* [ExpressionSet packages](project/analysis/scRNA-expressionSet-intro-page.html)
+* [Data description](project/analysis/data-description.html) 
 
 
 
