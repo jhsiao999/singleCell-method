@@ -97,7 +97,7 @@ Topic_clus <- classtpx::class_topics(
     known_samples = known_samples,
     class_labs = class_labs,
     method="omega.fix",
-    tol=0.01)
+    tol=0.001)
 ```
 
 
@@ -143,7 +143,7 @@ Topic_clus <- classtpx::class_topics(
     K, 
     known_samples = known_samples,
     class_labs = class_labs,
-    method="omega.fix",
+    method="theta.fix",
     tol=0.01)
 ```
 
@@ -182,11 +182,44 @@ barplot(t(docweights),
         las=1, ylim=c(0,1), cex.axis=1.5, cex.main=1.4)
 ```
 
-## maptpx Application
+### no.fix  method
 
 ```{r echo=TRUE, eval=TRUE}
-library(maptpx)
-Topic_clus <- maptpx::topics(counts, K, tol=0.001)
+Topic_clus <- classtpx::class_topics(
+    counts, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="no.fix",
+    tol=0.01)
+```
+
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+docweights <- Topic_clus$omega;
+library(permute);
+library(BioPhysConnectoR)
+perm_set=rbind(1:K,allPerms(1:K));
+diff=array(0,dim(perm_set)[1]);
+for (p in 1:dim(perm_set)[1])
+{
+    temp=docweights[,perm_set[p,]];
+    diff[p]=fnorm(temp,omega_sim);
+}
+
+p_star=which(diff==min(diff));
+docweights=docweights[,perm_set[p_star,]];
+
+barplot(t(docweights),col=2:(K+1),axisnames=F,space=0,border=NA,main=paste("No. of clusters=",K),las=1,ylim=c(0,1),cex.axis=1.5,cex.main=1.4)
+```
+
+## maptpx application
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- maptpx::topics(
+    counts, 
+    K,
+    tol=0.01)
 ```
 
 
