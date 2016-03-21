@@ -12,6 +12,10 @@ output:
 
 `classtpx` is a R package meant for semi-supervised topic modeling (see [site](https://github.com/kkdey/classtpx)). It is a modification of the `maptpx` package due to Matt Taddy, which performs unsupervised topic models. As a first illustration of the application of the `classtpx` package, we present a simulation example and apply the algorithm on the simulated data. We also compare the results from the `classtpx` application with the `maptpx` method. 
 
+```{r}
+library(classtpx)
+```
+
 
 ## Simulation Design
 
@@ -77,20 +81,71 @@ dim(counts)
 
 We assume that we have FACS sorted the cells into two known cell types. Cells numberd $1$ to $100$ are assigend to type 1, and cells $200$ to $300$ are assigned to type 2.
 
-
 ```{r echo=TRUE, eval=TRUE}
 library(classtpx)
-known_indices <- c(1:100, 201:300)
+known_samples <- c(1:100, 201:300)
+class_labs <- c(rep(1,100), rep(2,100))
+```
 
-omega_known <- omega_sim[known_indices,]
+
+### omega.fix method
+
+```{r echo=TRUE, eval=TRUE}
 Topic_clus <- classtpx::class_topics(
     counts, 
     K, 
-    known_indices = known_indices, 
-    omega_known = omega_known, 
-    tol=0.001)
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01)
 ```
 
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+# These are estimated gene relative expression
+docweights <- Topic_clus$omega
+
+library(permute)
+library(BioPhysConnectoR)
+
+# Decide on the correspondance of the simulated
+# and of the estimated relative expression matrix
+# 
+# We consider all possible cluster ordering in the 
+# estimated relative expression matrix and select
+# the relative expression matrix with the nearest
+# distance to the simulate relative experssion matrix
+# (forbieus norm)
+
+perm_set <- rbind(1:K,allPerms(1:K))
+diff <- array(0,dim(perm_set)[1]) 
+for (p in 1:dim(perm_set)[1])
+{
+    temp <- docweights[, perm_set[p,]]
+    diff[p] <- fnorm(temp,omega_sim)
+}
+
+p_star <- which(diff==min(diff))
+docweights <- docweights[,perm_set[p_star,]]
+
+barplot(t(docweights),
+        col = 2:(K+1),
+        axisnames = F, space = 0, border = NA, 
+        main=paste("No. of clusters=", K),
+        las=1, ylim=c(0,1), cex.axis=1.5, cex.main=1.4)
+```
+
+### theta.fix method
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- classtpx::class_topics(
+    counts, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01)
+```
 
 
 ```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
