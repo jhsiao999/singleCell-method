@@ -1,38 +1,26 @@
 ---
-title: 'classtpx: Simulation design 1'
+title: "classtpx simulation Design 5"
 author: "Kushal K Dey"
-date: "February 8, 2016"
-output: 
-  html_document:
-    css: floating-toc.css
-    toc: true
+date: "March 21, 2016"
+output: html_document
 ---
 
 ## Classtpx overview
 
 `classtpx` is a R package meant for semi-supervised topic modeling (see [site](https://github.com/kkdey/classtpx)). It is a modification of the `maptpx` package due to Matt Taddy, which performs unsupervised topic models. As a first illustration of the application of the `classtpx` package, we present a simulation example and apply the algorithm on the simulated data. We also compare the results from the `classtpx` application with the `maptpx` method. 
 
-```{r}
-library(classtpx)
-```
+Here we pick a scenario with the number of hidden topics $K=2$ with .
 
-
-## Simulation Design
-
-Assume K = 2 hidden subpopulations in the data, and n = 600 cells. We set a 600 by 2 membership weight matrix $\mathbf{q} with $\sum_{K=2} q_{n.} = 1$, where $q_{n.}$ denotes the vector of membership weight (grade?) of cell $n$. 
-
+## Simulation Set up
 
 ```{r echo=TRUE, eval=TRUE}
-n.out <- 200
+n.out <- 1000
 omega_sim <- rbind( cbind( rep(1, n.out), rep(0, n.out)), 
                     cbind( rep(0, n.out), rep(1, n.out)),
                     cbind( seq(0.6, 0.4, length.out = n.out), 
                            1- seq(0.6, 0.4,length.out=n.out)) )
 dim(omega_sim)
-```
 
-
-```{r}
 K <- dim(omega_sim)[2]
 barplot(t(omega_sim), 
         col = 2:(K+1),
@@ -40,35 +28,11 @@ barplot(t(omega_sim),
         border = NA, 
         main=paste("No. of clusters=", K),
         las=1, ylim = c(0,1), cex.axis=1.5,cex.main=1.4)
-```
 
-
-We generate the cluster or topic distributions. These are also known as relative gene expression weights of individual cells. Here we simulate $G = 100$ genes, and membership weight
-
-$\begin{pmatrix} q_{,11} & q_{1,2} & \dots & q_{1,G} \\
-  q_{2,1} & q_{2,2} & \dots & q_{2,G} 
-  \end{pmatrix}$
-
-
-```{r echo=TRUE, eval=TRUE}
-freq <- rbind( c(0.1, 0.2, rep(0.70/98, 98)),
-               c(rep(0.70/98,98), 0.1, 0.2) )
+freq <- rbind( c(0.1, 0.2, rep(0.70/998, 998)),
+               c(rep(0.70/998,998), 0.1, 0.2) )
 str(freq)
-```
 
-
-Now we generate the counts table given the topic proportions matrix and the topic distributions.
-
-For every cell $n$, we assume that $C_{n.}$ the vector of read counts coming from genes 1 to G follows a multinomial distribution where $\left( p_{n,1}, \dots, p_{n,G} \right)$ the probabilities of a read coming from genes 1 to $G$ sum up to 1. That is, 
-
-$C_{n.} \sim Multinomial \left( C_{n+}, p_{n.} \right)$ 
-
-and 
-
-$p_{n.}= \sum_{k=1}^{K} q_{nk} \theta_{kg}$.
-
-
-```{r echo=TRUE, eval=TRUE}
 counts <- t( do.call(cbind,
                      lapply(1:dim(omega_sim)[1], 
                             function(x) 
@@ -76,17 +40,14 @@ counts <- t( do.call(cbind,
 dim(counts)
 ```
 
+## classtpx application
 
-## classtpx Application
-
-We assume that we have FACS sorted the cells into two known cell types. Cells numberd $1$ to $100$ are assigend to type 1, and cells $200$ to $300$ are assigned to type 2.
+We assume we have FACS sorted the cells the first $100$ and then from $1000$ to $1100$.
 
 ```{r echo=TRUE, eval=TRUE}
-library(classtpx)
-known_samples <- c(1:100, 201:300)
-class_labs <- c(rep(1,100), rep(2,100))
+known_samples<- c(1:100, 1001:1100);
+class_labs <- c(rep(1,100), rep(2, 100));
 ```
-
 
 ### omega.fix method
 
@@ -107,15 +68,6 @@ docweights <- Topic_clus$omega
 
 library(permute)
 library(BioPhysConnectoR)
-
-# Decide on the correspondance of the simulated
-# and of the estimated relative expression matrix
-# 
-# We consider all possible cluster ordering in the 
-# estimated relative expression matrix and select
-# the relative expression matrix with the nearest
-# distance to the simulate relative experssion matrix
-# (forbieus norm)
 
 perm_set <- rbind(1:K,allPerms(1:K))
 diff <- array(0,dim(perm_set)[1]) 
@@ -154,15 +106,6 @@ docweights <- Topic_clus$omega
 
 library(permute)
 library(BioPhysConnectoR)
-
-# Decide on the correspondance of the simulated
-# and of the estimated relative expression matrix
-# 
-# We consider all possible cluster ordering in the 
-# estimated relative expression matrix and select
-# the relative expression matrix with the nearest
-# distance to the simulate relative experssion matrix
-# (forbieus norm)
 
 perm_set <- rbind(1:K,allPerms(1:K))
 diff <- array(0,dim(perm_set)[1]) 
