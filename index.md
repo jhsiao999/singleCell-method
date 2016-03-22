@@ -110,7 +110,7 @@ tagline:
 
 * [classtpx package](https://github.com/kkdey/classtpx)
 * Simulation Runs (K=2) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_1.html),
-[Simulation Run 2](project/analysis/classtpx_simulation_run_2.html))
+[Simulation Run 2](project/analysis/classtpx_simulation_run_2.html), [Simulation Run 3](project/analysis/classtpx_simulation_run_5.html))
 * Simulation Runs (K=3) to validate classtpx - ([Simulation Run 1](project/analysis/classtpx_simulation_run_3.html),
 [Simulation Run 2](project/analysis/classtpx_simulation_run_4.html))
 * [Scialdone 2015 classtpx analysis](project/analysis/scialdone_classtpx.html)
