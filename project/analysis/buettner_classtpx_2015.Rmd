@@ -56,18 +56,29 @@ saveRDS(Topic_clus, "../rdas/botstein_topic_fit.rda")
 ```{r echo=TRUE, eval=TRUE}
 Topic_clus <- readRDS("../rdas/botstein_topic_fit.rda")
 
-samp_metadata <- cbind.data.frame(c(rep("G1", 96), rep("S", 96), rep("G2", 96)));
-colnames(samp_metadata) <- c("cycle_phase");
+omega <- Topic_clus$omega;
 
-if(!dir.exists("../figures/buettner_structure/")) dir.create("../figures/buettner_structure/")
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 96), rep("S", 96), rep("G2", 96))
+)
 
-if(!dir.exists("../figures/buettner_structure/maptpx/")) dir.create("../figures/buettner_structure/maptpx/")
+rownames(omega) <- annotation$sample_id;
 
-library(CountClust)
-obj <- StructureObj_omega(Topic_clus$omega, samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/buettner_structure/maptpx/",control=list(cex.axis=1));
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+
 ```
 
-<img src='../figures/buettner_structure/maptpx/clus_3/struct_clus_3_cycle_phase.png' style="width:450px;height:500px;">
 
 ## Manufacturing bulk data
 
@@ -93,31 +104,177 @@ pooled_data <- t(cbind(bulk_data, sc_data));
 
 Fitting classtpx. We assume that we have done the bulk-RNA FACS sorting and we do not know about the cell cycle phases of the single phases. We use this information to drive the `classtpx`.
 
+### omega.fix method
+
 ```{r echo=TRUE, eval=FALSE}
 library(classtpx)
 K <- 3;
-known_indices <- 1:3;
-omega_known <- rbind(c(1,0,0), c(0,1,0), c(0,0,1));
-Topic_clus <- classtpx::class_topics(pooled_data, K, known_indices = known_indices, omega_known = omega_known, tol=0.001);
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01)
 
-saveRDS(Topic_clus, "../rdas/botstein_topic_fit_classtpx.rda")
+saveRDS(Topic_clus, "../rdas/botstein_topic_fit_classtpx_omega_fix.rda")
 ```
 
 ```{r echo=TRUE, eval=TRUE}
-Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx.rda")
+Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx_omega_fix.rda")
 
-samp_metadata <- cbind.data.frame(c(rep("G1", 48), rep("S", 48), rep("G2", 48)));
-colnames(samp_metadata) <- c("cycle_phase");
+omega <- Topic_clus$omega[-(1:3),];
 
-if(!dir.exists("../figures/buettner_structure/")) dir.create("../figures/buettner_structure/")
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
 
-if(!dir.exists("../figures/buettner_structure/classtpx/")) dir.create("../figures/buettner_structure/classtpx/")
+rownames(omega) <- annotation$sample_id;
 
-library(CountClust)
-obj <- StructureObj_omega(Topic_clus$omega[-(1:3),], samp_metadata = samp_metadata, batch_lab = NULL,partition = rep("TRUE",dim(samp_metadata)[2]),path_struct="../figures/buettner_structure/classtpx/",control=list(cex.axis=1));
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
 ```
 
-<img src='../figures/buettner_structure/classtpx/clus_3/struct_clus_3_cycle_phase.png' style="width:450px;height:500px;">
+### no.fix method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="no.fix",
+    tol=0.1)
+
+saveRDS(Topic_clus, "../rdas/botstein_topic_fit_classtpx_no_fix.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx_no_fix.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### theta.fix method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    tol=0.01)
+
+saveRDS(Topic_clus, "../rdas/botstein_topic_fit_classtpx_theta_fix.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx_theta_fix.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### theta.prior method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.prior",
+    tol=0.01)
+
+saveRDS(Topic_clus, "../rdas/botstein_topic_fit_classtpx_theta_prior.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/botstein_topic_fit_classtpx_theta_prior.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
 
 ## PCA 
 
