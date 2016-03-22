@@ -1,5 +1,5 @@
 ---
-title: 'Buettner single cell data: classtpx check'
+title: 'Buettner single cell data (with bulk training): classtpx check'
 author: "Kushal K Dey"
 date: "February 27, 2016"
 output: 
