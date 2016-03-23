@@ -117,7 +117,7 @@ tagline:
 * [classtpx on Buettner 2015 + Scialdone 2015 combined cell cycle data](project/analysis/buettner_scialdone_classtpx.html)
 * [classtpx on Buettner 2015 data: half single cells from each phase used to manufacture bulk in training](project/analysis/buettner_classtpx_2015.html)
 * [classtpx on Buettner 2015 data: half single cells used as it is from each phase in training ](project/analysis/buettner_classtpx_2015_2.html)
-* [classtpx on Treutlin et al 2014 lung development data](treutlin_classtpx.html)
+* [classtpx on Treutlin et al 2014 lung development data](project/analysis/treutlin_classtpx.html)
 
 
 
