@@ -120,6 +120,7 @@ tagline:
 * [classtpx on Treutlin et al 2014 lung development data](project/analysis/treutlin_classtpx.html)
 * [classtpx on Blakeley et al 2015 human blastocyst data](project/analysis/blakeley_classtpx.html)
 * [classtpx on Deng et al 2014 using Blakeley 2015 as training](project/analysis/blakeley_deng_classtpx.html)
+* [classtpx on Leng et al 2015 Oscope data using Buettner et al 2015 data](project/analysis/leng_buettner_classtpx.html)
 
 
 ---
