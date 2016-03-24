@@ -119,7 +119,7 @@ tagline:
 * [classtpx on Buettner 2015 data: half single cells used as it is from each phase in training ](project/analysis/buettner_classtpx_2015_2.html)
 * [classtpx on Treutlin et al 2014 lung development data](project/analysis/treutlin_classtpx.html)
 * [classtpx on Blakeley et al 2015 human blastocyst data](project/analysis/blakeley_classtpx.html)
-
+* [classtpx on Deng et al 2014 using Blakeley 2015 as training](project/analysis/blakeley_deng_classtpx.html)
 
 
 ---
