@@ -123,11 +123,11 @@ Topic_clus <- classtpx::class_topics(
     tol=0.01,
     shrink=FALSE)
 
-save(Topic_clus, file="../rdas/treutlin_topic_fit_3_classtpx_omega_fix.rda")
+save(Topic_clus, file="../rdas/treutlin_topic_fit_2_classtpx_omega_fix.rda")
 ```
 
 ```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
-Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_3_classtpx_omega_fix.rda"))
+Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_2_classtpx_omega_fix.rda"))
 
 omega <- Topic_clus$omega;
 
