@@ -78,7 +78,6 @@ img {
 </ul></li>
 <li><a href="#classtpx-theta.fix-application">classtpx (theta.fix) application</a></li>
 <li><a href="#classtpx-omega.fix-application">classtpx (omega.fix) application</a></li>
-<li><a href="#classtpx-theta.fix-application-1">classtpx (theta.fix) application</a></li>
 </ul>
 </div>
 
@@ -95,7 +94,7 @@ library(maptpx)</code></pre>
 <pre class="r"><code>gtex_data &lt;- data.frame(fread(&quot;../data/GTEX_V6/cis_gene_expression.txt&quot;));</code></pre>
 <pre><code>## 
 Read 62.2% of 16069 rows
-Read 16069 rows and 8557 (of 8557) columns from 0.532 GB file in 00:00:08</code></pre>
+Read 16069 rows and 8557 (of 8557) columns from 0.532 GB file in 00:00:07</code></pre>
 <pre class="r"><code>matdata &lt;- gtex_data[,-(1:2)];
 
 tissue_labels=read.table(&quot;../data/GTEX_V6/samples_id.txt&quot;)[,3];
@@ -173,7 +172,7 @@ misclass_svm</code></pre>
 <pre><code>## 
 Read 0.0% of 16069 rows
 Read 62.2% of 16069 rows
-Read 16069 rows and 8556 (of 8556) columns from 2.201 GB file in 00:00:27</code></pre>
+Read 16069 rows and 8556 (of 8556) columns from 2.201 GB file in 00:00:31</code></pre>
 <pre class="r"><code>voom_matdata &lt;- voom_matdata[,-1]
 
 training_data &lt;- t(cbind(voom_matdata[,breast_labels[1:50]],voom_matdata[,ovary_labels[1:50]]))
@@ -247,9 +246,6 @@ misclass_classtpx</code></pre>
 </div>
 <div id="classtpx-omega.fix-application" class="section level2">
 <h2>classtpx (omega.fix) application</h2>
-</div>
-<div id="classtpx-theta.fix-application-1" class="section level2">
-<h2>classtpx (theta.fix) application</h2>
 <pre class="r"><code>class_labs &lt;- c(rep(1,50), rep(2,50));
 known_samples &lt;- c(rep(1,50), length(breast_labels) + (1:50));
 
