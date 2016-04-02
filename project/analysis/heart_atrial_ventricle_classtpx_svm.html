@@ -93,9 +93,8 @@ library(maptpx)</code></pre>
 <h2>Data preparation (Heart Atrial + Heart Ventricle)</h2>
 <pre class="r"><code>gtex_data &lt;- data.frame(fread(&quot;../data/GTEX_V6/cis_gene_expression.txt&quot;));</code></pre>
 <pre><code>## 
-Read 0.0% of 16069 rows
 Read 62.2% of 16069 rows
-Read 16069 rows and 8557 (of 8557) columns from 0.532 GB file in 00:00:10</code></pre>
+Read 16069 rows and 8557 (of 8557) columns from 0.532 GB file in 00:00:09</code></pre>
 <pre class="r"><code>matdata &lt;- gtex_data[,-(1:2)];
 
 tissue_labels=read.table(&quot;../data/GTEX_V6/samples_id.txt&quot;)[,3];
@@ -108,7 +107,7 @@ pooled_data &lt;- t(cbind(matdata[,heart_atrial_labels],matdata[,heart_ventricle
 <div id="maptpx-application" class="section level2">
 <h2>maptpx application</h2>
 <p>We first perform <code>maptpx</code>.</p>
-<pre class="r"><code>Topic_clus &lt;- maptpx::topics(pooled_data, K=2, tol=10);
+<pre class="r"><code>Topic_clus &lt;- maptpx::topics(pooled_data, K=2, tol=0.1);
 save(Topic_clus, file=&quot;../rdas/gtex_heart_atrial_ventricle.rda&quot;);</code></pre>
 <p>We plot suing the Structure plot visualization.</p>
 <pre class="r"><code>Topic_clus &lt;- get(load(&quot;../rdas/gtex_heart_atrial_ventricle.rda&quot;));

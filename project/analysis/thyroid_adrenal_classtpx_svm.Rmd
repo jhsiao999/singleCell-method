@@ -38,7 +38,7 @@ pooled_data <- t(cbind(matdata[,thyroid_labels],matdata[,adrenal_labels]))
 We first perform `maptpx`.
 
 ```{r echo=TRUE, eval=FALSE}
-Topic_clus <- maptpx::topics(pooled_data, K=2, tol=10);
+Topic_clus <- maptpx::topics(pooled_data, K=2, tol=0.1);
 save(Topic_clus, file="../rdas/gtex_thyroid_adrenal.rda");
 ```
 
