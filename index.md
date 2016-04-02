@@ -122,6 +122,12 @@ tagline:
 * [classtpx on Deng et al 2014 using Blakeley 2015 as training](project/analysis/blakeley_deng_classtpx.html)
 * [classtpx on Leng et al 2015 Oscope data](leng_classtpx.html)
 * [classtpx on Leng et al 2015 Oscope data using Buettner et al 2015 data](project/analysis/leng_buettner_classtpx.html)
+* [classtpx vs SVM comparison on GTEx V6 data]
+  * [Testis vs LCL](project/analysis/testis_lcl_classtpx_svm.html)
+  * [Thyroid vs Adrenal Gland](project/analysis/thyroid_adrenal_classtpx_svm.html)
+  * [Heart Atrial Appendage vs Heart Left Ventricle](project/analysis/heart_atrial_ventricle_classtpx_svm.html)
+  * [Whole Blood vs Pancreas](project/analysis/blood_pancreas_classtpx_svm.html)
+  * [Breast Mammary Tissue vs Ovary](project/analysis/breast_ovary_classtpx_svm.html)
 
 
 
