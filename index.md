@@ -128,6 +128,7 @@ tagline:
   * [Heart Atrial Appendage vs Heart Left Ventricle](project/analysis/heart_atrial_ventricle_classtpx_svm.html)
   * [Whole Blood vs Pancreas](project/analysis/blood_pancreas_classtpx_svm.html)
   * [Breast Mammary Tissue vs Ovary](project/analysis/breast_ovary_classtpx_svm.html)
+  * [Brain Cerebellum and Brain Cerebellar Hemisphere](project/analysis/brain_cerebellum_hemisphere_classtpx_svm.html)
 
 
 
