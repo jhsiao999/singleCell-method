@@ -13,7 +13,7 @@ output:
 `classtpx` is a R package meant for semi-supervised topic modeling (see [site](https://github.com/kkdey/classtpx)). It is a modification of the `maptpx` package due to Matt Taddy, which performs unsupervised topic models. As a first illustration of the application of the `classtpx` package, we present a simulation example and apply the algorithm on the simulated data. We also compare the results from the `classtpx` application with the `maptpx` method. 
 
 ```{r}
-library(classtpx)
+library(maptpx)
 ```
 
 
@@ -23,7 +23,7 @@ Assume K = 2 hidden subpopulations in the data, and n = 600 cells. We set a 600 
 
 
 ```{r echo=TRUE, eval=TRUE}
-n.out <- 200
+n.out <- 400
 omega_sim <- rbind( cbind( rep(1, n.out), rep(0, n.out)), 
                     cbind( rep(0, n.out), rep(1, n.out)),
                     cbind( seq(0.6, 0.4, length.out = n.out), 
@@ -51,8 +51,8 @@ $\begin{pmatrix} q_{,11} & q_{1,2} & \dots & q_{1,G} \\
 
 
 ```{r echo=TRUE, eval=TRUE}
-freq <- rbind( c(0.1, 0.2, rep(0.70/98, 98)),
-               c(rep(0.70/98,98), 0.1, 0.2) )
+freq <- rbind( c(0.1, 0.2, rep(0.70/998, 998)),
+               c(rep(0.70/998,998), 0.1, 0.2) )
 str(freq)
 ```
 
