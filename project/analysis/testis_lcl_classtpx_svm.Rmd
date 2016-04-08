@@ -134,7 +134,7 @@ misclass_svm
 
 ```{r echo=TRUE, eval=FALSE}
 class_labs <- c(rep(1,50), rep(2,50));
-known_samples <- c(rep(1,50), length(testis_labels) + (1:50));
+known_samples <- c(1:50, length(testis_labels) + (1:50));
 
 Topic_clus <- classtpx::class_topics(
     pooled_data, 
@@ -142,8 +142,9 @@ Topic_clus <- classtpx::class_topics(
     known_samples = known_samples,
     class_labs = class_labs,
     method="theta.fix",
-    shrink=FALSE,
-    tol=0.01)
+    shrink=TRUE,
+    tol=0.01,
+    ord=FALSE)
 
 save(Topic_clus, file="../rdas/testis_lcl_theta_fix_classtpx.rda")
 ```
@@ -176,11 +177,58 @@ misclass_classtpx <- (tab_class_classtpx[1,2]+tab_class_classtpx[2,1])/sum(tab_c
 misclass_classtpx
 ```
 
+## classtpx (theta.fix) application
+
+```{r echo=TRUE, eval=FALSE}
+class_labs <- c(rep(1,50), rep(2,50));
+known_samples <- c(1:50, length(testis_labels) + (1:50));
+
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    shrink=FALSE,
+    tol=0.01,
+    ord=FALSE)
+
+save(Topic_clus, file="../rdas/testis_lcl_theta_fix_classtpx_no_shrink.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- get(load("../rdas/testis_lcl_theta_fix_classtpx_no_shrink.rda"));
+
+omega <- Topic_clus$omega;
+
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+
+test_class_classtpx <- c("Testis", "LCL")[apply(omega,1,function(x) which.max(x))];
+tab_class_classtpx <- table(c(rep("Testis", length(testis_labels)), 
+                              rep("LCL", length(lcl_labels)))[c(51:length(testis_labels), (length(testis_labels)+51):dim(omega)[1])],
+                            test_class_classtpx[c(51:length(testis_labels), (length(testis_labels)+51):dim(omega)[1])]);
+
+print(tab_class_classtpx)
+
+misclass_classtpx <- (tab_class_classtpx[1,2]+tab_class_classtpx[2,1])/sum(tab_class_classtpx)
+misclass_classtpx
+```
+
 ## classtpx (omega.fix) application
 
 ```{r echo=TRUE, eval=FALSE}
 class_labs <- c(rep(1,50), rep(2,50));
-known_samples <- c(rep(1,50), length(testis_labels) + (1:50));
+known_samples <- c(1:50, length(testis_labels) + (1:50));
 
 Topic_clus <- classtpx::class_topics(
     pooled_data, 
@@ -189,7 +237,8 @@ Topic_clus <- classtpx::class_topics(
     class_labs = class_labs,
     method="omega.fix",
     shrink=FALSE,
-    tol=0.01)
+    tol=0.01,
+    ord=FALSE)
 
 save(Topic_clus, file="../rdas/testis_lcl_omega_fix_classtpx.rda")
 ```
