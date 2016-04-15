@@ -140,6 +140,7 @@ Topic_clus <- classtpx::class_topics(
     class_labs = class_labs,
     method="theta.fix",
     shrink=TRUE,
+    shrink.method = 1,
     tol=0.01,
     ord=FALSE)
 
