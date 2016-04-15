@@ -519,7 +519,7 @@ row_data <- data.frame(gene_name = as.character(rownames(reads)),
 rownames(row_data) <- rownames(reads)
 
 
-metadata1 <- colnames(counts);
+metadata1 <- colnames(reads);
 metadata2 <- unlist(lapply(1:length(metadata1), function(l) return(strsplit(metadata1[l],"[.]")[[1]][1])))
 metadata3 <- unlist(lapply(1:length(metadata2), function(l) return(substr(metadata2[l],1, nchar(metadata2[l])-1))))
 
