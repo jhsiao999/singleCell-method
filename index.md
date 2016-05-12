@@ -129,6 +129,8 @@ tagline:
   * [Whole Blood vs Pancreas](project/analysis/blood_pancreas_classtpx_svm.html)
   * [Breast Mammary Tissue vs Ovary](project/analysis/breast_ovary_classtpx_svm.html)
   * [Brain Cerebellum and Brain Cerebellar Hemisphere](project/analysis/brain_cerebellum_hemisphere_classtpx_Svm.html)
+  * [Arteries + Whole Blood + Uterus](project/analysis/arteries_blood_uterus_classtpx_svm.html)
+  * [All arteries](project/analysis/arteries_classtpx_svm.html)
 
 
 
