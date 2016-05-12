@@ -129,8 +129,7 @@ misclass_svm <- (tab_class_svm[1,2]+tab_class_svm[2,1])/sum(tab_class_svm)
 misclass_svm
 ```
 
-
-## classtpx (theta.fix) application
+## classtpx (theta.fix with shrink on voom counts) application
 
 ```{r echo=TRUE, eval=FALSE}
 class_labs <- c(rep(1,50), rep(2,50));
@@ -143,7 +142,56 @@ Topic_clus <- classtpx::class_topics(
     class_labs = class_labs,
     method="theta.fix",
     shrink=TRUE,
-    tol=0.01,
+    shrink.method = 1,
+    tol=0.001,
+    ord=FALSE)
+
+save(Topic_clus, file="../rdas/breast_ovary_theta_fix_classtpx_voom.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- get(load("../rdas/breast_ovary_theta_fix_classtpx_voom.rda"));
+
+omega <- Topic_clus$omega;
+
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+
+test_class_classtpx <- c("Breast", "Ovary")[apply(omega,1,function(x) which.max(x))];
+tab_class_classtpx <- table(c(rep("Breast", length(breast_labels)), 
+                              rep("Ovary", length(ovary_labels)))[c(51:length(breast_labels), (length(breast_labels)+51):dim(omega)[1])],
+                            test_class_classtpx[c(51:length(breast_labels), (length(breast_labels)+51):dim(omega)[1])]);
+
+print(tab_class_classtpx)
+
+misclass_classtpx <- (tab_class_classtpx[1,2]+tab_class_classtpx[2,1])/sum(tab_class_classtpx)
+misclass_classtpx
+```
+
+## classtpx (theta.fix with shrink on counts) application
+
+```{r echo=TRUE, eval=FALSE}
+class_labs <- c(rep(1,50), rep(2,50));
+known_samples <- c(1:50, length(breast_labels) + (1:50));
+
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    shrink=TRUE,
+    shrink.method = 2,
+    tol=0.001,
     ord=FALSE)
 
 save(Topic_clus, file="../rdas/breast_ovary_theta_fix_classtpx.rda")
