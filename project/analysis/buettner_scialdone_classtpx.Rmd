@@ -22,13 +22,18 @@ We first use the `classtpx` package to build a semi-supervised topic model using
 ### Buettner et al 2015 
 
 ```{r echo=TRUE, eval=TRUE}
+devtools::install_github("jhsiao999/singleCellRNASeqMouseBuettnerESC")
+library(singleCellRNASeqMouseBuettnerESC)
+data("MouseBuettnerESC")
+MouseBuettnerESC
+pData(MouseBuettnerESC)
+
 library(data.table)
 G1_single <- data.frame(fread('../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
 G2M_single <- data.frame(fread('../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
 S_single <- data.frame(fread('../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
 
 cell_phases <- c(rep("G1", 96), rep("S", 96), rep("G2M", 96))
-
 ```
 
 We filter out ERCC spike ins.

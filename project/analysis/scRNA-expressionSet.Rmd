@@ -1,7 +1,7 @@
 ---
-title: "Store scRNASeq data in ExpressionSet objects"
+title: "Store datasets in ExpressionSet objects"
 author: "Joyce Hsiao"
-date: "2016-03-18"
+date: "2016-03-22"
 output: 
   html_document:
     css: floating-toc.css
@@ -15,18 +15,20 @@ opts_chunk$set(eval = FALSE, echo = TRUE)
 ```
 
 
-## Background and objectives
+# Background and objectives
 
 This document contains the code for storing scRNA-seq data set in `ExpressionSet` objects. Each scRNA-seq data set is stored in its own GitHub repository and can be loaded as an R package.
 
 
-## Load packages
+# Load packages
 
 ```{r}
 library(data.table)
 library(Biobase)
 ```
 
+
+# single-cell RNA-seq
 
 
 ## Buettner et al., 2015, mouse ESC, reads + ERCC
@@ -504,6 +506,95 @@ Deng2014MouseESC <- new("ExpressionSet",
 save(Deng2014MouseESC,
         file = "../data/all-rds/Deng2014MouseEsc.rda")
 ```
+
+## Scialdone et al 2015, reads
+
+```{r}
+library(data.table)
+counts_liver <- data.frame(
+    fread("../data/MouseScialdoneLiver/Marioni_lab_1_Jul_2015_gene_counts_table.txt"))
+dim(counts_liver)
+str(counts_liver)
+
+row_data <- data.frame(gene_name = as.character(counts_liver$V1),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- counts_liver$V1
+
+col_data <- data.frame(sample_id = paste0("sampleID",c(1:96)))
+rownames(col_data) <- paste0("sampleID",c(1:96))
+
+meta_list <- data.frame(labelDescription = c("sampleID"),
+                    row.names = colnames(col_data))
+
+counts_liver <- counts_liver[,-1]
+rownames(counts_liver) <- row_data$gene_name
+colnames(counts_liver) <- col_data$sample_id
+
+# dim(counts_liver)
+# dim(col_data); dim(row_data)
+
+MouseScialdoneLiver <- new("ExpressionSet",
+                exprs = as.matrix(counts_liver),
+                phenoData = new("AnnotatedDataFrame",
+                                data = col_data),
+                featureData = new("AnnotatedDataFrame",
+                                  data = row_data),
+                experimentData = new("MIAME",
+                                     title = "Mouse Sciladone liver"))
+
+save(MouseScialdoneLiver,
+        file = "../data/all-rda/MouseScialdoneLiver.rda")
+```
+
+
+# Bulk RNA-seq
+
+## Scialdone et al 2015, reads
+
+
+```{r, eval = F}
+library(data.table)
+G1_data <- read.table("../data/MouseScialdoneESC/G1_htseq_count.txt");
+G2M_data <- read.table("../data/MouseScialdoneESC/G2M_htseq_count.txt");
+S_data <- read.table("../data/MouseScialdoneESC/S_htseq_count.txt");
+colnames(G1_data) <- c("gene_names", "G1")
+colnames(G2M_data) <- c("gene_names", "G2M")
+colnames(S_data) <- c("gene_names", "S")
+
+dim(G1_data)
+dim(G2M_data)
+dim(S_data)
+
+counts_ESC <- merge(G1_data, G2M_data, by = "gene_names")
+counts_ESC <- merge(counts_ESC, S_data, by = "gene_names")
+head(counts_ESC)
+
+row_data <- data.frame(gene_name = as.character(counts_ESC$gene_names),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- counts_ESC$gene_names
+
+col_data <- data.frame(cycle_phase = colnames(counts_ESC)[-1])
+rownames(col_data) <- col_data$cycle_phase
+
+meta_list <- data.frame(labelDescription = c("cycle phase"),
+                    row.names = colnames(col_data))
+
+counts_ESC <- counts_ESC[,-1]
+
+MouseScialdoneESC <- new("ExpressionSet",
+                exprs = as.matrix(counts_ESC),
+                phenoData = new("AnnotatedDataFrame",
+                                data = col_data),
+                featureData = new("AnnotatedDataFrame",
+                                  data = row_data),
+                experimentData = new("MIAME",
+                                     title = "Mouse Sciladone ESC"))
+
+save(MouseScialdoneESC,
+        file = "../data/all-rda/MouseScialdoneESC.rda")
+
+```
+
 
 
 
