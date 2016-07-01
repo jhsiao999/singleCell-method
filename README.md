@@ -6,15 +6,14 @@ Workflow template for statistical computing projects at [Stephens Lab](http://st
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Making your own ashlar](#making-your-own-ashlar)
-  - [Cloning [*ashlar*](http://github.com/jhsiao999/ashlar)](#cloning-ashlarhttpgithubcomjhsiao999ashlar)
-  - [Reset git remote directory](#reset-git-remote-directory)
-  - [Producing and publishing the website](#producing-and-publishing-the-website)
-    - [Option 1: All contents for my eyes only](#option-1-all-contents-for-my-eyes-only)
-    - [Option 2: Publish it! Keep a two-branch workflow.](#option-2-publish-it-keep-a-two-branch-workflow)
-  - [A typical git workflow](#a-typical-git-workflow)
+- [Make your own ashlar](#make-your-own-ashlar)
+  - [1. Making a copy of ashlar](#1-making-a-copy-of-ashlar)
+  - [2. Configuring settings](#2-configuring-settings)
+  - [3. Adding and committing local files](#3-adding-and-committing-local-files)
+  - [4. Publishing the content](#4-publishing-the-content)
+  - [5. Adding new analysis](#5-adding-new-analysis)
 - [Resources](#resources)
-- [Some tips on how to collaborate with others using GitHub](#tip-collaborate)
+- [Collaborate with other using git](#collaborate-with-other-using-git)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -25,7 +24,7 @@ Workflow template for statistical computing projects at [Stephens Lab](http://st
 Below we give a step-by-step guide for how to set up an ashlar repository, 
 and how to publish the repository content to a website.
 
-1. Making a copy of ashlar
+### 1. Making a copy of ashlar
 
 Move to a directory which is going to keep a local copy of the ashlar repository. 
 *git clone* to copy the remote ashlar folder to the local directory, and rename to
@@ -36,7 +35,7 @@ cd GitHub-local-dir
 git clone https://github.com/jhsiao999/ashlar.git ashlar-trial
 ```
 
-2. Configuring settings
+### 2. Configuring settings
 
 Create a repository for *ashlar-trial* on github.com. Then, link this remote 
 directory with the local folder created in the first step.
@@ -46,7 +45,7 @@ git remote rm origin
 git remote add origin https://github.com/jhsiao999/ashlar-trial.git
 ```
 
-3. Adding and committing local files
+### 3. Adding and committing local files
 
 *git add -f --all* forces add all local files ot the remote directory. *-f* force option
 overrides *.gitignore*. Following the steps below, you can now see the local files on github.com.
@@ -57,7 +56,7 @@ git commit -m "first commit"
 git push -u origin master
 ```
 
-4. Publishing the content
+### 4. Publishing the content
 
 Switch to a new branch *gh-pages*. By convention, GitHub publishes the content 
 of this branch to a website.
@@ -83,7 +82,7 @@ Note: The website is under the analysis directory:
 *https://jhsiao999.github.io/ashlar-trial/analysis*
 
 
-5. Adding new analysis
+### 5. Adding new analysis
 
 This workflow is set up to separate source codes from their output files. 
 The source codes are kept in the master branch, and their output is stored and published
