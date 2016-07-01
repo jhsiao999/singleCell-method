@@ -78,13 +78,6 @@ of this branch to a website.
 git checkout -b gh-pages 
 ```
 
-Add and commit changes to *gh-pages* branch.
-
-```
-git add -f --all
-git commit -m "Build site"
-```
-
 Push to the remote *gh-pages* branch. This step also generates your website.
 
 ```
