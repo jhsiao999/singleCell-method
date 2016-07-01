@@ -6,11 +6,11 @@ title: "Home"
 
 **Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
 
-## Tutorials
+
+## Notes
 
 *  [Making a project site](tutorial.html) ([2015-12-12 lab meeting slides](../docs/repo-setup-tutorial-stephens-lab-2015-12-03.pdf))
 
+## Analysis
 
-## Using Rmardown to document anaysis: An example
-
-*  [Use PCA to visualize some single-cell data](single-cell-pca.html)
+*  [An exmaple: using PCA to visualize some single-cell data](single-cell-pca.html)

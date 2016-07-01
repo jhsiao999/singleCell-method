@@ -45,7 +45,12 @@ git remote rm origin
 git remote add origin https://github.com/jhsiao999/ashlar-trial.git
 ```
 
-### 3. Adding and committing local files
+### 3. Personalizing ashlar
+
+* analysis/index.Rmd: this is your table of content. Follow markdown syntax to make bullet lists.
+
+
+### 4. Adding and committing local files
 
 *git add -f --all* forces add all local files ot the remote directory. *-f* force option
 overrides *.gitignore*. Following the steps below, you can now see the local files on github.com.
@@ -56,7 +61,7 @@ git commit -m "first commit"
 git push -u origin master
 ```
 
-### 4. Publishing the content
+### 5. Publishing the content
 
 Switch to a new branch *gh-pages*. By convention, GitHub publishes the content 
 of this branch to a website.
@@ -82,7 +87,7 @@ Note: The website is under the analysis directory:
 *https://jhsiao999.github.io/ashlar-trial/analysis*
 
 
-### 5. Adding new analysis
+### 6. Adding new analysis
 
 This workflow is set up to separate source codes from their output files. 
 The source codes are kept in the master branch, and their output is stored and published
