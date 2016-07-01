@@ -42,6 +42,7 @@ Create a repository for *ashlar-trial* on github.com. Then, link this remote
 directory with the local folder created in the first step.
 
 ```
+cd GitHub-local-dir/ashlar-trial
 git remote rm origin
 git remote add origin https://github.com/jhsiao999/ashlar-trial.git
 ```
