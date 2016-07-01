@@ -8,11 +8,12 @@ Workflow template for statistical computing projects at [Stephens Lab](http://st
 
 - [Make your own ashlar](#make-your-own-ashlar)
   - [1. Making a copy of ashlar](#1-making-a-copy-of-ashlar)
-  - [2. Configuring settings](#2-configuring-settings)
-  - [3. Personalizing ashlar](#3-personalizing-ashlar)
+  - [2. Configuring git settings](#2-configuring-git-settings)
+  - [3. Editing basic information and site layout](#3-editing-basic-information-and-site-layout)
   - [4. Adding and committing local files](#4-adding-and-committing-local-files)
   - [5. Publishing the content](#5-publishing-the-content)
-  - [6. Adding new analysis](#6-adding-new-analysis)
+- [Adding new analysis](#adding-new-analysis)
+- [What if I don't want to publish the content?](#what-if-i-dont-want-to-publish-the-content)
 - [Resources](#resources)
 - [Collaborate with other using git](#collaborate-with-other-using-git)
 
@@ -36,7 +37,7 @@ cd GitHub-local-dir
 git clone https://github.com/jhsiao999/ashlar.git ashlar-trial
 ```
 
-### 2. Configuring settings
+### 2. Configuring git settings
 
 Create a repository for *ashlar-trial* on github.com. Then, link this remote 
 directory with the local folder created in the first step.
@@ -47,17 +48,17 @@ git remote rm origin
 git remote add origin https://github.com/jhsiao999/ashlar-trial.git
 ```
 
-### 3. Personalizing ashlar
+### 3. Editing basic information and site layout
 
 Now that you have a copy of ashlar. Edit the following content and add your project information.
 
 * analysis/index.Rmd: Homepage of the website, which is typically the table of content. Follow markdown syntax to make bullet lists.
 * README.md: readme of the GitHub repository. 
-* analysis/include/before_body.html: In line 17, change the hyperlink of the GitHub repository.
+* analysis/include/before_body.html: Edit the name of the repository in line 10. 
+Edit the hyperlink of the reposotyr in line 17.
 * analysis/license.Rmd: Change the software license if necessary.
 * analysis/about.Rmd: Edit basic information about yourself or about the project.
  
-
 ### 4. Adding and committing local files
 
 *git add --all* add all local files to the remote directory, except for files listed in *.gitignore*.
@@ -71,7 +72,8 @@ git push -u origin master
 ### 5. Publishing the content
 
 Switch to a new branch *gh-pages*. By convention, GitHub publishes the content 
-of this branch to a website.
+of this branch to a website. All content of the repository becomes public, even 
+if the repository was private.
 
 ```
 git checkout -b gh-pages 
@@ -87,7 +89,7 @@ Note: The website is under the analysis directory:
 *https://jhsiao999.github.io/ashlar-trial/analysis*
 
 
-### 6. Adding new analysis
+## Adding new analysis
 
 The idea is to work from the master branch and then add to both master branch and gh-pages branch.
 Using this workflow, gh-pages branch mirrors master branch. Advanced users can modify *.gitignore* 
@@ -105,6 +107,14 @@ git merge master
 git push origin gh-pages
 ```
 
+
+## What if I don't want to publish the content?
+
+Do not make a gh-pages branch. Just work with the master branch. This means you will
+skip the step "Publishing the content". 
+
+You can still view the site locally, which can be accessed via its
+homepage "index.html".
 
 
 ## Resources 
