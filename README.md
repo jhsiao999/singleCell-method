@@ -9,9 +9,10 @@ Workflow template for statistical computing projects at [Stephens Lab](http://st
 - [Make your own ashlar](#make-your-own-ashlar)
   - [1. Making a copy of ashlar](#1-making-a-copy-of-ashlar)
   - [2. Configuring settings](#2-configuring-settings)
-  - [3. Adding and committing local files](#3-adding-and-committing-local-files)
-  - [4. Publishing the content](#4-publishing-the-content)
-  - [5. Adding new analysis](#5-adding-new-analysis)
+  - [3. Personalizing ashlar](#3-personalizing-ashlar)
+  - [4. Adding and committing local files](#4-adding-and-committing-local-files)
+  - [5. Publishing the content](#5-publishing-the-content)
+  - [6. Adding new analysis](#6-adding-new-analysis)
 - [Resources](#resources)
 - [Collaborate with other using git](#collaborate-with-other-using-git)
 
@@ -47,8 +48,14 @@ git remote add origin https://github.com/jhsiao999/ashlar-trial.git
 
 ### 3. Personalizing ashlar
 
-* analysis/index.Rmd: this is your table of content. Follow markdown syntax to make bullet lists.
+Now that you have a copy of ashlar. Edit the following content and add your project information.
 
+* analysis/index.Rmd: Homepage of the website, which is typically the table of content. Follow markdown syntax to make bullet lists.
+* README.md: readme of the GitHub repository. 
+* analysis/include/before_body.html: In line 17, change the hyperlink of the GitHub repository.
+* analysis/license.Rmd: Change the software license if necessary.
+* analysis/about.Rmd: Edit basic information about yourself or about the project.
+ 
 
 ### 4. Adding and committing local files
 
