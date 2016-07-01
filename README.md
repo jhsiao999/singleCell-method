@@ -60,11 +60,10 @@ Now that you have a copy of ashlar. Edit the following content and add your proj
 
 ### 4. Adding and committing local files
 
-*git add -f --all* forces add all local files ot the remote directory. *-f* force option
-overrides *.gitignore*. Following the steps below, you can now see the local files on github.com.
+*git add --all* add all local files to the remote directory, except for files listed in *.gitignore*.
 
 ```
-git add -f --all
+git add --all
 git commit -m "first commit"
 git push -u origin master
 ```
@@ -90,24 +89,22 @@ Note: The website is under the analysis directory:
 
 ### 6. Adding new analysis
 
-This workflow is set up to separate source codes from their output files. 
-The source codes are kept in the master branch, and their output is stored and published
-in the gh-pages branch.
+The idea is to work from the master branch and then add to both master branch and gh-pages branch.
+Using this workflow, gh-pages branch mirrors master branch. Advanced users can modify *.gitignore* 
+and choose to not to publish selected files.
 
 ```
 git checkout master
 cd analysis
-git add new-analysis.Rmd index.Rmd
+git add *Rmd *html figure/* (or git add --all)
 git commit -m "add new analysis"
 git push origin master
 
 git checkout gh-pages
 git merge master
-make
-git add *Rmd *html figure/*
-git commit -m "add new analysis"
 git push origin gh-pages
 ```
+
 
 
 ## Resources 
