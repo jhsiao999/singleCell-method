@@ -1,0 +1,272 @@
+---
+title: "classtpx vs SVM on GTEx V6 data: (Blood+Pancreas)"
+author: "Kushal K Dey"
+date: "April 1, 2016"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+## Overview
+
+In this script, we extract tissue samples from two tissues in the GTEx V6 samples and apply a classification due to Support Vector Machines (SVM) and the classtpx model. We would like to figure out which of the two methods has higher misclassification rate.
+
+```{r warning=FALSE, message=FALSE}
+library(data.table)
+library(e1071)
+library(classtpx)
+library(maptpx)
+```
+
+## Data preparation (Blood + Pancreas)
+
+```{r message=FALSE, warning=FALSE}
+gtex_data <- data.frame(fread("../data/GTEX_V6/cis_gene_expression.txt"));
+matdata <- gtex_data[,-(1:2)];
+
+tissue_labels=read.table("../data/GTEX_V6/samples_id.txt")[,3];
+
+blood_labels <- which(as.character(tissue_labels) == 'Whole Blood')
+pancreas_labels <- which(as.character(tissue_labels) == 'Pancreas');
+
+pooled_data <- t(cbind(matdata[,blood_labels],matdata[,pancreas_labels]))
+```
+
+## maptpx application
+
+We first perform `maptpx`.
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- maptpx::topics(pooled_data, K=2, tol=0.1);
+save(Topic_clus, file="../rdas/gtex_blood_pancreas.rda");
+```
+
+We plot suing the Structure plot visualization.
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- get(load("../rdas/gtex_blood_pancreas.rda"));
+
+par(mfrow=c(1,1))
+par(mar=c(4,2,2,2))
+omega <- Topic_clus$omega;
+annotation <- data.frame(
+sample_id = paste0("X", c(1:NROW(omega))),
+tissue_label = factor(tissue_labels[c(blood_labels, pancreas_labels)],
+                      levels=c("Whole Blood", "Pancreas"))
+)
+
+rownames(omega) <- annotation$sample_id;
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+```
+
+## Support Vector Machine (SVM) application 
+
+We filter out the first $50$ samples from the Blood samples and the first $50$ samples from the Pancreas tissues and then perform classification of the other samples based on these two sets of samples. 
+
+### On counts
+
+```{r echo=TRUE, eval=TRUE}
+
+gene_names <- read.table("../data/GTEX_V6/gene_names_GTEX_V6.txt");
+gene_names <- substring(gene_names[,1],1,15);
+
+training_data <- t(cbind(matdata[,blood_labels[1:50]],matdata[,pancreas_labels[1:50]]))
+
+test_data <- t(cbind(matdata[,blood_labels[-(1:50)]],matdata[,pancreas_labels[-(1:50)]]))
+
+tissue_type <- c(rep("Blood",50), rep("Pancreas",50));
+
+training.data.frame <- cbind.data.frame(training_data, tissue_type);
+colnames(training.data.frame) <- c(gene_names, "tissue_type");
+
+model <- svm(tissue_type ~ ., data = training.data.frame)
+
+test_class_svm <- predict(model, test_data)
+
+tab_class_svm <- table(test_class_svm, c(rep("Blood", length(blood_labels)-50), rep("Pancreas", length(pancreas_labels)-50)))
+
+print(tab_class_svm)
+
+misclass_svm <- (tab_class_svm[1,2]+tab_class_svm[2,1])/sum(tab_class_svm)
+misclass_svm
+```
+
+### On voom transformed counts
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+voom_matdata <- data.frame(fread("../data/GTEX_V6/voom_cis_gene_expression.txt"))
+voom_matdata <- voom_matdata[,-1]
+
+training_data <- t(cbind(voom_matdata[,blood_labels[1:50]],voom_matdata[,pancreas_labels[1:50]]))
+
+test_data <- t(cbind(voom_matdata[,blood_labels[-(1:50)]],voom_matdata[,pancreas_labels[-(1:50)]]))
+
+tissue_type <- c(rep("Blood",50), rep("Pancreas",50));
+
+training.data.frame <- cbind.data.frame(training_data, tissue_type);
+colnames(training.data.frame) <- c(gene_names, "tissue_type");
+
+model <- svm(tissue_type ~ ., data = training.data.frame)
+
+test_class_svm <- predict(model, test_data)
+
+tab_class_svm <- table(test_class_svm, c(rep("Blood", length(blood_labels)-50), rep("Pancreas", length(pancreas_labels)-50)))
+
+print(tab_class_svm)
+
+misclass_svm <- (tab_class_svm[1,2]+tab_class_svm[2,1])/sum(tab_class_svm)
+misclass_svm
+```
+
+
+## classtpx (theta.fix) application
+
+```{r echo=TRUE, eval=FALSE}
+class_labs <- c(rep(1,50), rep(2,50));
+known_samples <- c(1:50, length(blood_labels) + (1:50));
+
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    shrink=TRUE,
+    tol=0.01,
+    ord=FALSE)
+
+save(Topic_clus, file="../rdas/blood_pancreas_theta_fix_classtpx.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- get(load("../rdas/blood_pancreas_theta_fix_classtpx.rda"));
+
+omega <- Topic_clus$omega;
+
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+
+test_class_classtpx <- c("Blood", "Pancreas")[apply(omega,1,function(x) which.max(x))];
+tab_class_classtpx <- table(c(rep("Blood", length(blood_labels)), 
+                              rep("Pancreas", length(pancreas_labels)))[c(51:length(blood_labels), (length(blood_labels)+51):dim(omega)[1])],
+                            test_class_classtpx[c(51:length(blood_labels), (length(blood_labels)+51):dim(omega)[1])]);
+
+print(tab_class_classtpx)
+
+misclass_classtpx <- (tab_class_classtpx[1,2]+tab_class_classtpx[2,1])/sum(tab_class_classtpx)
+misclass_classtpx
+```
+
+## classtpx (theta.fix & no shrink) application
+
+```{r echo=TRUE, eval=FALSE}
+class_labs <- c(rep(1,50), rep(2,50));
+known_samples <- c(1:50, length(blood_labels) + (1:50));
+
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    shrink=FALSE,
+    tol=0.01,
+    ord=FALSE)
+
+save(Topic_clus, file="../rdas/blood_pancreas_theta_fix_classtpx_no_shrink.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- get(load("../rdas/blood_pancreas_theta_fix_classtpx_no_shrink.rda"));
+
+omega <- Topic_clus$omega;
+
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+
+test_class_classtpx <- c("Blood", "Pancreas")[apply(omega,1,function(x) which.max(x))];
+tab_class_classtpx <- table(c(rep("Blood", length(blood_labels)), 
+                              rep("Pancreas", length(pancreas_labels)))[c(51:length(blood_labels), (length(blood_labels)+51):dim(omega)[1])],
+                            test_class_classtpx[c(51:length(blood_labels), (length(blood_labels)+51):dim(omega)[1])]);
+
+print(tab_class_classtpx)
+
+misclass_classtpx <- (tab_class_classtpx[1,2]+tab_class_classtpx[2,1])/sum(tab_class_classtpx)
+misclass_classtpx
+```
+
+## classtpx (omega.fix) application
+
+```{r echo=TRUE, eval=FALSE}
+class_labs <- c(rep(1,50), rep(2,50));
+known_samples <- c(1:50, length(blood_labels) + (1:50));
+
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    shrink=FALSE,
+    tol=0.01)
+
+save(Topic_clus, file="../rdas/blood_pancreas_omega_fix_classtpx.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- get(load("../rdas/blood_pancreas_omega_fix_classtpx.rda"));
+
+omega <- Topic_clus$omega;
+
+
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+
+test_class_classtpx <- c("Blood", "Pancreas")[apply(omega,1,function(x) which.max(x))];
+tab_class_classtpx <- table(c(rep("Blood", length(blood_labels)), 
+                              rep("Pancreas", length(pancreas_labels)))[c(51:length(blood_labels), (length(blood_labels)+51):dim(omega)[1])],
+                            test_class_classtpx[c(51:length(blood_labels), (length(blood_labels)+51):dim(omega)[1])]);
+
+print(tab_class_classtpx)
+
+misclass_classtpx <- (tab_class_classtpx[1,2]+tab_class_classtpx[2,1])/sum(tab_class_classtpx)
+misclass_classtpx
+```

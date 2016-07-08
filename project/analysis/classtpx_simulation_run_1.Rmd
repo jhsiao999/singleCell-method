@@ -13,7 +13,7 @@ output:
 `classtpx` is a R package meant for semi-supervised topic modeling (see [site](https://github.com/kkdey/classtpx)). It is a modification of the `maptpx` package due to Matt Taddy, which performs unsupervised topic models. As a first illustration of the application of the `classtpx` package, we present a simulation example and apply the algorithm on the simulated data. We also compare the results from the `classtpx` application with the `maptpx` method. 
 
 ```{r}
-library(classtpx)
+library(maptpx)
 ```
 
 
@@ -91,12 +91,14 @@ class_labs <- c(rep(1,100), rep(2,100))
 ### omega.fix method
 
 ```{r echo=TRUE, eval=TRUE}
-Topic_clus <- classtpx::class_topics(
+Topic_clus <- class_topics(
     counts, 
     K, 
     known_samples = known_samples,
     class_labs = class_labs,
     method="omega.fix",
+    shrink=TRUE,
+    shrink.method=2,
     tol=0.001)
 ```
 
@@ -138,12 +140,14 @@ barplot(t(docweights),
 ### theta.fix method
 
 ```{r echo=TRUE, eval=TRUE}
-Topic_clus <- classtpx::class_topics(
+Topic_clus <- class_topics(
     counts, 
     K, 
     known_samples = known_samples,
     class_labs = class_labs,
     method="theta.fix",
+    shrink=TRUE,
+    shrink.method = 2,
     tol=0.001)
 ```
 

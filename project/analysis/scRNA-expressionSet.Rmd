@@ -507,6 +507,7 @@ save(Deng2014MouseESC,
         file = "../data/all-rds/Deng2014MouseEsc.rda")
 ```
 
+<<<<<<< HEAD
 ## Scialdone et al 2015, reads
 
 ```{r}
@@ -583,11 +584,42 @@ counts_ESC <- counts_ESC[,-1]
 
 MouseScialdoneESC <- new("ExpressionSet",
                 exprs = as.matrix(counts_ESC),
+=======
+## Blakeley 2015 Human embryo, counts
+
+```{r eval=F}
+data <- data.frame(fread("../data/GSE66507_human_blastocyst_rnaseq_counts.txt"));
+
+gene_names <- data[,1];
+reads <- data[,-1];
+rownames(reads) <- gene_names;
+
+row_data <- data.frame(gene_name = as.character(rownames(reads)),
+                       stringsAsFactors = FALSE)
+rownames(row_data) <- rownames(reads)
+
+
+metadata1 <- colnames(reads);
+metadata2 <- unlist(lapply(1:length(metadata1), function(l) return(strsplit(metadata1[l],"[.]")[[1]][1])))
+metadata3 <- unlist(lapply(1:length(metadata2), function(l) return(substr(metadata2[l],1, nchar(metadata2[l])-1))))
+
+col_data <- data.frame(
+    cell_type = metadata3,
+    cell_type_class = metadata2,
+    cell_id = metadata1);
+
+colnames(col_data) <- c("cell_type", "cell_type_class", "cell_id");
+rownames(col_data) <- colnames(reads);
+
+HumanBlakeleyEmbryo <- new("ExpressionSet",
+                exprs = as.matrix(reads),
+>>>>>>> 89b30f8a5b87ddb9b95a5af4ae098e115ea566be
                 phenoData = new("AnnotatedDataFrame",
                                 data = col_data),
                 featureData = new("AnnotatedDataFrame",
                                   data = row_data),
                 experimentData = new("MIAME",
+<<<<<<< HEAD
                                      title = "Mouse Sciladone ESC"))
 
 save(MouseScialdoneESC,
@@ -596,6 +628,15 @@ save(MouseScialdoneESC,
 ```
 
 
+=======
+                                     title = "Blakeley 2015 Human Embryo"))
+
+save(HumanBlakeleyEmbryo,
+     file = "../data/all-rds/HumanBlakeleyEmbryo.rda")
+
+```
+
+>>>>>>> 89b30f8a5b87ddb9b95a5af4ae098e115ea566be
 
 
 ## Session information

@@ -117,6 +117,20 @@ tagline:
 * [classtpx on Buettner 2015 + Scialdone 2015 combined cell cycle data](project/analysis/buettner_scialdone_classtpx.html)
 * [classtpx on Buettner 2015 data: half single cells from each phase used to manufacture bulk in training](project/analysis/buettner_classtpx_2015.html)
 * [classtpx on Buettner 2015 data: half single cells used as it is from each phase in training ](project/analysis/buettner_classtpx_2015_2.html)
+* [classtpx on Treutlin et al 2014 lung development data](project/analysis/treutlin_classtpx.html)
+* [classtpx on Blakeley et al 2015 human blastocyst data](project/analysis/blakeley_classtpx.html)
+* [classtpx on Deng et al 2014 using Blakeley 2015 as training](project/analysis/blakeley_deng_classtpx.html)
+* [classtpx on Leng et al 2015 Oscope data](leng_classtpx.html)
+* [classtpx on Leng et al 2015 Oscope data using Buettner et al 2015 data](project/analysis/leng_buettner_classtpx.html)
+* [classtpx vs SVM comparison on GTEx V6 data]
+  * [Testis vs LCL](project/analysis/testis_lcl_classtpx_svm.html)
+  * [Thyroid vs Adrenal Gland](project/analysis/thyroid_adrenal_classtpx_svm.html)
+  * [Heart Atrial Appendage vs Heart Left Ventricle](project/analysis/heart_atrial_ventricle_classtpx_svm.html)
+  * [Whole Blood vs Pancreas](project/analysis/blood_pancreas_classtpx_svm.html)
+  * [Breast Mammary Tissue vs Ovary](project/analysis/breast_ovary_classtpx_svm.html)
+  * [Brain Cerebellum and Brain Cerebellar Hemisphere](project/analysis/brain_cerebellum_hemisphere_classtpx_Svm.html)
+  * [Arteries + Whole Blood + Uterus](project/analysis/arteries_blood_uterus_classtpx_svm.html)
+  * [All arteries](project/analysis/arteries_classtpx_svm.html)
 
 
 

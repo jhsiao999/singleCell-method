@@ -1,0 +1,64 @@
+---
+title: Test Structure_gg"
+author: "Kushal K Dey"
+date: "April 8, 2016"
+output: html_document
+---
+
+## Overview
+
+```{r warning=FALSE, message=FALSE}
+library(data.table)
+library(e1071)
+library(classtpx)
+library(maptpx)
+```
+
+## Data preparation (Thyroid + Adrenal Gland)
+
+```{r message=FALSE, warning=FALSE}
+gtex_data <- data.frame(fread("../data/GTEX_V6/cis_gene_expression.txt"));
+matdata <- gtex_data[,-(1:2)];
+
+tissue_labels=read.table("../data/GTEX_V6/samples_id.txt")[,3];
+
+thyroid_labels <- which(as.character(tissue_labels) == 'Thyroid')
+adrenal_labels <- which(as.character(tissue_labels) == 'Adrenal Gland');
+
+pooled_data <- t(cbind(matdata[,thyroid_labels[1]],matdata[,adrenal_labels[1:25]]))
+```
+
+## maptpx application
+
+We first perform `maptpx`.
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- maptpx::topics(pooled_data, K=2, tol=0.1);
+```
+
+We plot suing the Structure plot visualization.
+
+```{r echo=TRUE, eval=TRUE}
+
+par(mfrow=c(1,1))
+par(mar=c(4,2,2,2))
+omega <- Topic_clus$omega;
+annotation <- data.frame(
+sample_id = paste0("X", c(1:NROW(omega))),
+tissue_label = factor(tissue_labels[c(thyroid_labels[1], adrenal_labels[1:25])],
+                      levels=c("Thyroid", "Adrenal Gland"))
+)
+
+rownames(omega) <- annotation$sample_id;
+CountClust::StructureGGplot(omega = as.matrix(omega),
+                    annotation = annotation,
+                    palette = RColorBrewer::brewer.pal(8, "Accent"),
+                    yaxis_label = "Tissue type",
+                    order_sample = TRUE,
+                    axis_tick = list(axis_ticks_length = .1,
+                                     axis_ticks_lwd_y = .1,
+                                     axis_ticks_lwd_x = .1,
+                                     axis_label_size = 7,
+                                     axis_label_face = "bold"))
+
+```
