@@ -322,14 +322,14 @@ known_samples <- c(1:50,
                    length(adipose_subcut_labels) + (1:50), 
                   length(adipose_visc_labels)+length(adipose_subcut_labels)+ (1:50));
 
-Topic_clus <- classtpx::class_topics(
+Topic_clus <- class_topics(
     pooled_data, 
     K=3, 
     known_samples = known_samples,
     class_labs = class_labs,
     method="omega.fix",
     shrink=FALSE,
-    tol=0.001,
+    tol=0.1,
     ord=FALSE)
 
 save(Topic_clus, file="../rdas/breast_adipose_omega_fix_classtpx.rda")

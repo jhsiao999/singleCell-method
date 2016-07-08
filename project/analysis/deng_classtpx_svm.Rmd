@@ -45,32 +45,166 @@ We fit the classtpx model.
 ```{r echo=TRUE, eval=TRUE}
 class_labs <- labels_class
 known_samples <- inds_class
+length_vec <- table(cell_type)[match(unique(cell_type), names(table(cell_type)))];
+#cum_length_vec <- cumsum(cell_type_2)
+class_labs_full <- rep(1:length(names(table(cell_type))), length_vec)
 
-Topic_clus <- classtpx::class_topics(
+
+```
+
+```{r}
+training_data <- counts[known_samples,];
+```
+
+```{r}
+mean_features <- apply(training_data, 2, function(x) return (tapply(x, as.factor(class_labs), function(y) return(round(mean(y))))));
+mean_features <- class.normalizetpx(mean_features, byrow=TRUE)
+top_features <- CountClust::ExtractTopFeatures(t(mean_features), top_features = 500,                                             method="poisson", options="min")
+top_features <- as.vector(top_features)
+top_features <- top_features[!is.na(top_features)]
+```
+
+```{r}
+top_features <- 1:dim(counts)[2]
+train.x <- counts[known_samples,top_features];
+train.y <- class_labs;
+test.x <- counts[-(known_samples),top_features];
+test.y <- class_labs_full[-(known_samples)];
+```
+
+```{r}
+#######  PLS-LDA on GTEx V6 counts #########
+
+out2 <- plsgenomics::pls.lda(train.x, train.y, test.x, ncomp=50)
+test_class_pls <- out2$predclass
+tab_class_pls <- table(test_class_pls, test.y)
+misclass_pls <- sum(tab_class_pls[row(tab_class_pls)!=col(tab_class_pls)])/ sum(tab_class_pls)
+misclass_pls
+
+#######  PLS-LDA on GTEx V6 voom #########
+
+out2 <- plsgenomics::pls.lda(voom2(train.x), train.y, voom2(test.x), ncomp=50)
+test_class_pls <- out2$predclass
+tab_class_pls <- table(test_class_pls, test.y)
+misclass_pls <- sum(tab_class_pls[row(tab_class_pls)!=col(tab_class_pls)])/ sum(tab_class_pls)
+misclass_pls
+
+#######  PLS-LDA on GTEx V6 voom shrink #########
+
+voom_generate <- class.voom_generator(train.x, class_labs = class_labs, doshrink=TRUE)
+
+out2 <- plsgenomics::pls.lda(voom_generate$voom_shrunk_class, train.y, voom2(test.x), ncomp=50)
+test_class_pls <- out2$predclass
+tab_class_pls <- table(test_class_pls, test.y)
+misclass_pls <- sum(tab_class_pls[row(tab_class_pls)!=col(tab_class_pls)])/ sum(tab_class_pls)
+misclass_pls
+
+```
+
+```{r}
+
+voom_generate <- class.voom_generator(train.x, class_labs = class_labs, doshrink=TRUE)
+
+
+#############   SVM on GTEx V6 counts data ###########################
+
+training.data.frame <- data.frame(cbind(train.y, train.x));
+colnames(training.data.frame)[-1] <- colnames(train.x)
+model <- svm(as.factor(train.y) ~ ., data = training.data.frame)
+colnames(test.x) <- colnames(train.x)
+test_class_svm <- predict(model, test.x)
+tab_class_svm <- table(test_class_svm, test.y)
+misclass_svm <- sum(tab_class_svm[row(tab_class_svm)!=col(tab_class_svm)])/ sum(tab_class_svm)
+misclass_svm
+
+#############  SVM on GTEx V6 voom data ##############################
+
+voom.train.x <- voom2(train.x)
+voom.test.x <- voom2(test.x)
+training.data.frame <- data.frame(train.y, voom.train.x);
+colnames(training.data.frame)[-1] <- colnames(train.x)
+model <- svm(as.factor(train.y) ~ ., data = training.data.frame)
+colnames(voom.test.x) <- colnames(voom.train.x)
+test_class_svm <- predict(model, voom.test.x)
+tab_class_svm <- table(test_class_svm, test.y)
+misclass_svm <- sum(tab_class_svm[row(tab_class_svm)!=col(tab_class_svm)])/ sum(tab_class_svm)
+misclass_svm
+
+############  SVM on GTEx V6 voom shrunk data ##########################
+
+voom.train.x <- data.frame(voom_generate$voom_shrunk_class);
+colnames(voom.train.x) <- colnames(train.x)
+voom.test.x <- voom2(test.x)
+training.data.frame <- data.frame(train.y, voom.train.x);
+colnames(training.data.frame)[-1] <- colnames(train.x)
+model <- svm(as.factor(train.y) ~ ., data = training.data.frame)
+colnames(voom.test.x) <- colnames(voom.train.x)
+test_class_svm <- predict(model, voom.test.x)
+tab_class_svm <- table(test_class_svm, test.y)
+misclass_svm <- sum(tab_class_svm[row(tab_class_svm)!=col(tab_class_svm)])/ sum(tab_class_svm)
+misclass_svm
+
+```
+
+
+```{r}
+model1 <- class.model_clust(counts, known_samples = known_samples,class_labs = class_labs, dist="normal")
+
+test_class_normal <- apply(model1, 1, which.max);
+tab_class_normal <- table(test_class_normal, test.y)
+
+test_class_normal <- apply(model1, 1, which.max);
+tab_class_normal <- table(test_class_normal, test.y)
+print(tab_class_normal)
+sum(diag(tab_class_normal[rownames(tab_class_normal) %in% colnames(tab_class_normal), ]))
+misclass_normal <- 1 - (sum(diag(tab_class_normal[rownames(tab_class_normal) %in% colnames(tab_class_normal), ]))/ sum(tab_class_normal))
+misclass_normal
+
+print(tab_class_normal)
+
+
+
+model2 <- class.model_clust(counts, known_samples = known_samples,
+                            class_labs = class_labs, dist="poisson")
+
+test_class_poisson <- apply(model2, 1, which.max);
+tab_class_poisson <- table(test_class_poisson, test.y)
+print(tab_class_poisson)
+sum(diag(tab_class_poisson[rownames(tab_class_poisson) %in% colnames(tab_class_poisson), ]))
+misclass_poisson <- 1 - (sum(diag(tab_class_poisson[rownames(tab_class_poisson) %in% colnames(tab_class_poisson), ]))/ sum(tab_class_poisson))
+misclass_poisson
+
+print(tab_class_poisson)
+
+
+```
+
+
+```{r}
+Topic_clus <- class_topics(
     counts, 
     K=length(unique(cell_type)), 
     known_samples = known_samples,
     class_labs = class_labs,
-    method="theta.fix",
+    method="omega.fix",
     shrink=TRUE,
     shrink.method = 1,
-    tol=0.0001,
+    tol=0.01,
     ord=FALSE)
 
-save(Topic_clus, file="../rdas/deng_theta_fix_classtpx_voom.rda")
-
+#save(Topic_clus, file="../rdas/deng_omega_fix_classtpx_shrink.rda")
 
 ```
 
 
 ```{r echo=TRUE, eval=TRUE}
 
-Topic_clus <- get(load("../rdas/deng_theta_fix_classtpx_voom.rda"))
+Topic_clus <- get(load("../rdas/deng_omega_fix_classtpx_shrink.rda"))
 
 omega <- Topic_clus$omega
 annotation <- data.frame(
   sample_id = paste0("X", c(1:NROW(omega))),
-  tissue_label = factor(rownames(omega),
+  tissue_label = factor(cell_type,
                         levels = rev( c("zy", "early2cell",
                                         "mid2cell", "late2cell",
                                         "4cell", "8cell", "16cell",
@@ -88,7 +222,7 @@ cols1 <- c(rev(RColorBrewer::brewer.pal(12, "Paired"))[c(3,4,7,8,11,12,5,6,9,10)
 
 CountClust::StructureGGplot(omega = omega,
                 annotation = annotation,
-                palette = cols1[1:11],
+                palette = cols1,
                 yaxis_label = "Development Phase",
                 order_sample = TRUE,
                 axis_tick = list(axis_ticks_length = .1,
@@ -106,8 +240,14 @@ sum(diag(tab_class_classtpx[rownames(tab_class_classtpx) %in% colnames(tab_class
 misclass_classtpx <- 1 - (sum(diag(tab_class_classtpx[rownames(tab_class_classtpx) %in% colnames(tab_class_classtpx), ]))/ sum(tab_class_classtpx))
 misclass_classtpx
 
-print(tab_class_classtpx)
+rownames(tab_class_classtpx)
 
+inds <- match(c("zy", "early2cell", "mid2cell", "late2cell",
+          "4cell", "8cell", "16cell", "earlyblast","midblast",
+          "lateblast"), rownames(tab_class_classtpx))
+tab_class_classtpx_2 <- tab_class_classtpx[inds,inds];
+colnames(tab_class_classtpx_2) <- rep("", 10)
+myImagePlot(class.normalizetpx(tab_class_classtpx_2))
 
 ```
 
@@ -135,7 +275,7 @@ save(Topic_clus, file="../rdas/deng_theta_fix_classtpx_no_shrink.rda")
 
 ```{r echo=TRUE, eval=TRUE}
 
-Topic_clus <- get(load(""../rdas/deng_theta_fix_classtpx_no_shrink.rda""))
+Topic_clus <- get(load("../rdas/deng_theta_fix_classtpx_no_shrink.rda"))
 
 omega <- Topic_clus$omega
 annotation <- data.frame(
@@ -165,38 +305,44 @@ tab_class_classtpx <- table(cell_type[-known_samples],
       test_class_classtpx[-known_samples]);
 
 print(tab_class_classtpx)
+colnames(tab_class_classtpx) <- rownames(tab_class_classtpx)
 sum(diag(tab_class_classtpx[rownames(tab_class_classtpx) %in% colnames(tab_class_classtpx), ]))
 misclass_classtpx <- 1 - (sum(diag(tab_class_classtpx[rownames(tab_class_classtpx) %in% colnames(tab_class_classtpx), ]))/ sum(tab_class_classtpx))
 misclass_classtpx
 
 print(tab_class_classtpx)
 
-
+inds <- match(c("zy", "early2cell", "mid2cell", "late2cell",
+          "4cell", "8cell", "16cell", "earlyblast","midblast",
+          "lateblast"), rownames(tab_class_classtpx))
+tab_class_classtpx_2 <- tab_class_classtpx[inds,inds];
+colnames(tab_class_classtpx_2) <- rep("", 10)
+myImagePlot(class.normalizetpx(tab_class_classtpx_3))
 ```
 
 ```{r echo=TRUE, eval=TRUE}
 class_labs <- labels_class
 known_samples <- inds_class
 
-Topic_clus <- classtpx::class_topics(
+Topic_clus <- class_topics(
     counts, 
     K=length(unique(cell_type)), 
     known_samples = known_samples,
     class_labs = class_labs,
-    method="omega.fix",
-    shrink=FALSE,
+    method="theta.fix",
+    shrink=TRUE,
     shrink.method = 1,
-    tol=0.0001,
+    tol=0.001,
     ord=FALSE)
 
-save(Topic_clus, file="../rdas/deng_omega_fix.rda")
+save(Topic_clus, file="../rdas/deng_theta_fix_classtpx_shrink.rda")
 
 ```
 
 
 ```{r echo=TRUE, eval=TRUE}
 
-Topic_clus <- get(load("../rdas/deng_omega_fix.rda"))
+Topic_clus <- get(load("../rdas/deng_theta_fix_classtpx_shrink.rda"))
 
 omega <- Topic_clus$omega
 annotation <- data.frame(

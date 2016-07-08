@@ -33,8 +33,6 @@ pooled_data <- t(cbind(matdata[,aorta_labels],
                        matdata[,tibial_labels],
                        matdata[,blood_labels],
                        matdata[,uterus_labels]))
-
-
 ```
 
 ## maptpx application
@@ -144,6 +142,8 @@ training_data <- t(cbind(voom_matdata[,aorta_labels[1:50]],
                          voom_matdata[, blood_labels[1:50]],
                          voom_matdata[, uterus_labels[1:50]]))
 
+#training_data <- voom_shrunk_class_2
+
 test_data <- t(cbind(voom_matdata[,aorta_labels[-(1:50)]],
                          voom_matdata[,coronary_labels[-(1:50)]],
                          voom_matdata[,tibial_labels[-(1:50)]],
@@ -189,9 +189,13 @@ known_samples <- as.vector(outer(1:50, c(0, cum_length_vec[1:(length(cum_length_
 
 ```
 
+```{r}
+counts_class <- pooled_data[known_samples,];
+```
+
 
 ```{r echo=TRUE, eval=FALSE}
-Topic_clus <- classtpx::class_topics(
+Topic_clus <- class_topics(
     pooled_data, 
     K=5, 
     known_samples = known_samples,
@@ -199,7 +203,7 @@ Topic_clus <- classtpx::class_topics(
     method="theta.fix",
     shrink=TRUE,
     shrink.method = 1,
-    tol=0.0001,
+    tol=0.001,
     ord=FALSE)
 
 save(Topic_clus, file="../rdas/arteries_blood_uterus_theta_fix_classtpx_voom.rda")
