@@ -1,0 +1,214 @@
+---
+title: 'cellcycleR validation: cell states and ribosomal expression'
+author: "Kushal K Dey"
+date: "January 30, 2016"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+## Overview
+
+It has been seen from our applications of cellcycleR to single cell level data that the method has a tendency to pick up those genes as influential ones which have very high expression patterns under some cell states. Then the ordering is carried out based on the expression levels of these genes and the method tries to arrange the cells in the order based on the peaks of their expressions at these cell states (clumps these cell states together). As a result of this, the method is unable to detect true sinusoidal patterns in the data.
+
+## Simulation Example (moderate SNR)
+
+Consider the following example
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+
+library(cellcycleR)
+library(wavethresh)
+
+G <- 100;
+num_cells <- 128;
+amp_genes <- rep(1, G);
+phi_genes <- rep(c(2,5), each=G/2);
+sigma_genes <- rchisq(G, 1);
+cell_times_sim <- seq(0,2*pi, length.out=num_cells);
+cycle_data <- sim_sinusoidal_cycle(G, amp_genes, phi_genes, sigma_genes, cell_times_sim);
+
+celltime_levels <- 128;
+
+```
+
+Notice from the simulation design so far that we have picked most fenes to have high noise variation compared to signal variation. This is because in real cell cycle data, we do see a lot of noise variation.
+
+Now we assume the first $10$ genes to be ribosomal genes. We pick 10 cell states (uniformly spaced) where these ribosomal genes have higher expression.
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+n_states <- 10;
+n_ribo <- 10;
+cell_states <- sapply(1:n_states, function(s) floor((s*length(cell_times_sim))/n_states));
+for(m in 1:n_states){
+  for(n in 1:n_ribo){
+    cycle_data[cell_states[m],n] <- rnorm(1,8,1);
+  }
+}
+
+```
+
+We now observe the graphs of a ribosomal gene and a non-ribosomal gene.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data[,2], type="l", main="gene pattern for 2nd gene (ribosomal)")
+plot(cycle_data[,40], type="l", main="gene pattern for 40th gene (non ribosomal)")
+```
+
+We now reorder the data.
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
+cell_times_reorder <- cell_times_sim[sample_reorder];
+cycle_data_reorder <- cycle_data[sample_reorder,];
+```
+
+## cellcycleR method- sinusoidal 
+
+```{r echo=TRUE, eval=TRUE}
+system.time(out_sinusoidal <- sin_cell_ordering_class(cycle_data_reorder, celltime_levels = celltime_levels, num_iter=500))
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(plotrix)
+library(RColorBrewer)
+par(mfrow=c(1,2))
+radial.plot(lengths=1:length(out_sinusoidal$cell_times),radial.pos=out_sinusoidal$cell_times[order(cell_times_reorder)],
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(out_sinusoidal$cell_times)), lwd=2)
+
+radial.plot(lengths=1:length(cell_times_reorder),radial.pos=sort(cell_times_reorder),
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times_reorder)), lwd=2)
+```
+
+The plots of estimated gene pattern and the true gene pattern.
+
+### 2nd co-ordinate
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),2], type="l", main="gene pattern for estd order")
+plot(cycle_data[,2],type="l", main="gene pattern for true order")
+```
+
+
+### 30th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l", main="gene pattern for estd order")
+plot(cycle_data[,30],type="l", main="gene pattern for true order")
+```
+
+### 50th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l", main="gene pattern for estd order")
+plot(cycle_data[,50],type="l", main="gene pattern for true order")
+```
+
+
+## Simulation Example (low SNR)
+
+Consider the following example
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+
+library(cellcycleR)
+library(wavethresh)
+
+G <- 100;
+num_cells <- 128;
+amp_genes <- rep(1, G);
+phi_genes <- rep(c(2,5), each=G/2);
+sigma_genes <- rchisq(G, 3);
+cell_times_sim <- seq(0,2*pi, length.out=num_cells);
+cycle_data <- sim_sinusoidal_cycle(G, amp_genes, phi_genes, sigma_genes, cell_times_sim);
+
+celltime_levels <- 128;
+
+```
+
+Notice from the simulation design so far that we have picked most fenes to have high noise variation compared to signal variation. This is because in real cell cycle data, we do see a lot of noise variation.
+
+Now we assume the first $10$ genes to be ribosomal genes. We pick 10 cell states (uniformly spaced) where these ribosomal genes have higher expression.
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+n_states <- 10;
+n_ribo <- 10;
+cell_states <- sapply(1:n_states, function(s) floor((s*length(cell_times_sim))/n_states));
+for(m in 1:n_states){
+  for(n in 1:n_ribo){
+    cycle_data[cell_states[m],n] <- rnorm(1,8,1);
+  }
+}
+
+```
+
+We now observe the graphs of a ribosomal gene and a non-ribosomal gene.
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data[,2], type="l", main="gene pattern for 2nd gene (ribosomal)")
+plot(cycle_data[,40], type="l", main="gene pattern for 40th gene (non ribosomal)")
+```
+
+We now reorder the data.
+
+```{r echo=TRUE, eval=TRUE, cache=TRUE}
+sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
+cell_times_reorder <- cell_times_sim[sample_reorder];
+cycle_data_reorder <- cycle_data[sample_reorder,];
+```
+
+## cellcycleR method- sinusoidal 
+
+```{r echo=TRUE, eval=TRUE}
+system.time(out_sinusoidal <- sin_cell_ordering_class(cycle_data_reorder, celltime_levels = celltime_levels, num_iter=500))
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(plotrix)
+library(RColorBrewer)
+par(mfrow=c(1,2))
+radial.plot(lengths=1:length(out_sinusoidal$cell_times),radial.pos=out_sinusoidal$cell_times[order(cell_times_reorder)],
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(out_sinusoidal$cell_times)), lwd=2)
+
+radial.plot(lengths=1:length(cell_times_reorder),radial.pos=sort(cell_times_reorder),
+            line.col=colorRampPalette(brewer.pal(9,"Blues"))(length(cell_times_reorder)), lwd=2)
+```
+
+The plots of estimated gene pattern and the true gene pattern.
+
+### 2nd co-ordinate
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),2], type="l", main="gene pattern for estd order")
+plot(cycle_data[,2],type="l", main="gene pattern for true order")
+```
+
+
+### 30th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),30], type="l", main="gene pattern for estd order")
+plot(cycle_data[,30],type="l", main="gene pattern for true order")
+```
+
+### 50th coordinate
+
+```{r echo=TRUE, eval=TRUE}
+par(mfrow=c(1,2))
+plot(cycle_data_reorder[order(out_sinusoidal$cell_times),50], type="l", main="gene pattern for estd order")
+plot(cycle_data[,50],type="l", main="gene pattern for true order")
+```
+
+
+## Conclusion
+
+It seems that cellcyleR is not doing a bad job at extracting the patterns in the data even when the ribosomal genes which result in high expression at certain specific cell states are present.
+

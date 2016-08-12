@@ -1,0 +1,149 @@
+---
+title: 'Build a cell-cycle classifer using FACS sorted data'
+author: "Joyce Hsiao"
+date: "2016-02-03"
+output: 
+  html_document:
+    toc: true
+---
+
+
+## Background and objectives
+
+Build a classifer that use gene expression patterns to predict cell-cycle stages. We use the FACS sorted data (Leng2015) in which cells are sorted into G1, S, and G2 and loaded on to independent C1 plates. Modulo batch effect, there's information to be exploited here about cell-cycle classification. 
+
+
+## Set up
+
+```{r, message=FALSE, warning=FALSE}
+library("matrixStats")
+library("glmnet")
+library("knitr")
+library("mygene")
+```
+
+
+## Prepare data
+
+Import processed counts.
+
+
+```{r import-data}
+data <- read.csv("../data/leng-2015/GSE64016_H1andFUCCI_normalized_EC (1).csv")
+gene_names <- data[,1]
+data <- data[,-1]
+rownames(data) <- gene_names
+
+## The gene IDs provided, not Ensembl IDs
+gene_names[1:10]
+
+## Extract the cell labels
+cell_phases <- sapply(colnames(data), function(x) strsplit(x,"_")[[1]][1]);
+
+table(cell_phases)
+
+cycle_data <- data[ ,cell_phases != "H1"]
+dim(cycle_data)
+cycle_vector <- factor(cell_phases[cell_phases != "H1"], 
+                       levels = c("G1", "S", "G2"))
+cycle_vector <- as.integer(cycle_vector)
+table(cycle_vector)
+```
+
+
+Check column sums. These are EBseq normalized counts. 
+
+*[chunk not evaluated]*
+```{r check-properties, eval = FALSE}
+par(mfrow = c(1,1))
+boxplot(log2(cycle_data))
+```
+
+
+## Multinomial lasso
+
+```{r}
+fit_ungrouped <- glmnet(x = t(cycle_data) , y = cycle_vector, alpha = 1, 
+                        type.multinomial = "ungrouped", 
+                        family = "multinomial")
+head(print(fit_ungrouped))
+```
+
+```{r}
+plot(fit_ungrouped, xvar = "lambda", label = TRUE, type.coef = "2norm")
+
+plot(log10(fit_ungrouped$lambda),
+     fit_ungrouped$dev.ratio,
+     ylab = "percent of null variance explained",
+     xlab = "log10 lambda")
+```
+
+cross-validation on the glmnet fit
+
+```{r}
+cvfit <- cv.glmnet(x = t(cycle_data), 
+                   y = cycle_vector, 
+                   family="multinomial", 
+                   type.multinomial = "ungrouped", parallel = TRUE)
+plot(cvfit)
+```
+
+```{r}
+df_coef <- data.frame(v1 = matrix(coef(cvfit, s = "lambda.min")[[1]]),
+                      v2 = matrix(coef(cvfit, s = "lambda.min")[[2]]),
+                      v3 = matrix(coef(cvfit, s = "lambda.min")[[3]]) )
+length(which(rowSums(df_coef != 0) > 0))
+```
+
+Extract significant coefficients.
+
+```{r}
+df_coef_selected <- df_coef[which(rowSums(df_coef != 0) > 0), ]
+df_coef_relative_S <- data.frame(
+    G1_to_S = df_coef_selected[ ,1] - df_coef_selected[ ,2], 
+    G2_to_S = df_coef_selected[ ,3] - df_coef_selected[ ,2])
+#round(df_coef_relative_S, 4)
+```
+
+
+Compute phase-specific mean gene expression for the selected genes.
+
+```{r}
+cell_phases_cycle_data <- cell_phases[cell_phases != "H1"]
+genes_selected <- gene_names[which(rowSums(df_coef != 0) > 0)]
+data_selected <- log2(as.matrix(cycle_data[ as.character(gene_names) %in% genes_selected, ])+1)
+
+cycle_means <-
+  do.call(rbind, lapply(1:length(genes_selected), function(per_gene) {
+      data.frame(G1 = mean(data_selected[per_gene, cell_phases_cycle_data == "G1"]),
+                 S = mean(data_selected[per_gene, cell_phases_cycle_data == "S"]),
+                 G2 = mean(data_selected[per_gene, cell_phases_cycle_data == "G2"]) )  
+}))
+```
+
+
+```{r}
+fit_predict <- predict(cvfit, 
+        newx = t(cycle_data[, sample(x = ncol(cycle_data), size = 50, replace = FALSE) ]) ,
+        type="response", s=0.01)
+round(fit_predict[1:20, ,],3)
+```
+
+
+## Annotation
+
+```{r}
+query_genes <- queryMany(c(as.character(gene_names[which(rowSums(df_coef != 0) > 0)])),  
+                         scopes="symbol", 
+                         fields=c("name","summary"), species="human")
+kable(query_genes)
+```
+
+
+
+## Session information
+
+```{r info}
+sessionInfo()
+```
+

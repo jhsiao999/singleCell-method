@@ -6,6 +6,10 @@ title: "About"
 
 **Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
 
+
+Kushal K Dey is a doctoral student in the Department of Statistics at the University of Chicago.
+
 [Joyce Hsiao][github-io] is a postdoctoral fellow in the Department of Human Genetics at the University of Chicago.
+
 
 [github-io]: http://jhsiao999.github.io/

@@ -1,0 +1,301 @@
+---
+title: 'Buettner single cell data (with bulk training): classtpx check'
+author: "Kushal K Dey"
+date: "February 27, 2016"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+rm(list=ls())
+library(maptpx)
+library(CountClust)
+library(classtpx)
+library(limma)
+library(data.table)
+```
+
+
+## Overview
+
+When `classtpx` was used on the combined single cell RNA-seq FACS sorted data due to [Buettner et al 2015](http://www.nature.com/nbt/journal/v33/n2/full/nbt.3102.html) and the bulk RNA FACS sorted data due to [Scialdone et al 2015](http://www.sciencedirect.com/science/article/pii/S1046202315300098). The results were not very satisfactory as the classifier on test data would always put them in the G1 phase cluster. 
+
+The idea now is to explore the Buettner et al data and try to see if the difference in library size between the single cell RNA-seq and the bulk RNA-seq model when used jointly as in this case, is indeed a problem. 
+
+## Buettner et al 2015 data 
+
+```{r echo=TRUE, eval=TRUE}
+library(data.table)
+G1_single <- data.frame(fread('../data/Marioni_data/G1_singlecells_counts.txt'), row.names=1);
+G2M_single <- data.frame(fread('../data/Marioni_data/G2M_singlecells_counts.txt'), row.names=1);
+S_single <- data.frame(fread('../data/Marioni_data/S_singlecells_counts.txt'), row.names=1);
+
+cell_phases <- c(rep("G1", 96), rep("S", 96), rep("G2M", 96))
+```
+
+We filter out ERCC spike ins.
+
+```{r echo=TRUE, eval=TRUE}
+ercc_start <- grep("ERCC", rownames(G1_single))[1]
+G1_single <- G1_single[-(ercc_start:dim(G1_single)[1]),-(1:3)];
+G2M_single <- G2M_single[-(ercc_start:dim(G2M_single)[1]),-(1:3)];
+S_single <- S_single[-(ercc_start:dim(S_single)[1]),-(1:3)];
+pooled_data <- t(cbind(G1_single, S_single, G2M_single));
+```
+
+
+## maptpx Modeling
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- maptpx::topics(pooled_data, K=3, tol=0.01);
+saveRDS(Topic_clus, "../rdas/buettner_topic_fit_maptpx.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/buettner_topic_fit_maptpx.rda")
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 96), rep("S", 96), rep("G2", 96))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+
+```
+
+
+## Manufacturing bulk data
+
+We now pool the first 48 cells in each of the three phases and sum the read counts across up over the cells for each gene to make them represent bulk-RNA FACS sorted data. We keep the remaining 48 cells in each phase as it is as single cells on which we shall test the `classtpx`.
+
+```{r echo=TRUE, eval=TRUE}
+
+G1.bulk <- rowSums(G1_single[,1:48])
+G1_single_half <- G1_single[,-(1:48)];
+G2M.bulk <- rowSums(G2M_single[,1:48])
+G2M_single_half <- G2M_single[,-(1:48)];
+S.bulk <- rowSums(S_single[,1:48])
+S_single_half <- S_single[,-(1:48)];
+
+bulk_data <- cbind(G1.bulk, S.bulk, G2M.bulk);
+sc_data <- cbind(G1_single_half, G2M_single_half, S_single_half);
+
+pooled_data <- t(cbind(bulk_data, sc_data));
+
+```
+
+## classtpx Modeling
+
+Fitting classtpx. We assume that we have done the bulk-RNA FACS sorting and we do not know about the cell cycle phases of the single phases. We use this information to drive the `classtpx`.
+
+### omega.fix method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01)
+
+saveRDS(Topic_clus, "../rdas/buettner_topic_fit_classtpx_omega_fix_bulk.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/buettner_topic_fit_classtpx_omega_fix_bulk.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### no.fix method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="no.fix",
+    tol=0.1)
+
+saveRDS(Topic_clus, "../rdas/buettner_topic_fit_classtpx_no_fix_bulk.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/buettner_topic_fit_classtpx_no_fix_bulk.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### theta.fix method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    tol=0.01)
+
+saveRDS(Topic_clus, "../rdas/buettner_topic_fit_classtpx_theta_fix_bulk.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/buettner_topic_fit_classtpx_theta_fix_bulk.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### theta.prior method
+
+```{r echo=TRUE, eval=FALSE}
+library(classtpx)
+K <- 3;
+known_samples <- 1:3;
+class_labs <- 1:3;
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.prior",
+    tol=0.01)
+
+saveRDS(Topic_clus, "../rdas/buettner_topic_fit_classtpx_theta_prior_bulk.rda")
+```
+
+```{r echo=TRUE, eval=TRUE}
+Topic_clus <- readRDS("../rdas/buettner_topic_fit_classtpx_theta_prior_bulk.rda")
+
+omega <- Topic_clus$omega[-(1:3),];
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = c(rep("G1", 48), rep("S", 48), rep("G2", 48))
+)
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+## PCA 
+
+We perform PCA to see where the bulk samples and the single cell samples lie in the combined PCA plot with the voom transform. Note that the main difference between the bulk samples and single cell samples here is the library size, which is way higher in case of bulk samples.
+
+```{r echo=TRUE, eval=TRUE}
+color <- c(2,3,4, rep(2,48), rep(3, 48), rep(4,48));
+out_pca <- prcomp(limma::voom(pooled_data)$E);
+par(mfrow=c(1,1))
+plot(out_pca$x[,1], out_pca$x[,2], col=color, pch=c(rep(3,3), rep(20,144)), xlab="PC1",
+     ylab="PC2")
+legend("topleft", c("G1","S", "G2M"), fill=c(2,3,4), cex=0.6)
+
+plot(out_pca$x[,1], out_pca$x[,3], col=color, pch=c(rep(3,3), rep(20,144)), xlab="PC1",
+     ylab="PC2")
+legend("topleft", c("G1","S", "G2M"), fill=c(2,3,4), cex=0.6)
+
+```
+
+Note that PC1 vs PC2 or PC2 vs PC3 plots do not seem to match the single cells from different phases with the bulk samples from that phase. 
+
+## Conclusions
+
+`classtpx` does a good job at separating the single cells into their cell cycle phases based on the bulk data manufactured by pooling some of these single cells together. It fixes the identifiability problem as encountered when `maptpx` is applied to all the single cells. `maptpx` writes the cells from three phases as a homogeneous (within each phase) mix of three clusters instead of placing them in separate clusters for separate phases, the latter is achieved by `classtpx`. Also it seems PCA is not flexible enough to account for the library size effect which topic model does take care of. 

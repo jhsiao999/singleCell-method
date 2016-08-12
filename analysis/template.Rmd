@@ -2,6 +2,10 @@
 title: "Untitled"
 author: "First Last"
 date: YYYY-MM-DD
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
 ---
 
 **Last updated:** `r Sys.Date()`
@@ -9,7 +13,7 @@ date: YYYY-MM-DD
 **Code version:** `r system("git log -1 --format='%H'", intern = TRUE)`
 
 ```{r chunk-options, include=FALSE}
-source("chunk-options.R")
+source("../layout/chunk-options.R")
 ```
 
 This is a template for writing reports with R Markdown.
@@ -24,6 +28,6 @@ cp analysis/template.Rmd analysis/newfile.Rmd
 
 ## Session information
 
-```{r info}
+```{r info, echo = FALSE}
 sessionInfo()
 ```

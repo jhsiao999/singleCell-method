@@ -1,0 +1,417 @@
+---
+title: "RUV normalization of iPSC samples"
+author: "Kushal K Dey, Joyce H Siao"
+date: "2015-07-27"
+output: 
+  html_document:
+    toc: true
+---
+
+The iPSC data was found to have individual effects and batch effects. The individual effect (there were 3 individuals) was the strongest, and both the reads/molecules data seemed to be clustering as per individuals. Initially it seemed there is no batch effect. But when we looked closely at one specific individual, we found that the batch effect seems to be there. So batch effect seems to be nested within the individual. RUV assumes the batch effects as additive and may not be a great tool to normalize when the two effects (individual and batch effect here) are such that one effect is nested within another. 
+
+So, the aim of this script is two-fold
+
+1. To compare the density of the ERCC genes across the individuals and batches and see if the ERCC genes indeed change across the batches for one particular individual. This should not ideally be the case. 
+
+2. To see if RUV normalization is performed within an individual, if the normalized samples show the batch effect or not.
+
+
+```{r packages, warning=FALSE, message = FALSE}
+library("edgeR")
+library("ggplot2")
+library("RUVSeq")
+library("preprocessCore")
+library("affy")
+library(data.table)
+library(reshape2)
+library(testit)
+library(qtlcharts)
+source('functions.R')
+```
+
+
+## Prepare data
+
+Reading the reads and the molecules data.
+
+```{r data_read}
+anno <- read.table("../data/annotation.txt", header = TRUE,
+                   stringsAsFactors = FALSE)
+
+reads <- data.frame(fread("../data/reads.txt", header = FALSE, 
+                    stringsAsFactors = FALSE),row.names=1);
+
+molecules <- data.frame(fread("../data/molecules.txt", header = TRUE,
+                    stringsAsFactors = FALSE),row.names=1);
+```
+
+
+Next we read the ERCC information table
+
+```{r ercc_read}
+ercc <- read.table("../data/ercc-info.txt", header = TRUE, sep = "\t",
+                   stringsAsFactors = FALSE)
+colnames(ercc) <- c("num", "id", "subgroup", "conc_mix1", "conc_mix2",
+                    "expected_fc", "log2_mix1_mix2")
+head(ercc)
+
+```
+
+
+Next we filter out the single cells in the molecules data, we remove the cells in batch 2 for individual 1. Finally remove the genes that have 0 counts across all the cells. 
+
+```{r remove_cells_genes}
+
+stopifnot(nrow(ercc) == 92)
+quality_single_cells <- scan("../data/quality-single-cells.txt",
+                             what = "character")
+
+## just filtering cells that meet the QC check
+
+molecules_single <- molecules[, colnames(molecules) %in% quality_single_cells]
+anno_single <- anno[anno$sample_id %in% quality_single_cells, ]
+stopifnot(ncol(molecules_single) == nrow(anno_single),
+          colnames(molecules_single) == anno_single$sample_id)
+
+## remove indivual 1 and batch 2 samples 
+
+molecules_single <- molecules_single[, !(anno_single$individual == 19098 & anno_single$batch == 2)]
+anno_single <- anno_single[!(anno_single$individual == 19098 & anno_single$batch == 2), ]
+stopifnot(ncol(molecules_single) == nrow(anno_single))
+
+## remove zero count genes 
+
+expressed_single <- rowSums(molecules_single) > 0
+molecules_single <- molecules_single[expressed_single, ]
+dim(molecules_single)
+
+## remove genes that are overexpressed 
+
+overexpressed_genes <- rownames(molecules_single)[apply(molecules_single, 1,
+                                                        function(x) any(x >= 1024))]
+molecules_single <- molecules_single[!(rownames(molecules_single) %in% overexpressed_genes), ]
+
+molecules_single_collision <- -1024 * log(1 - molecules_single / 1024)
+
+
+```
+
+We obtain the CPM data from the counts data 
+
+```{r cpm_data}
+## calculating the cpm 
+
+molecules_single_cpm <- cpm(molecules_single_collision, log = TRUE)
+```
+
+
+Detect which rows of the matrix correspond to ERCCs and which to actual genes.
+
+```{r ercc_rows}
+ercc_rows_single <- grep("ERCC", rownames(molecules_single))
+gene_rows_single <- grep("ERCC", rownames(molecules_single), invert = TRUE)
+
+ercc <- ercc[order(ercc$id), ]
+# Also remove spike-ins with no counts
+ercc_single <- ercc[ercc$id %in% rownames(molecules_single), ]
+stopifnot(rownames(molecules_single[ercc_rows_single, ]) == ercc_single$id)
+
+```
+
+We first filter the ERCC genes so that we remove all the ERCC genes that have very high 0 expression, in fact we only sustained those genes that have non zero counts in at least $10 \%$ of the single cells. This actually removed a buncg of ERCC genes and we were finally left with only $16$ ERCC genes. 
+
+```{r density_ercc}
+ercc_rows <- rownames(molecules_single)[ercc_rows_single];
+ercc_rows_single_mod <- ercc_rows_single[ercc$id %in% rownames(molecules_single)];
+ercc_rows_single_mod <- ercc_rows_single_mod[!is.na(ercc_rows_single_mod)];
+
+molecules_single_ercc_cpm <- molecules_single_cpm[ercc_rows_single_mod,];
+molecules_single_ercc <- molecules_single[ercc_rows_single_mod,];
+
+numzeros <- apply(molecules_single_ercc,1, function(x) length(x[x==0]))
+
+molecules_single_ercc <- molecules_single_ercc[as.numeric(which(numzeros <=50)),];
+
+molecules_single_ercc_cpm <- molecules_single_ercc_cpm[as.numeric(which(numzeros <=50)),];
+
+ercc_final_lab <- ercc_rows_single_mod[as.numeric(which(numzeros <=50))];
+  
+```
+
+## ERCC log2CPM distribution
+
+We plot the signal or the log cpm values of the ERCC genes selected from above across the single cells to see how the behavioral pattern of these genes across the different single cells looks liek. It seems they are pretty uniformly varying across all the single cells. 
+
+```{r }
+individual_id <- unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[1]));
+batch_id <- unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[2]));
+
+ercc_indiv <-  lapply(1:length(unique(individual_id)),function(n) molecules_single_ercc[,which(individual_id==unique(individual_id)[n])])
+
+batch_id_indiv <- lapply(1:length(unique(individual_id)),function(n) batch_id[which(individual_id==unique(individual_id)[n])]);
+```
+
+### Batch effect
+
+```{r}
+iplotCurves(log(ercc_indiv[[1]]+0.5,base=2))
+iplotCurves(log(ercc_indiv[[2]]+0.5,base=2))
+iplotCurves(log(ercc_indiv[[3]]+0.5,base=2))
+
+#first_indiv_ercc_plot <-  melt(ercc_indiv[[1]]);
+#p <- ggplot(aes(x=value, colour=Var1), data=first_indiv_ercc_plot)
+#p + geom_density()
+
+```
+
+It seems that the ERCC expression is not determined by the batch effects. 
+
+We next obtain the cell cycle phases.
+
+## Cell cycle
+
+```{r cell_cycle}
+cell_cycle_genes <- read.table("../data/cellcyclegenes.txt", header = TRUE, sep="\t")
+
+## create 5 lists of 5 phases (de-level and then remove "")
+cell_cycle_genes_list <- lapply(1:5,function(x){
+  temp <- as.character(cell_cycle_genes[,x])
+  temp[temp!=""]
+})
+
+ans <-
+sapply(cell_cycle_genes_list,function(xx){
+  #### create table of each phase
+  molecules_single_phase <- molecules_single[rownames(molecules_single) %in% unlist(xx) ,]
+  #### add average expression of all genes in the phase
+  combined_matrix <- rbind(molecules_single_phase,average=apply(molecules_single_phase,2,mean))
+  #### use transpose to compute cor matrix
+  cor_matrix <- cor(t(combined_matrix))
+  #### take the numbers
+  cor_vector <- cor_matrix[,dim(cor_matrix)[1]]
+  #### restrict to correlation >= 0.3 
+  molecules_single_phase_restricted <- molecules_single_phase[rownames(molecules_single_phase) %in% names(cor_vector[cor_vector >= 0.3]),]
+  #### apply normalization to reads
+  norm_factors_single <- calcNormFactors(molecules_single_phase_restricted, method = "TMM")
+  molecules_single_cpm <- cpm(molecules_single_phase_restricted, log = TRUE,
+                            lib.size = colSums(molecules_single) * norm_factors_single)
+  #### output the phase specific scores (mean of normalized expression levels in the phase)
+  apply(molecules_single_cpm,2,mean)
+
+})
+
+#head(ans)
+
+#### normalization function
+flexible_normalization <- function(data_in,by_row=TRUE){
+  if(by_row){
+    row_mean <- apply(data_in,1,mean)
+    row_sd   <- apply(data_in,1,sd)
+    output <- data_in
+    for(i in 1:dim(data_in)[1]){
+      output[i,] <- (data_in[i,] - row_mean[i])/row_sd[i]
+    }
+  }
+  #### if by column
+  if(!by_row){
+    col_mean <- apply(data_in,2,mean)
+    col_sd   <- apply(data_in,2,sd)
+    output <- data_in
+    for(i in 1:dim(data_in)[2]){
+      output[,i] <- (data_in[,i] - col_mean[i])/col_sd[i]
+    }
+  }
+  output
+}
+
+#### apply the normalization function
+## first normalized for each phase
+ans_normed <- flexible_normalization(ans,by_row=FALSE)
+## then normalized of each cell
+ans_normed_normed <- flexible_normalization(ans_normed,by_row=TRUE)
+
+#head(ans_normed_normed)
+
+cell_phase_mat <- apply(ans_normed_normed,1,function(x) colnames(cell_cycle_genes)[which.max(x)])
+cell_phase <- as.vector(as.matrix(data.frame(cell_phase_mat)))
+cell_phase <- factor(cell_phase, 
+                            levels = c("G1.S", "S", "G2.M", "M", "M.G1"))
+```
+
+
+## RUV normalization
+
+First we do PC plots before RUV normalization and we check whether the batch effects show up or not in the ERCC genes. Ideally it should not show up.
+
+### PC plots of ERCC genes before RUV
+
+```{r PC_ERCC}
+
+#molecules_single_ercc_cpm <- molecules_single_cpm[ercc_rows_single_mod,];
+individual_id_full = unlist(lapply(strsplit(colnames(molecules_single_ercc_cpm), "\\."), function(x) x[1]));
+
+ercc_indiv_cpm <-  lapply(1:length(unique(individual_id_full)),function(n) molecules_single_ercc_cpm[,which(individual_id_full==unique(individual_id_full)[n])])
+
+metadata_ercc <- lapply(1:3, function(n) 
+                             {
+                                anno_indiv <- colnames(ercc_indiv_cpm[[n]]);
+                                indiv_id = unlist(lapply(strsplit(colnames(ercc_indiv_cpm[[n]]), "\\."), function(x) x[1]));
+                                batch_id = unlist(lapply(strsplit(colnames(ercc_indiv_cpm[[n]]), "\\."), function(x) x[2]));
+                                well_id = unlist(lapply(strsplit(colnames(ercc_indiv_cpm[[n]]), "\\."), function(x) x[3]));
+                                cell_phase_indiv =cell_phase[match(colnames(ercc_indiv_cpm[[n]]),colnames(molecules_single_cpm))];
+                                out <- as.data.frame(cbind(indiv_id,batch_id,well_id,cell_phase_indiv,anno_indiv));
+                                return(out)
+                              });
+
+
+
+pca_single_raw <- run_pca(ercc_indiv_cpm[[1]])
+plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=5,
+         xaxs=TRUE,metadata = metadata_ercc[[1]], color ="cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))
+
+pca_single_raw <- run_pca(ercc_indiv_cpm[[2]])
+plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=5,
+         xaxs=TRUE,metadata = metadata_ercc[[2]], color ="cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))
+
+pca_single_raw <- run_pca(ercc_indiv_cpm[[3]])
+plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=5,
+         xaxs=TRUE, metadata = metadata_ercc[[3]], color="cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))
+
+```
+
+Now we consider the PC plots of the non ERCC genes before RUV normalization. This should show batch effects if the batch effects indeed exist.
+
+### PC plots of non-ERCC genes before RUV
+
+```{r PC_non_ERCC}
+
+molecules_single_genes_cpm <- molecules_single_cpm[-ercc_rows_single,];
+individual_id_full = unlist(lapply(strsplit(colnames(molecules_single_genes_cpm), "\\."), function(x) x[1]));
+
+genes_indiv_cpm <-  lapply(1:length(unique(individual_id_full)),function(n) molecules_single_genes_cpm[,which(individual_id_full==unique(individual_id_full)[n])])
+
+metadata_genes <- lapply(1:3, function(n)
+                              {
+                                  anno_indiv <- colnames(genes_indiv_cpm[[n]]);
+                                  indiv_id =unlist(lapply(strsplit(colnames(genes_indiv_cpm[[n]]), "\\."), 
+                                                          function(x) x[1]));
+                                  batch_id = unlist(lapply(strsplit(colnames(genes_indiv_cpm[[n]]), "\\."), 
+                                                           function(x) x[2]));
+                                  well_id = unlist(lapply(strsplit(colnames(genes_indiv_cpm[[n]]), "\\."), 
+                                                          function(x) x[3]));
+                                  cell_phase_indiv =cell_phase[match(colnames(genes_indiv_cpm[[n]]),
+                                                                     colnames(molecules_single_cpm))];
+                                  out <- as.data.frame(cbind(indiv_id,batch_id,well_id,
+                                                                  cell_phase_indiv,anno_indiv));
+                                  return(out)
+                                });
+
+
+pca_single_raw <- run_pca(genes_indiv_cpm[[1]])
+plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=10,
+         xaxs=TRUE,metadata = metadata_genes[[1]], color="cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))
+
+pca_single_raw <- run_pca(genes_indiv_cpm[[2]])
+plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=10,
+         xaxs=TRUE,metadata = metadata_genes[[2]], color="cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))
+
+pca_single_raw <- run_pca(genes_indiv_cpm[[3]])
+plot_pca(pca_single_raw$PCs, explained = pca_single_raw$explained,scale=10,
+         xaxs=TRUE,metadata = metadata_genes[[3]], color="cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))
+
+```
+
+
+As you can check from the above figures, the batch effects for the non ERCCC genes are clearly visible.
+
+Now we consider the ERCC genes after RUV with k=1. Since the ERCC genes without RUV showed no batch effect after filtration, it does not seem likely the next plots would be any different.
+
+## ERCC genes RUV -k=1
+
+```{r RUV_norm_ERCC}
+
+#molecules_single_ercc <- molecules_single[ercc_rows_single,];
+individual_id_full = unlist(lapply(strsplit(colnames(molecules_single_ercc), "\\."), function(x) x[1]));
+
+ercc_indiv <-  lapply(1:length(unique(individual_id_full)),function(n) molecules_single_ercc[,which(individual_id_full==unique(individual_id_full)[n])])
+single_ruv_object_k1 <- RUVg(x = as.matrix(ercc_indiv[[1]]),  k = 1)
+single_ruv_k1 <- single_ruv_object_k1$normalizedCounts
+single_ruv_cpm_k1 <- cpm(single_ruv_k1, log = TRUE,
+                      lib.size = calcNormFactors(single_ruv_k1) * colSums(single_ruv_k1))
+
+pca_single_ruv_k1 <- run_pca(single_ruv_cpm_k1)
+suppressMessages(suppressWarnings(plot_pca(pca_single_ruv_k1$PCs, explained = pca_single_ruv_k1$explained,xaxs=TRUE,scale=10,
+         metadata = metadata_ercc[[1]], color = "cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))))
+
+single_ruv_object_k1 <- RUVg(x = as.matrix(ercc_indiv[[2]]),  k = 1)
+single_ruv_k1 <- single_ruv_object_k1$normalizedCounts
+single_ruv_cpm_k1 <- cpm(single_ruv_k1, log = TRUE,
+                      lib.size = calcNormFactors(single_ruv_k1) * colSums(single_ruv_k1))
+
+pca_single_ruv_k1 <- run_pca(single_ruv_cpm_k1)
+suppressMessages(suppressWarnings(plot_pca(pca_single_ruv_k1$PCs, explained = pca_single_ruv_k1$explained,xaxs=TRUE,scale=10,
+         metadata = metadata_ercc[[2]], color = "cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))))
+
+single_ruv_object_k1 <- RUVg(x = as.matrix(ercc_indiv[[3]]),  k = 1)
+single_ruv_k1 <- single_ruv_object_k1$normalizedCounts
+single_ruv_cpm_k1 <- cpm(single_ruv_k1, log = TRUE,
+                      lib.size = calcNormFactors(single_ruv_k1) * colSums(single_ruv_k1))
+
+pca_single_ruv_k1 <- run_pca(single_ruv_cpm_k1)
+suppressMessages(suppressWarnings(plot_pca(pca_single_ruv_k1$PCs, explained = pca_single_ruv_k1$explained,xaxs=TRUE,scale=10,
+         metadata = metadata_ercc[[3]], color = "cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))))
+
+```
+
+Finally we perform RUV on the non ERCC genes using ERCC as controls. The ERCC genes should take care of the batch effects and that the non ERCC genes after RUV normalization should not show batch effects. But it seems, though the batch effects are not as strong as the ones without RUV, still the batch effects are kind of retained.
+
+## RUVg on non-ERCC genes using ERCC as controls
+
+```{r non-ercc_ruv}
+individual_id_full = unlist(lapply(strsplit(colnames(molecules_single), "\\."), function(x) x[1]));
+
+molecules_single_indiv <- lapply(1:length(unique(individual_id_full)),function(n) molecules_single[,which(individual_id_full==unique(individual_id_full)[n])])
+
+single_ruv_object_k1 <- RUVg(x = as.matrix(molecules_single_indiv[[1]]), cIdx = ercc_rows_single_mod[which(numzeros<=50)], k = 1)
+single_ruv_k1 <- single_ruv_object_k1$normalizedCounts
+single_ruv_cpm_k1 <- cpm(single_ruv_k1, log = TRUE,
+                      lib.size = calcNormFactors(single_ruv_k1) * colSums(single_ruv_k1))
+
+pca_single_ruv_k1 <- run_pca(single_ruv_cpm_k1)
+suppressMessages(suppressWarnings(plot_pca(pca_single_ruv_k1$PCs, explained = pca_single_ruv_k1$explained, xaxs=FALSE,
+         metadata = metadata_genes[[1]], color = "cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))))
+
+
+single_ruv_object_k1 <- RUVg(x = as.matrix(molecules_single_indiv[[2]]), cIdx = ercc_rows_single_mod[which(numzeros<=50)], k = 1)
+single_ruv_k1 <- single_ruv_object_k1$normalizedCounts
+single_ruv_cpm_k1 <- cpm(single_ruv_k1, log = TRUE,
+                      lib.size = calcNormFactors(single_ruv_k1) * colSums(single_ruv_k1))
+
+pca_single_ruv_k1 <- run_pca(single_ruv_cpm_k1)
+suppressMessages(suppressWarnings(plot_pca(pca_single_ruv_k1$PCs, explained = pca_single_ruv_k1$explained, xaxs=FALSE,
+         metadata = metadata_genes[[2]], color = "cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))))
+
+single_ruv_object_k1 <- RUVg(x = as.matrix(molecules_single_indiv[[3]]), cIdx = ercc_rows_single_mod[which(numzeros<=50)], k = 1)
+single_ruv_k1 <- single_ruv_object_k1$normalizedCounts
+single_ruv_cpm_k1 <- cpm(single_ruv_k1, log = TRUE,
+                      lib.size = calcNormFactors(single_ruv_k1) * colSums(single_ruv_k1))
+
+pca_single_ruv_k1 <- run_pca(single_ruv_cpm_k1)
+suppressMessages(suppressWarnings(plot_pca(pca_single_ruv_k1$PCs, explained = pca_single_ruv_k1$explained, xaxs=FALSE,
+         metadata = metadata_genes[[3]], color = "cell_phase_indiv",
+         shape = "batch_id", factors = c("cell_phase_indiv", "batch_id"))))
+
+
+```
+

@@ -1,0 +1,193 @@
+---
+title: "Oscope data: cell ordering"
+author: "Kushal K Dey"
+date: "November 4, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(qtlcharts)
+library(CountClust)
+library(parallel)
+library(cellcycleR)
+library(data.table)
+library(binhf)
+library(vioplot)
+```
+
+## Background
+
+In this script, we apply the cell phasing and ordering approach on the Oscope data, by [Leng et al 2015](http://www.nature.com/nmeth/journal/v12/n10/full/nmeth.3549.html). In this paper, the authors tried to order an unsynchronized cell population by filtering out the genes with sinusoidal gene expression patterns and having similar phase structure to learn about the cell order. The data is downloaded from GEO Omnibus (GSE64016). The authors grouped the genes with just a phase shift and then they obtained a order for each of these gene groups. 
+
+## Data Exploration
+
+We first explore the data.  
+
+```{r echo=TRUE, eval=TRUE}
+setwd("/Users/kushal/Documents/singleCell-method/project/analysis/")
+data <- read.csv("../data/Oscope data/GSE64016_H1andFUCCI_normalized_EC.csv")
+gene_names <- data[,1];
+data <- data[,-1];
+
+## The gene IDs provided, not Ensembl IDs
+gene_names[1:10]
+
+## The cell labels
+cell_phases <- sapply(colnames(data), function(x) strsplit(x,"_")[[1]][1]);
+
+table(cell_phases)
+
+```
+
+Some of the cells are  labeled H1, these are H1 hESc (Human embryonic stem cells) culture, the cell phases for these cells was not known. The other phases G1, S and G2 correspond to the H1 FUCCI hESc cell line (Fluorescent  ubiquitination-based cell-cycle indicator (FUCCI) H1 hESCs ). The  H1-FUCCI cell line provides a two-color fluorescence labeling system allowing single-cell suspensions from G1, S or G2/M cell-cycle phases to be isolated by FACS. 
+
+Initially we separate the cells marked by H1 out, and the purpose would be more to classify them or order them based on the ordering we obtain from the fluorescence marked G1, G2 and S cells. 
+
+```{r echo=TRUE, eval=TRUE}
+cell_data <- as.matrix(data[-1,which(cell_phases != "H1")]);
+cycle_data <- t(cell_data);
+cell_phases <- cell_phases[which(cell_phases != "H1")];
+dim(cycle_data)
+```
+
+We normalize the data (mean adjusted and scaled) and remove the genes that have 0 normalized 
+value across all cells.
+
+```{r cellcycler_apply, echo=TRUE, eval=TRUE}
+cycle_data_norm <- apply(cycle_data,2,function(x)  return (x-mean(x))/sd(x))
+celltime_levels <- 100;
+cycle_data_norm <- cycle_data_norm[, -which(colSums(cycle_data_norm)==0)]
+
+dim(cycle_data_norm)
+```
+
+## cellcycleR application
+
+Next, we run the cell ordering mechanism.
+
+```{r echo=TRUE, eval=FALSE}
+out <- cell_ordering_class(cycle_data_norm, celltime_levels = 100, num_iter=50,
+                           save_path="../rdas/Botstein_cell_cycle.rdata")
+```
+
+We ran the method above once already (took around 30 minutes) and now we just load the output.
+
+```{r echo=TRUE, eval=TRUE}
+out <- get(load(file="../rdas/Botstein_cell_cycle.rdata"));
+cell_order_full <- cell_ordering_full(out$signal_intensity, dim(cycle_data_norm)[2])
+```
+
+We look at the plots of the amplitudes, phases and the non signal variation of the genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out$amp;
+sd_genes <- out$sigma;
+phi_genes <- out$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+```
+
+We extract the genes with high SNR - these are more likely to be sinusoidal.
+
+```{r echo=TRUE, eval=TRUE}
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 3);
+
+```
+
+Next we plot the qtlcharts for these top sinusoidal genes and see if their patterns are indeed
+sinusoidal or not.
+
+```{r echo=TRUE, eval=TRUE}
+iplotCurves(t(cycle_data_norm[order(cell_order_full),top_genes]))
+```
+
+We also provide the violin plot of the cell orders estimated against the labels for G1, S and G2 obtained from the experimenters using FUCCI. There are 91, 80 and 76 cells from G1, S and G2. So, we perform qtlcharts keeping the relative order of the sample and see how the patterns look like (since numbers almost same, you can view it as uniformly split).
+
+```{r echo=TRUE,eval=TRUE}
+vioplot(cell_order_full[which(cell_phases=="G1")],
+        cell_order_full[which(cell_phases=="S")],
+        cell_order_full[which(cell_phases=="G2")],
+        names=c("G1","S","G2"),
+        col="red")
+
+iplotCurves(t(cycle_data_norm[c(which(cell_phases=="G1"),which(cell_phases=="S"), which(cell_phases=="G2")),top_genes]))
+
+```
+
+## Observations
+
+We do observe that the cell ordering lead to more sinusoidal looking expression patterns for the high SNR genes. But it must be kept in mind that it may be that the cell ordering mechanism is probably forcing these genes to have high SNR by arranging the cell orders. I am not sure how much to rely on this method.
+
+## Redo on high SNR genes
+
+We extract the high SNR genes as they seem to have sinusoidal patterns and repeat the procedure again. The aim here is to see how much robust the analysis is to the selction of the (most) sinusoidal genes.
+
+```{r echo=TRUE, eval=TRUE}
+
+snr_high_indices <- which(SNR > 1);
+
+cycle_data_norm_sinusoidal <- cycle_data_norm[,snr_high_indices];
+
+dim(cycle_data_norm_sinusoidal)
+```
+
+We apply the cell ordering mechanism (it takes around 5 minutes to run)
+
+```{r echo=TRUE, eval=FALSE}
+out2 <- cell_ordering_class(cycle_data_norm_sinusoidal, celltime_levels = 100, num_iter=100,
+                            save_path="../rdas/Botstein_cell_cycle_sinusoidal.rdata")
+```
+
+We reload the output 
+
+```{r echo=TRUE, eval=TRUE}
+out2 <- get(load(file="../rdas/Botstein_cell_cycle_sinusoidal.rdata"));
+cell_order_full <- cell_ordering_full(out2$signal_intensity, dim(cycle_data_norm_sinusoidal)[2])
+```
+
+We plot the same features as above and check for the robustness. We needed to shift the cell order so as to compare with previous plot on all genes as the method is non-identifiable upto a rotation. 
+
+```{r echo=TRUE, eval=TRUE}
+
+amp_genes <- out2$amp;
+sd_genes <- out2$sigma;
+phi_genes <- out2$phi;
+
+plot(density(phi_genes), col="red", main="Density plot of the phases")
+plot(density(amp_genes[-which.max(amp_genes)]), col="red", main="Density plot of the amplitudes")
+plot(density(sd_genes[-which.max(sd_genes)]), col="red", main="Density plot of the non-signal sd")
+
+ESS <- amp_genes^2; RSS <- sd_genes^2
+
+SNR <- ESS/RSS;
+
+plot(SNR, col="red", pch=20, lwd=1)
+top_genes <- which(SNR > 0.5);
+new_cell_order <- shift(order(cell_order_full),130,dir="right")
+iplotCurves(t(cycle_data_norm_sinusoidal[new_cell_order,top_genes]))
+
+```
+
+## Final Thoughts
+
+Going by the qtlcharts plot, it does seem our method is extracting a nice cell order that seems to match up with the sinusoidal gene expression patterns for many of the genes. Also the method seems fairly robust to whether we apply it on all the genes (in which case I believe the ones which are non sinusoidal are no longer influential) and on sinusoidal genes (high SNR). The main concern here seems to be the fact that it is not matching up very well with the FUCCI labels (G1, S, G2). We would have liked to see a more clearer separation of the three phases, which we are not getting. Also the method clubs the peaks to form a more continuous pattern, but what if they are just outliers or noise? I kind of feel the method may be over representing the signal.
+
+```{r echo=TRUE, eval=TRUE}
+
+sessionInfo()
+```
+
+
+
+

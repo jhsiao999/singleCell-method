@@ -1,0 +1,105 @@
+---
+title: 'Nonparametric cellcycleR: is it effective?'
+author: "Kushal K Dey"
+date: "January 18, 2016"
+output: 
+  html_document:
+    toc: true
+---
+
+## Background
+
+The idea of using nonparametric cellcycleR is to help recover the correct time order when the gene expression patterns follow some smooth patterns that cannot be modeled as sinusoidal function (so that the parameteric version of cellcycleR fails). In this script, we will consider a toy example on which we apply parametric cellcycleR and then test smoothness fit of nonparameteric cellcycleR on the data. 
+
+## Example simulation
+
+```{r echo=TRUE, eval=TRUE}
+library(cellcycleR)
+library(wavethresh)
+
+G <- 100;
+num_cells <- 256;
+phi_genes <- seq(1, pi, length.out=G);
+sigma_genes <- rchisq(G, 1);
+cell_times_sim <- seq(0,2*pi, length.out=num_cells);
+cycle_data <- matrix(0,num_cells,G)
+for(s in 1:num_cells){
+cycle_data[s,] <- 10*cell_times_sim[s] + 30*sin(2*cell_times_sim[s] + phi_genes) + rnorm(G,0,sigma_genes);
+}
+```
+
+We can check the patterns of a couple of genes we consider.
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data[,1], type="l")
+plot(cycle_data[,60], type="l")
+plot(cycle_data[,30], type="l")
+```
+
+## A cell re-ordering of the data
+
+```{r echo=TRUE, eval=TRUE}
+sample_reorder <- sample(1:num_cells,num_cells, replace=FALSE);
+cell_times_reorder <- cell_times_sim[sample_reorder];
+cycle_data_reorder <- cycle_data[sample_reorder,];
+
+plot(cycle_data_reorder[,1], type="l")
+plot(cycle_data_reorder[,60], type="l")
+plot(cycle_data_reorder[,30], type="l")
+
+```
+
+## Sinusoidal cellcycleR 
+
+```{r echo=TRUE, eval=TRUE}
+system.time(out <- sin_cell_ordering_class(cycle_data_reorder, celltime_levels = 128, num_iter=300))
+```
+
+We check how the patterns look like for the genes considered above under the re-ordered cell times.
+
+```{r echo=TRUE, eval=TRUE}
+plot(cycle_data_reorder[order(out$cell_times),1], type="l");
+plot(cycle_data_reorder[order(out$cell_times),60], type="l");
+plot(cycle_data_reorder[order(out$cell_times),30], type="l");
+```
+
+## Nonparameteric smoother fit on re-ordered data from sinusoidal cellcycleR
+
+We now fit nonparameteric model fit to these patterns we recover and compare that with nonparameteric model fit on the true data. We have chosen the Wavelet method for the comparison.
+
+```{r echo=TRUE, eval=TRUE}
+system.time(smash_disp_est <- mean(sapply(1:G, function(g)
+                               {
+                                  mu.est.true <- smooth.spline(sort(out$cell_times), cycle_data_reorder[order(out$cell_times),g]);
+                                  tab_cell_times <- as.numeric(table(out$cell_times));
+                                  mu.est.y <- rep(mu.est.true$y, tab_cell_times);
+                                  disp <- mean((cycle_data_reorder[order(out$cell_times),g] - mu.est.y)^2)
+                                  return(disp)
+                               })))
+
+print(smash_disp_est)
+
+```
+
+## Nonparameteric smoother fit on true data ordering 
+
+Now we perform the same analysis on the true data with the true order.
+
+```{r echo=TRUE, eval=TRUE}
+system.time(smash_disp_true <- mean(sapply(1:G, function(g)
+                               {
+                                  mu.est.true <- smooth.spline(cell_times_sim, cycle_data[,g])
+                                  out <- mean((cycle_data[,g] - mu.est.true$y)^2)
+                                  return(out)
+                               })))
+
+print(smash_disp_true)
+
+```
+
+## Discussion
+
+Note that the average squared distance between data and the fitted curve is way higher for the re-ordered data obtain from sinusoidal or parameteric cellcycleR, thereby ensuring the fact that nonparameteric fit may indeed be useful for performing the re-ordering and may do better than parameteric or sinusoidal cellcycleR.
+
+
+

@@ -1,0 +1,289 @@
+---
+title: "classtpx on Deng mouse embryo genes using Blakeley human embryo genes"
+author: "Kushal K Dey"
+date: "March 23, 2016"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+## Introduction
+
+We apply the `classtpx` package for topic model classfication on the [Deng et al 2014](http://www.ncbi.nlm.nih.gov/pubmed/24408435) data using the lineages in [Blakeley et al 2015](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4582176/) human embryo data. The data for Deng et al 2014 and Blakeley et al 2015 are saved as ExpressionSet objects at  [link1](https://github.com/kkdey/singleCellRNASeqMouseDeng2014) and [link2](https://github.com/kkdey/singleCellRNASeqHumanBlakeleyEmbryo). We first load the Blakeley 2015 data.
+
+## Prepare Blakeley 2015 data
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+# devtools::install_github("kkdey/singleCellRNASeqHumanBlakeleyEmbryo", force=TRUE)
+library("singleCellRNASeqHumanBlakeleyEmbryo")
+data("HumanBlakeleyEmbryo")
+blakeley_ensembl_ids <- Biobase::featureNames(HumanBlakeleyEmbryo)
+```
+
+## Ortholog gene extraction 
+
+We extract mouse ortholog genes given the human genes from Blakeley 2015 human embryo data.
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+library(biomaRt)
+human = useMart("ensembl", dataset = "hsapiens_gene_ensembl");
+attributes = c("ensembl_gene_id","mmusculus_homolog_ensembl_gene","mmusculus_homolog_perc_id_r1")
+attributes=c(attributes,"mmusculus_homolog_orthology_type",
+"mmusculus_homolog_subtype", "mmusculus_homolog_perc_id")
+orth.mouse = getBM(attributes,
+filters="with_homolog_mmus",values=TRUE, mart = human,
+uniqueRows=TRUE)
+
+```
+
+Match the gene names observed here with the list from BioMart.
+
+```{r echo=TRUE, eval=TRUE}
+human_orthologs <- blakeley_ensembl_ids[match(orth.mouse[,1], blakeley_ensembl_ids)];
+human_orthologs <- human_orthologs[!is.na(human_orthologs)];
+
+orth.mouse.filtered <- orth.mouse[match(human_orthologs,orth.mouse[,1]),2];
+
+```
+
+```{r warning=FALSE, message=FALSE}
+
+mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+mySymbols <- orth.mouse.filtered; # mySymbols is a vector of MGI symbols.
+gene_list_mouse <- getBM( attributes=c("ensembl_gene_id", "mgi_symbol") , filters=
+"ensembl_gene_id"    , values =mySymbols ,mart=mouse)
+
+blakeley_gene_names <- gene_list_mouse$mgi_symbol;
+
+```
+
+## Deng et al 2014 Preparation
+
+```{r}
+# devtools::install_github("kkdey/singleCellRNASeqMouseDeng2014", force=TRUE)
+library(singleCellRNASeqMouseDeng2014)
+deng_genes <- featureNames(Deng2014MouseESC);
+
+filter_indices <- match(blakeley_gene_names, deng_genes);
+filter_indices <- filter_indices[!is.na(filter_indices)];
+
+deng_gene_names_filtered <- deng_genes[filter_indices];
+```
+
+## Filter ortholog genes for Blakeley and Deng data
+
+Filter the expression data of Deng 
+
+```{r}
+deng_reads <- Biobase::exprs(Deng2014MouseESC);
+deng_pheno <- Biobase::pData(Deng2014MouseESC)[,1];
+deng_pheno <- deng_pheno[grep("blast",deng_pheno)];
+deng_reads_filtered <- deng_reads[match(deng_gene_names_filtered, deng_genes),grep("blast",deng_pheno)];
+```
+
+Filter the expression for Blakeley data 
+
+```{r}
+blakeley_reads <- Biobase::exprs(HumanBlakeleyEmbryo);
+blakeley_reads_filtered <- blakeley_reads[match(deng_gene_names_filtered,blakeley_gene_names),];
+
+pheno_metadata <- pData(HumanBlakeleyEmbryo);
+table(pheno_metadata[,1])
+
+```
+
+Pooling the data from Blakeley data and the Deng data
+
+```{r }
+pooled_data <- t(cbind(blakeley_reads_filtered, deng_reads_filtered));
+```
+
+## classtpx application
+
+```{r}
+TE_indices <- which(pheno_metadata[,1]=="TE");
+PE_indices <- which(pheno_metadata[,1]=="PE");
+EPI_indices <- which(pheno_metadata[,1]=="EPI");
+
+known_samples <- c(TE_indices, PE_indices, EPI_indices);
+class_labs <- c(rep(1,length(TE_indices)), rep(2,length(PE_indices)), rep(3,length(EPI_indices)));
+
+```
+
+### omega.fix method K=3
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=3, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/deng_topic_fit_3_classtpx_omega_fix_blakeley.rda")
+
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/deng_topic_fit_3_classtpx_omega_fix_blakeley.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(c(as.character(pheno_metadata[,1]), as.character(deng_pheno)),
+                        levels = rev( c("TE", "PE", "EPI",
+                                        "earlyblast","midblast",
+                                         "lateblast") ) )
+)
+
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### theta.prior method K=3
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=3, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.prior",
+    tol=0.1,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/deng_topic_fit_3_classtpx_theta_prior_blakeley.rda")
+
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/deng_topic_fit_3_classtpx_theta_prior_blakeley.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(c(as.character(pheno_metadata[,1]), as.character(deng_pheno)),
+                        levels = rev( c("TE", "PE", "EPI",
+                                        "earlyblast","midblast",
+                                         "lateblast") ) )
+)
+
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### theta.fix method K=3
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    pooled_data, 
+    K=3, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    tol=0.1,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/deng_topic_fit_3_classtpx_theta_fix_blakeley.rda")
+
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/deng_topic_fit_3_classtpx_theta_fix_blakeley.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(c(as.character(pheno_metadata[,1]), as.character(deng_pheno)),
+                        levels = rev( c("TE", "PE", "EPI",
+                                        "earlyblast","midblast",
+                                         "lateblast") ) )
+)
+
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+## maptpx
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- maptpx::topics(
+    pooled_data, 
+    K=3, 
+    tol=0.1
+    )
+
+save(Topic_clus, file="../rdas/deng_topic_fit_3_maptpx_blakeley.rda")
+
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/deng_topic_fit_3_maptpx_blakeley.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(c(as.character(pheno_metadata[,1]), as.character(deng_pheno)),
+                        levels = rev( c("TE", "PE", "EPI",
+                                        "earlyblast","midblast",
+                                         "lateblast") ) )
+)
+
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
