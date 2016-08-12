@@ -1,0 +1,168 @@
+---
+title: 'Variable selection in classtpx: (with ash)'
+author: "Kushal K Dey"
+date: "March 17, 2016"
+output: html_document
+---
+
+## Overview
+
+It has been found that the performance of `classtpx` even for simulated data 
+depends on the feature set chosen. Usually in general bulk-RNA or single cell 
+RNA-seq data, there are many genes which do not change across cell types or 
+the biological groups of interest. Including them is essentially equivalent to 
+adding noisy features to the data. More importantly, these noisy features often
+lead to wrong classification. 
+
+```{r echo=TRUE, eval=TRUE}
+n.out <- 200
+omega_sim <- rbind( cbind( rep(1, n.out), rep(0, n.out)), 
+                    cbind( rep(0, n.out), rep(1, n.out)),
+                    cbind( seq(0.6, 0.4, length.out = n.out), 
+                           1- seq(0.6, 0.4,length.out=n.out)) )
+dim(omega_sim)
+
+freq <- rbind( c(0.1, 0.2, rep(0.70/98, 98)),
+               c(rep(0.70/98,49), 0.1, rep(0.70/98,49), 0.2) )
+str(freq)
+
+counts <- t( do.call(cbind,
+                     lapply(1:dim(omega_sim)[1], 
+                            function(x) 
+                                rmultinom(1,1000,prob=omega_sim[x,]%*%freq))))
+dim(counts)
+```
+
+Extracting the data already known to be in classes.
+
+```{r echo=TRUE, eval=TRUE}
+counts_class <- counts[1:(2*n.out),];
+class_labs <- c(rep(1,n.out), rep(2, n.out));
+```
+
+We compute the F-statistic scores for all the genes.
+
+```{r echo=TRUE, eval=TRUE}
+mean_features <- apply(counts_class, 2, mean);
+FeatureSummary_class <- parallel::mclapply(1:dim(counts_class)[2], 
+        function(l) {
+                sd_element <- tapply(counts_class[,l], class_labs, sd);
+                mean_element <- tapply(counts_class[,l], class_labs, mean);
+                beta_element <- mean_element - mean_features[l];
+                n.element <- as.numeric(table(class_labs));
+                sebeta_element <- sd_element/sqrt(n.element);
+                ll <- list("mean_element"=mean_element, "sd_element"=sd_element,                                                   "beta_element"=beta_element, "sebeta_element"=sebeta_element);
+                return(ll)
+                })
+
+mean_class <- do.call(rbind, lapply(1:dim(counts_class)[2], function(l)
+                          {
+                            return(FeatureSummary_class[[l]]$mean_element)
+}))
+
+sebeta_class <- do.call(rbind, lapply(1:dim(counts_class)[2], function(l)
+                          {
+                            return(FeatureSummary_class[[l]]$sebeta_element)
+}))
+
+beta_class <- do.call(rbind, lapply(1:dim(counts_class)[2], function(l)
+                          {
+                            return(FeatureSummary_class[[l]]$beta_element)
+}))
+
+ash_beta_class <- do.call(cbind, lapply(1:length(unique(class_labs)), function(l) return(suppressWarnings(ashr::ash(beta_class[,l], sebeta_class[,l], mixcompdist="normal")$PosteriorMean))));
+
+
+ash_mean_class <- ash_beta_class + mean_features;
+ash_theta_class <- normalize(ash_mean_class, byrow=FALSE)
+barplot(ash_theta_class[,1])
+barplot(ash_theta_class[,2])
+
+theta_class <- normalize(mean_class, byrow=FALSE)
+barplot(theta_class[,1])
+barplot(theta_class[,2])
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+classTopics <- class_topics(counts, K=2, 
+                                theta_known = ash_theta_class, 
+                                    tol=0.1);
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+docweights <- classTopics$omega
+
+library(permute)
+library(BioPhysConnectoR)
+
+# Decide on the correspondance of the simulated
+# and of the estimated relative expression matrix
+# 
+# We consider all possible cluster ordering in the 
+# estimated relative expression matrix and select
+# the relative expression matrix with the nearest
+# distance to the simulate relative experssion matrix
+# (forbieus norm)
+
+perm_set <- rbind(1:K,allPerms(1:K))
+diff <- array(0,dim(perm_set)[1]) 
+for (p in 1:dim(perm_set)[1])
+{
+    temp <- docweights[, perm_set[p,]]
+    diff[p] <- fnorm(temp,omega_sim)
+}
+
+p_star <- which(diff==min(diff))
+docweights <- docweights[,perm_set[p_star,]]
+
+barplot(t(docweights),
+        col = 2:(K+1),
+        axisnames = F, space = 0, border = NA, 
+        main=paste("No. of clusters=", K),
+        las=1, ylim=c(0,1), cex.axis=1.5, cex.main=1.4)
+
+```
+
+
+```{r echo=TRUE, eval=TRUE}
+classTopics2 <- class_topics(counts, K=2, 
+                                theta_known = theta_class, 
+                                    tol=0.1);
+
+```
+
+```{r echo=TRUE, eval=TRUE}
+docweights <- classTopics2$omega
+
+library(permute)
+library(BioPhysConnectoR)
+
+# Decide on the correspondance of the simulated
+# and of the estimated relative expression matrix
+# 
+# We consider all possible cluster ordering in the 
+# estimated relative expression matrix and select
+# the relative expression matrix with the nearest
+# distance to the simulate relative experssion matrix
+# (forbieus norm)
+
+perm_set <- rbind(1:K,allPerms(1:K))
+diff <- array(0,dim(perm_set)[1]) 
+for (p in 1:dim(perm_set)[1])
+{
+    temp <- docweights[, perm_set[p,]]
+    diff[p] <- fnorm(temp,omega_sim)
+}
+
+p_star <- which(diff==min(diff))
+docweights <- docweights[,perm_set[p_star,]]
+
+barplot(t(docweights),
+        col = 2:(K+1),
+        axisnames = F, space = 0, border = NA, 
+        main=paste("No. of clusters=", K),
+        las=1, ylim=c(0,1), cex.axis=1.5, cex.main=1.4)
+
+```

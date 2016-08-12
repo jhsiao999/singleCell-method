@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Home</title>
+
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<style type="text/css">
+
+/* padding for bootstrap navbar */
+body {
+  padding-top: 50px;
+  padding-bottom: 40px;
+}
+
+
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h2 {
+  padding-top: 55px;
+  margin-top: -55px;
+}
+.section h3 {
+  padding-top: 55px;
+  margin-top: -55px;
+}
+
+
+
+/* don't use link color in navbar */
+.dropdown-menu>li>a {
+  color: black;
+}
+
+/* some padding for disqus */
+#disqus_thread {
+  margin-top: 45px;
+}
+
+</style>
+
+<link rel="stylesheet" href="libs/font-awesome-4.1.0/css/font-awesome.min.css"/>
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="libs/highlight/textmate.css"
+      type="text/css" />
+<script src="libs/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="libs/navigation-1.0/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">singleCell-method</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="license.html">License</a></li>
+        <li><a href="https://github.com/jhsiao999/singleCell-method">GitHub</a></li>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Home</h1>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#admixture-clustering">Admixture clustering</a></li>
+<li><a href="#cellcycler-cell-cycle-phase-modeling">cellcycleR: Cell-cycle phase modeling</a></li>
+<li><a href="#classtpx-semi-supervised-classification">classtpx: Semi-supervised classification</a></li>
+</ul>
+</div>
+
+<p><strong>Last updated:</strong> 2016-08-12</p>
+<p><strong>Code version:</strong> ef6e859b9d92c1950a3ca3059e2d24529c441c7b</p>
+<div id="admixture-clustering" class="section level2">
+<h2>Admixture clustering</h2>
+<ul>
+<li>Human iPSCs multiple C1 replicates (Tung et al., 2016)
+<ul>
+<li>Human iPSC single cells
+<ul>
+<li>Endogeneous genes
+<ul>
+<li><a href="cell_phase_analysis.html">Structure plot of iPSC by batch, individual, cell cycle</a></li>
+<li><a href="structure_per_individual.html">Structure plot per individual and per individual &amp; batch</a></li>
+<li><a href="low_counts_genes.html">Investigating the properties of genes - low counts</a></li>
+<li><a href="RUV_normalization.html">Investigating ERCC spike ins - RUV normalization</a></li>
+<li><a href="batch_effect_all_genes.html">iPSC Structure plots before and after batch correction</a></li>
+</ul></li>
+<li>Cell-cycle genes
+<ul>
+<li><a href="cell_cycle_score_analysis.html">Cell-cycle scores</a></li>
+<li><a href="clustering_cell_cycle_genes.html">Structure plots using before batch, individual correction</a></li>
+<li><a href="batch_effect_cell_cycle_genes.html">Structure plots after batch effect correction</a></li>
+</ul></li>
+</ul></li>
+<li>LCL data
+<ul>
+<li><a href="lcl_structure.html">Endogeneous genes</a></li>
+<li><a href="lcl_structure_cell_cycle_genes.html">Cell-cycle genes</a></li>
+</ul></li>
+<li>iPSC +LCL pooled data analysis
+<ul>
+<li><a href="ipsc_lcl_structure.html">Admixture analysis (All genes + Cell cycle genes)</a></li>
+<li><a href="gene_annotations_ipsc_lcl.html">Gene annotations of iPSC and LCL data</a></li>
+<li><a href="gene_patterns_iPSC_LCL.html">Patterns of counts for cluster driving genes</a></li>
+</ul></li>
+</ul></li>
+<li>Mouse ESCs staged for cell-cycle phase (Buettner et al., 2015)
+<ul>
+<li><a href="marioni_structure_all_genes.html">Structure analysis</a></li>
+<li><a href="gene_annotations_marioni.html">Gene annotations</a></li>
+</ul></li>
+<li>Mouse embryos from oocyte to blastocyst stages (Deng et al., 2015)
+<ul>
+<li><a href="deng_structure_all_genes.html">Structure analysis</a></li>
+<li><a href="gene_annotations_deng.html">Gene annotations (K=7)</a></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="cellcycler-cell-cycle-phase-modeling" class="section level2">
+<h2>cellcycleR: Cell-cycle phase modeling</h2>
+<ul>
+<li>Methods and Materials
+<ul>
+<li><a href="../docs/cell-cycle/cell_reorder.pdf">Our model</a></li>
+<li><a href="https://github.com/kkdey/cellcycleR">Software package on GitHub</a></li>
+</ul></li>
+<li>Exploratory analysis
+<ul>
+<li>Human iPSC data
+<ul>
+<li><a href="cell_ordering_iPSC.html">Macosko method</a></li>
+<li><a href="cell_cycle_score_analysis.html">explore cell order</a></li>
+</ul></li>
+</ul></li>
+<li>Sinusoidal fitting: applications
+<ul>
+<li>Human iPSC data (Tung et al. 2015)
+<ul>
+<li>Annotated cell cycle genes
+<ul>
+<li>2015-11-04
+<ul>
+<li><a href="yoav_cellcycleR_cellcycle_genes.html">Estimation</a></li>
+<li><a href="yoav_cellcycleR_postprocessing_cellcycle_genes.html">Gene annotations</a></li>
+</ul></li>
+<li>2016-01-28, NA19239
+<ul>
+<li><a href="yoav_cellcycleR_cellcycle_genes-2016-01-28.html">Estimation &amp; annotations</a></li>
+<li><a href="pca-sinu-ipsc-19239.html">Compared with PCA</a></li>
+</ul></li>
+</ul></li>
+<li>All genes
+<ul>
+<li>2015-11-11
+<ul>
+<li><a href="yoav_cellcycleR_all_genes.html">Estimation</a></li>
+<li><a href="yoav_cellcycleR_postprocessing_all_genes.html">Gene annotations</a></li>
+</ul></li>
+<li>2016-01-31, NA19239
+<ul>
+<li><a href="gilad-ipsc-all-genes-2016-01-31.html">Estimation &amp; annotations</a></li>
+</ul></li>
+</ul></li>
+<li><a href="yoav_cellycleR_non_ribosomal.html">On non-ribosomal genes</a><br />
+</li>
+<li><a href="yoav_cellcycleR_cdc_cyclin.html">On CDC, cyclin and cell cycle genes</a></li>
+</ul></li>
+<li><a href="lcl_cellcycleR.html">Human LCL data (Tung et al., 2015)</a></li>
+<li><a href="marioni_cellcycleR.html">Mouse ESCs (Buettner et al., 2015)</a></li>
+<li><a href="oscope_cellcycleR.html">Oscope data (Leng et al., 2015)</a></li>
+<li><a href="monocle_cellcycleR.html">Monocle data (Trapnell et al., 2014)</a></li>
+<li><a href="yeast_cellcycleR.html">Botstein yeast data (cdc, elu and alpha)</a></li>
+</ul></li>
+<li>Sinusoidal fitting: benchmark performance and simulation studies
+<ul>
+<li>PCA comparison with cellcycleR
+<ul>
+<li><a href="pca_snr_compare.html">Simulation</a></li>
+<li><a href="pca-sinu-ipsc-19239.html">Gilad-2015-NA19101</a></li>
+</ul></li>
+<li><a href="sin_cell_order_iter-runtime.html">Runtime comparisons: parallel vs. lmFit</a></li>
+<li><a href="cellcycler_with_ribosomal_sim.html">Check how cell states and ribosomal genes may affect cellcycleR</a></li>
+<li><a href="pmd_cellcycler_test_1.html">Testing Penalized Matrix Decomposition on cellcycle genes</a></li>
+<li><a href="gene-correlation-sinusoidal.html">Homegeneous correlation</a></li>
+</ul></li>
+<li>Nonparametric smoothing: benchmark performance and simulation studies
+<ul>
+<li><a href="wavelet_validation_check.html">Wavelets</a></li>
+<li><a href="smash_validation_check.html">SMASH (smoothing wavelets)</a></li>
+<li><a href="loess_validation_check.html">LOESS (locally weighted scatterplot smoothing)</a></li>
+<li><a href="splines_validation_check.html">Smoothing splines</a></li>
+<li><a href="nonparametric_cellcycleR_tests.html">Testing effectiveness of nonparametric cellcycleR</a></li>
+<li><a href="nonparametric_cellcycler_methods_compare.html">Comparison of different nonparameteric smoothers in cellcycleR</a></li>
+<li><a href="np_smoother_constraint.html">Nonparameteric smoothing - make ends meet</a></li>
+</ul></li>
+<li>Nonparametric vs sinusoidal fitting
+<ul>
+<li><a href="cellcycleR_compare1.html">Case Study 1</a></li>
+<li><a href="cellcycler_compare2.html">Case Study 2</a></li>
+<li><a href="cellcycleR_compare3.html">Case Study 3</a></li>
+<li><a href="cellcycleR_compare4.html">Case Study 4</a></li>
+</ul></li>
+<li>Cell-cycle phase classifer
+<ul>
+<li><a href="oscope-classifer.html">Multinomial lasso, Leng2015</a></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+<div id="classtpx-semi-supervised-classification" class="section level2">
+<h2>classtpx: Semi-supervised classification</h2>
+<ul>
+<li>Methods and Materials
+<ul>
+<li><a href="https://github.com/kkdey/classtpx">R package on GitHub</a></li>
+</ul></li>
+<li>Simulation studies
+<ul>
+<li>Simulation Runs (K=2) to validate classtpx - (<a href="classtpx_simulation_run_1.html">Simulation Run 1</a>, <a href="classtpx_simulation_run_2.html">Simulation Run 2</a>, <a href="classtpx_simulation_run_5.html">Simulation Run 3</a>)</li>
+<li>Simulation Runs (K=3) to validate classtpx - (<a href="classtpx_simulation_run_3.html">Simulation Run 1</a>, <a href="classtpx_simulation_run_4.html">Simulation Run 2</a>)</li>
+</ul></li>
+<li>Applications
+<ul>
+<li><a href="scialdone_classtpx.html">Scialdone 2015 classtpx analysis</a></li>
+<li><a href="buettner_scialdone_classtpx.html">Buettner 2015 + Scialdone 2015 combined cell cycle data</a></li>
+<li><a href="buettner_classtpx_2015.html">Buettner 2015 data: half single cells from each phase used to manufacture bulk in training</a></li>
+<li><a href="buettner_classtpx_2015_2.html">Buettner 2015 data: half single cells used as it is from each phase in training</a></li>
+<li><a href="treutlin_classtpx.html">Treutlin et al 2014 lung development data</a></li>
+<li><a href="blakeley_classtpx.html">Blakeley et al 2015 human blastocyst data</a></li>
+<li><a href="blakeley_deng_classtpx.html">Deng et al 2014 using Blakeley 2015 as training</a></li>
+<li><a href="leng_classtpx.html">Leng et al 2015 Oscope data</a></li>
+<li><a href="leng_buettner_classtpx.html">Leng et al 2015 Oscope data using Buettner et al 2015 data</a></li>
+<li>[classtpx vs SVM comparison on GTEx V6 data]
+<ul>
+<li><a href="testis_lcl_classtpx_svm.html">Testis vs LCL</a></li>
+<li><a href="thyroid_adrenal_classtpx_svm.html">Thyroid vs Adrenal Gland</a></li>
+<li><a href="heart_atrial_ventricle_classtpx_svm.html">Heart Atrial Appendage vs Heart Left Ventricle</a></li>
+<li><a href="blood_pancreas_classtpx_svm.html">Whole Blood vs Pancreas</a></li>
+<li><a href="breast_ovary_classtpx_svm.html">Breast Mammary Tissue vs Ovary</a></li>
+<li><a href="brain_cerebellum_hemisphere_classtpx_Svm.html">Brain Cerebellum and Brain Cerebellar Hemisphere</a></li>
+<li><a href="arteries_blood_uterus_classtpx_svm.html">Arteries + Whole Blood + Uterus</a></li>
+<li><a href="arteries_classtpx_svm.html">All arteries</a></li>
+</ul></li>
+</ul></li>
+</ul>
+<hr />
+</div>
+
+
+<!-- some extra javascript for older browsers -->
+<script type="text/javascript" src="libs/polyfill.js"></script>
+
+<script>
+
+// manage active state of menu based on current page
+$(document).ready(function () {
+
+    // active menu
+    href = window.location.pathname
+    href = href.substr(href.lastIndexOf('/') + 1)
+    $('a[href="' + href + '"]').parent().addClass('active');
+
+    // manage active menu header
+    if (href.startsWith('authoring_'))
+      $('a[href="' + 'authoring' + '"]').parent().addClass('active');
+    else if (href.endsWith('_format.html'))
+      $('a[href="' + 'formats' + '"]').parent().addClass('active');
+    else if (href.startsWith('developer_'))
+      $('a[href="' + 'developer' + '"]').parent().addClass('active');
+
+});
+
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

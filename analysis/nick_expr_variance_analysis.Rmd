@@ -1,0 +1,43 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    title: "Boundary estimates in linear mixed models"
+    author: "Kushal K Dey"
+    date: "April 3, 2016"
+    theme: flatly
+---
+
+
+```{r run_date, results='asis', echo=FALSE}
+email = "<a href='mailto:joyce.hsiao1@gmail.com'>Joyce Hsiao</a>"
+last_update = format(Sys.time(), "(<time>%Y-%m-%d</time>)")
+cat(paste(email, last_update))
+```
+
+
+```{r knitr_settings, include=FALSE, echo=FALSE}
+library(knitr)
+library(Biobase)
+opts_knit$set(progress = TRUE, verbose = TRUE)
+opts_chunk$set(fig.width = 800/96, fig.height = 800/96, dpi = 96,
+              message = FALSE, warning = FALSE, eval = TRUE, echo = TRUE,
+              bootstrap.panel = TRUE, bootstrap.show.code = FALSE)
+#opts_chunk$set(dpi=96, message = FALSE, warning = FALSE, eval = TRUE, echo = FALSE )
+```
+
+We load the data packages.
+
+```{r}
+library(nlme)
+library(lme4)
+library(varComp)
+library(blme)
+library(scales)
+```
+
+```{r}
+
+nick_data <- data.frame(data.table::fread("../data/Nick_Banovich_data/Expression_data/GSE65035_non-normalized.txt"));
+
+```
+

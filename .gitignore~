@@ -1,0 +1,10 @@
+.DS_Store
+.Rproj.user
+.R*
+.Rhistory
+*png
+*pdf
+data
+analysis/rda
+
+
