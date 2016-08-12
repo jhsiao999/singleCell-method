@@ -1,0 +1,128 @@
+---
+title: "Deng gene annotations"
+author: "Kushal K Dey"
+date: "October 8, 2015"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r echo=FALSE, eval=TRUE}
+rm(list=ls())
+```
+
+```{r echo=TRUE, eval=TRUE}
+library(CountClust)
+suppressMessages(library(mygene))
+library(knitr)
+```
+
+## Objective
+
+The Structure analysis of Deng data showed interesting clustering patterns across the developing phases from zygote to blastocyst. We now seek to obtain the list of genes that are driving these clusters and will try to annotate them. Since the experiment was on mouse data, some of the annotations may be lacking.
+
+## Extracting top genes 
+
+### K=7 
+
+```{r echo=TRUE, eval=TRUE}
+
+deng_topics <- get(load("../../project/rdas/deng_topic_fit.rda"));
+
+theta <- deng_topics[[6]]$theta;
+features <- ExtractTopFeatures(theta,top_features=50,method="poisson")
+
+features_vec <- unique(as.vector(features));
+
+class <- as.numeric(apply(theta[features_vec,], 1, which.max))
+
+imp_gene_names <- rownames(theta[features_vec,]);
+
+imp_genes_per_class <- lapply(1:dim(theta)[2], function(x) imp_gene_names[which(class==x)]);
+
+```
+
+The colors of the designated cluster numbers as per the Structure plot are in the order given below. 
+
+```{r echo=TRUE, eval=TRUE}
+
+barplot(rep(1,dim(theta)[2]),col=(2:(dim(theta)[2]+1)))
+```
+
+## Gene Annotations - Top genes driving clusters
+
+### First class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[1]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Second Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[2]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Third Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[3]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Fourth Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[4]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Fifth Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[5]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Sixth Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[6]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+### Seventh Class
+
+```{r echo=TRUE, eval=TRUE}
+
+out <- queryMany(imp_genes_per_class[[7]], scopes="symbol", fields=c("name", "summary"), species="mouse");
+
+kable(as.data.frame(out))
+
+```
+
+
+```{r echo=TRUE}
+sessionInfo()
+```
+

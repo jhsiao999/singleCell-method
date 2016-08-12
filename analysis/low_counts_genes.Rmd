@@ -1,0 +1,120 @@
+---
+title: "low counts genes??…iPSC clustering"
+author: "Kushal K Dey"
+date: "2015-07-21"
+output: 
+  html_document:
+    toc: true
+---
+
+
+In this script, we try to figure out if some of the genes with very low counts form a cluster and would be sensible to remove these genes. The aim of this script is to build a density plot of based on the counts data available for each gene. 
+
+We start with the dataset of single cells and genes table that was obtained after various QC checks and filtering of both cells and genes.
+
+
+```{r, message = FALSE, warning = FALSE}
+library(data.table)
+library(maptpx)
+library(gplots)
+library(philentropy)
+library(dplyr)
+library(edgeR)
+```
+
+## Prepare data
+
+```{r}
+reads <- data.frame(fread('../data/reads.txt'),row.names=1);
+molecules <-  data.frame(fread('../data/molecules.txt'),row.names=1);
+```
+
+Quality single cells
+
+```{r}
+quality_single_cells <- scan("../data/quality-single-cells.txt",
+                             what = "character")
+
+anno <- data.frame(fread('../data/annotation.txt'));
+
+molecules <- molecules[, grepl("bulk", colnames(molecules)) |
+                         colnames(molecules) %in% quality_single_cells]
+anno <- anno[anno$well == "bulk" | anno$sample_id %in% quality_single_cells, ]
+stopifnot(ncol(molecules) == nrow(anno),
+          colnames(molecules) == anno$sample_id)
+
+reads <- reads[, grepl("bulk", colnames(reads)) |
+                         colnames(reads) %in% quality_single_cells]
+stopifnot(ncol(reads) == nrow(anno),
+          colnames(reads) == anno$sample_id)
+```
+
+
+Remove over-expressed genes and bulk samples.
+
+```{r}
+expressed <- rowSums(molecules[, anno$well == "bulk"]) > 0 &
+             rowSums(molecules[, anno$well != "bulk"]) > 0
+molecules <- molecules[expressed, ]
+dim(molecules)
+
+expressed <- rowSums(reads[, anno$well == "bulk"]) > 0 &
+             rowSums(reads[, anno$well != "bulk"]) > 0
+reads <- reads[expressed, ]
+dim(reads)
+
+molecules_single <- molecules %>% select(-contains("bulk"))
+reads_single <- reads %>% select(-contains("bulk"))
+
+## Remove genes with max molecule numer larger than 1024
+molecules_single <- molecules_single[apply(molecules_single,1,max) < 1024,];
+```
+
+
+## Gene count distribution
+
+We mainly focus on the molecules data because they correspond to UMI tagging. 
+
+```{r echo=TRUE, eval=TRUE}
+
+gene_counts_molecules <- rowSums(molecules_single)
+plot( density(log(gene_counts_molecules+1) ),
+     xlab="log total reads per gene", ylab="density",
+     main="Density plot of log total reads per gene (molecules)", col="red")
+
+hist( log(gene_counts_molecules+1),
+      xlab="log total reads per gene", ylab="frequency",
+      main="Histogram of log total reads per gene (molecules)", col="gray")
+
+gene_counts_reads <- rowSums(reads_single)
+plot(density(log(gene_counts_reads+1)), 
+     xlab="log total reads per gene",ylab="density",
+     main="Density plot of log total reads per gene (reads)", col="red")
+
+hist( log(gene_counts_reads+1),
+     xlab="log total reads per gene", ylab="frequency",
+     main="Histogram of log total reads per gene (reads)", col="gray")
+```
+
+## Sparsity
+
+We now examine the sparsity in the dataset
+
+```{r echo=TRUE, eval=TRUE}
+gene_counts_zeros_molecules <- apply(molecules_single,1, function(x) length(which(x==0))/length(x));
+
+plot(density(gene_counts_zeros_molecules),xlab="prop. zero reads per gene",ylab="density",
+     main="Density plot of prop. of zero reads per gene (molecules)",col="red");
+
+hist(gene_counts_zeros_molecules,xlab="prop. zero reads per gene",ylab="frequency",
+     main="Histogram of prop. of zero reads per gene (molecules)",col="gray")
+
+gene_counts_zeros_reads <- apply(reads_single,1, function(x) length(which(x==0))/length(x));
+
+
+plot(density(gene_counts_zeros_reads),xlab="prop. zero reads per gene",ylab="density",
+     main="Density plot of prop of zero reads per gene (reads)",col="red");
+
+hist(gene_counts_zeros_reads,xlab="prop. zero reads per gene",ylab="frequency",
+     main="Histogram of prop of  zero reads per gene (reads)",col="gray")
+```

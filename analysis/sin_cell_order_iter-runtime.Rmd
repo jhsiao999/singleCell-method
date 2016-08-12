@@ -1,0 +1,94 @@
+---
+title: ' Cell-cycle modeling: iPSC human cell lines'
+author: "Joyce Hsiao"
+date: "2016-01-28"
+output: 
+  html_document:
+    toc: true
+---
+
+
+## Background and objective
+
+Compare runtime of sin_cell_order_iter under the scenarios of 1) use mcapply to parallelize computions of per gene regression estimates, 2) do not use mcapply but use lmFit to estimate estimates for all gene simultaneously.
+
+
+## Conclusion
+
+parallel is about 10 times faster than lmFit on a Macbook Pro (2.5 GHz Intel Core i7) with 8 cores.
+
+
+## Setting up
+
+Load packages
+
+```{r}
+library(parallel)
+library(cellcycleR)
+library(limma)
+```
+
+Import data 
+
+```{r}
+molecules_final <- read.table("../data/gilad-2015/molecules-final.txt",
+                              header = TRUE,
+                              stringsAsFactors = FALSE)
+```
+
+Parameter settings.
+
+```{r}
+cycle_data <- t(molecules_final)
+G <- 100
+numcells <- dim(cycle_data)[1]
+celltime_levels <- 100
+celltimes_choice <- seq(0, 2*pi, 2*pi/(celltime_levels - 1))
+cell_times_iter <- sample(celltimes_choice, numcells, replace=TRUE)
+
+dim(cycle_data)
+```
+
+
+## parallel 
+
+```{r}
+t1 <- Sys.time()
+#system.time( 
+    lmfit_list <- parallel::mclapply(1:G, function(g)
+    {
+      fit <- lm(cycle_data[,g]  ~ sin(cell_times_iter) + cos(cell_times_iter) -1);
+      out_sigma <- sd(fit$residuals);
+      beta1 <- fit$coefficients[1];
+      beta2 <- fit$coefficients[2];
+      if(beta1==0 & beta2==0){
+          stop(paste0("You have a gene with all 0 counts at gene",g));
+      }
+      out_amp <- sqrt(beta1^2 + beta2^2);
+      out_phi <- atan3(as.numeric(beta2), as.numeric(beta1));
+      ll <- list("out_amp"=out_amp, "out_phi"=out_phi, "out_sigma"=out_sigma)
+      return(ll)
+    }, mc.cores=parallel::detectCores())
+#)
+t2 <- Sys.time()
+t2 - t1
+```
+
+
+## lmFit
+
+```{r}
+t1 <- Sys.time()
+#system.time( 
+    lmfit_limma <- 
+        lmFit(t(cycle_data),
+              design = model.matrix(~sin(cell_times_iter) + cos(cell_times_iter) -1))
+#    )
+t2 <- Sys.time()
+t2 - t1
+
+```
+
+
+
+## Session information

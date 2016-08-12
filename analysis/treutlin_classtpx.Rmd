@@ -1,0 +1,242 @@
+---
+title: "classtpx on Treutlin et al 2014"
+author: "Kushal K Dey"
+date: "March 22, 2016"
+output: 
+  html_document:
+    css: floating-toc.css
+    toc: true
+---
+
+## Introduction
+
+We apply the `classtpx` package for topic model classfication on the [Treutlin et al 2014](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4145853/pdf/nihms568867.pdf). The data for this package is saved as an ExpressionSet object at the following [link](https://github.com/jhsiao999/singleCellRNASeqMouseTreutleinLung). We first load the data.
+
+```{r echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+# devtools::install_github("jhsiao999/singleCellRNASeqMouseTreutleinLung", force=TRUE)
+library("singleCellRNASeqMouseTreutlein")
+data("MouseTreutleinLung")
+```
+
+```{r}
+counts_data <- t(Biobase::exprs(MouseTreutleinLung));
+pheno_metadata <- pData(MouseTreutleinLung);
+table(pheno_metadata[,1])
+```
+
+## maptpx application
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- maptpx::topics(counts_data, 3, tol=0.1);
+save(Topic_clus, file="../rdas/treutlin_topic_fit_3_maptpx.rda")
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_3_maptpx.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(paste0(pheno_metadata$cell_type, "_", pheno_metadata$replicate),
+                        levels=rev(c("E14.5_1", "E16.5_1", "E18.5_1","E18.5_2","E18.5_3","adult_replicate"))
+))
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+It seems the ideal fit would be $2$ clusters. We now consider one class to be the adult replicate and the other would be E14.5.
+
+## classtpx model
+
+## omega.fix method 
+
+
+```{r}
+known_samples <- c(which(pheno_metadata$cell_type=="E14.5"), which(pheno_metadata$cell_type=="adult"));
+class_labs <- c(rep(1, length(which(pheno_metadata$cell_type=="E14.5"))), rep(2,length(which(pheno_metadata$cell_type=="adult"))));
+```
+
+### K=2 method
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    counts_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/treutlin_topic_fit_2_classtpx_omega_fix.rda")
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_2_classtpx_omega_fix.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(paste0(pheno_metadata$cell_type, "_", pheno_metadata$replicate),
+                        levels=rev(c("E14.5_1", "E16.5_1", "E18.5_1","E18.5_2","E18.5_3","adult_replicate"))
+))
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+
+### K=3 method
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    counts_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="omega.fix",
+    tol=0.01,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/treutlin_topic_fit_2_classtpx_omega_fix.rda")
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_2_classtpx_omega_fix.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(paste0(pheno_metadata$cell_type, "_", pheno_metadata$replicate),
+                        levels=rev(c("E14.5_1", "E16.5_1", "E18.5_1","E18.5_2","E18.5_3","adult_replicate"))
+))
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+## theta.fix method
+
+### K=2
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    counts_data, 
+    K=2, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    tol=0.01,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/treutlin_topic_fit_2_classtpx_theta_fix.rda")
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_2_classtpx_theta_fix.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(paste0(pheno_metadata$cell_type, "_", pheno_metadata$replicate),
+                        levels=rev(c("E14.5_1", "E16.5_1", "E18.5_1","E18.5_2","E18.5_3","adult_replicate"))
+))
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+### K=3
+
+```{r echo=TRUE, eval=FALSE}
+Topic_clus <- classtpx::class_topics(
+    counts_data, 
+    K=3, 
+    known_samples = known_samples,
+    class_labs = class_labs,
+    method="theta.fix",
+    tol=0.01,
+    shrink=FALSE)
+
+save(Topic_clus, file="../rdas/treutlin_topic_fit_3_classtpx_theta_fix.rda")
+```
+
+```{r echo=TRUE, eval=TRUE, warning=FALSE, fig.show="asis", dpi=144, fig.width=3, fig.height=5}
+Topic_clus <- get(load(file="../rdas/treutlin_topic_fit_3_classtpx_theta_fix.rda"))
+
+omega <- Topic_clus$omega;
+
+annotation <- data.frame(
+  sample_id = paste0("X", c(1:NROW(omega))),
+  tissue_label = factor(paste0(pheno_metadata$cell_type, "_", pheno_metadata$replicate),
+                        levels=rev(c("E14.5_1", "E16.5_1", "E18.5_1","E18.5_2","E18.5_3","adult_replicate"))
+))
+
+rownames(omega) <- annotation$sample_id;
+
+
+CountClust::StructureGGplot(omega = omega,
+                annotation = annotation,
+                palette = RColorBrewer::brewer.pal(8, "Accent"),
+                yaxis_label = "Cell cycle phase",
+                order_sample = TRUE,
+                axis_tick = list(axis_ticks_length = .1,
+                                 axis_ticks_lwd_y = .1,
+                                 axis_ticks_lwd_x = .1,
+                                 axis_label_size = 7,
+                                 axis_label_face = "bold"))
+```
+
+## Conclusion
+
+the classtpx model for K=2 clearly shows a continuous gradient from E14.5 stage to adult replicate stage. When we perform K=3, the continuity in gradient is preserved.
+
